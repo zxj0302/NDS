@@ -1,0 +1,21 @@
+*.idea
+*.vscode
+*__pycache__
+*build
+*cmake*
+output
+tests
+temp*
+.vscode
+.ipynb_checkpoints
+.virtual_documents
+# TODO*
+.DS_Store
+# others
+# *.txt
+# *.json
+# *.zip
+*.exe
+*backups
+src/pads_cpp/datasets
+src/Negative-Densest-Subgraph-Discovery
