@@ -21,7 +21,7 @@
                 "exe": "/Users/zxj/Desktop/NDS/src/NDS/build/NDS",
                 "params": {
                     "max_neg": 100,
-                    "num_iter": 1
+                    "num_iter": 10
                 }
             },
             {
@@ -29,7 +29,7 @@
                 "exe": "/Users/zxj/Desktop/NDS/src/NEG-DSD/build/NEG-DSD",
                 "params": {
                     "C": 1,
-                    "num_iter": 1
+                    "num_iter": 10
                 }
             }
         ]

@@ -38,7 +38,7 @@ def run(config):
             func = globals().get(comp_name)
             result = func(competitor)
 
-            logger.info(f'{comp_name}: time: {result[0]:.4f}s, density: {result[1]:8f}')
+            logger.info(f'{comp_name}: time: {result[0]:.6f}s, density: {result[1]:.6f}')
     logger.success('All done!')
 
 

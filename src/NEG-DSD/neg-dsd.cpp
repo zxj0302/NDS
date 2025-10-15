@@ -286,7 +286,7 @@ int main(int argc, char* argv[]) {
 
     json_file.close();
 
-    cout << "Results written to " << output_filename << endl;
+    // cout << "Results written to " << output_filename << endl;
 
     return 0;
 }

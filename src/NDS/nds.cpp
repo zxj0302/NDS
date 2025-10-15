@@ -420,7 +420,6 @@ int main(int argc, char* argv[]) {
         // Variables to store results from first iteration (for output consistency)
         vector<Vertex> first_selected;
         double first_density;
-
         // Variables to accumulate timing results
         double total_elapsed = 0.0;
 
@@ -431,15 +430,14 @@ int main(int argc, char* argv[]) {
             // Time positive case
             auto start = chrono::high_resolution_clock::now();
             auto result = ecc_greedy(G_iteration, max_neg);
-            vector<Vertex> selected = result.first;
-            first_density = result.second;
             auto end = chrono::high_resolution_clock::now();
-            double elapsed = static_cast<double>(chrono::duration_cast<chrono::microseconds>(end - start).count()) / 1e6;
+            double elapsed = static_cast<double>(chrono::duration_cast<chrono::nanoseconds>(end - start).count()) / 1e9;
             total_elapsed += elapsed;
 
             // Store first iteration results for output
             if (iteration == 0) {
-                first_selected = selected;
+                first_selected = result.first;
+                first_density = result.second;
             }
         }
 
@@ -467,7 +465,7 @@ int main(int argc, char* argv[]) {
         json_file << "}\n";
 
         json_file.close();
-        cout << "Results written to " << output_filename << endl;
+        // cout << "Results written to " << output_filename << endl;
 
     } catch (const std::exception& ex) {
         cerr << "Error: " << ex.what() << "\n";
