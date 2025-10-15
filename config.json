@@ -1,0 +1,40 @@
+{
+    "performance": {
+        "input": [
+            "/Users/zxj/Desktop/NDS/input/Abortion/Abortion.txt", 
+            "/Users/zxj/Desktop/NDS/input/Biogrid/Biogrid.txt", 
+            "/Users/zxj/Desktop/NDS/input/Brexit/Brexit.txt", 
+            "/Users/zxj/Desktop/NDS/input/Collins/Collins.txt", 
+            "/Users/zxj/Desktop/NDS/input/Election/Election.txt", 
+            "/Users/zxj/Desktop/NDS/input/Gavin/Gavin.txt", 
+            "/Users/zxj/Desktop/NDS/input/Gun/Gun.txt", 
+            "/Users/zxj/Desktop/NDS/input/Krogan-Core/Krogan-Core.txt", 
+            "/Users/zxj/Desktop/NDS/input/Krogan-Extended/Krogan-Extended.txt",
+            "/Users/zxj/Desktop/NDS/input/Partisanship/Partisanship.txt",
+            "/Users/zxj/Desktop/NDS/input/Referendum/Referendum.txt"
+        ],
+        "weight_reverse": false,
+        "output": "/Users/zxj/Desktop/NDS/output/",
+        "competitors": [
+            {
+                "name": "NDS",
+                "exe": "/Users/zxj/Desktop/NDS/src/NDS/build/NDS",
+                "params": {
+                    "max_neg": 100,
+                    "num_iter": 1
+                }
+            },
+            {
+                "name": "NEG_DSD",
+                "exe": "/Users/zxj/Desktop/NDS/src/NEG-DSD/build/NEG-DSD",
+                "params": {
+                    "C": 1,
+                    "num_iter": 1
+                }
+            }
+        ]
+    },
+    "scalibility": {
+
+    }
+}

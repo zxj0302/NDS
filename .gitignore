@@ -15,7 +15,10 @@ temp*
 # *.txt
 # *.json
 # *.zip
+.venv
 *.exe
 *backups
 src/pads_cpp/datasets
 src/Negative-Densest-Subgraph-Discovery
+temp*
+logs

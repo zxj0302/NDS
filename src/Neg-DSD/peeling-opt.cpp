@@ -199,47 +199,38 @@ pair<vector<int>, double> heuristicPeeling(Graph& graph, double C) {
 }
 
 Graph readGraphFromFile(const string& filename, bool reverse_weight) {
-    ifstream file(filename);
+    ifstream infile(filename);
     int n, m;
-    file >> n >> m;
+    infile >> n >> m;
 
     Graph graph(n);
-    string line;
-    getline(file, line);
-
     for (int i = 0; i < m; i++) {
-        getline(file, line);
-        istringstream iss(line);
-
-        vector<string> tokens;
-        string token;
-        while (iss >> token) {
-            tokens.push_back(token);
-        }
-
-        int u = stoi(tokens[0]);
-        int v = stoi(tokens[3]);
-        double weight = stod(tokens[6]);
+        int u, v;
+        double weight;
+        infile >> u >> v >> weight;
 
         graph.addEdge(u, v, reverse_weight ? -weight : weight);
     }
+    infile.close();
 
     return graph;
 }
+
 
 int main(int argc, char* argv[]) {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
 
-    if (argc < 4 || argc > 5) {
-        cerr << "Usage: " << argv[0] << " <graph_file> <C_value> <reverse_weight> [num_iterations]" << endl;
+    if (argc < 4 || argc > 6) {
+        cerr << "Usage: " << argv[0] << " <graph_file> <output_json> <reverse_weight> <C_value> [num_iterations]" << endl;
         return 1;
     }
 
     string filename = argv[1];
-    double C = stod(argv[2]);
-    bool reverse_weight = stoi(argv[3]);
-    int num_iterations = (argc >= 5) ? stoi(argv[4]) : 1; // Default to 1 iteration
+    string output_filename = argv[2];
+    bool reverse_weight = (string(argv[3]) == "1"); // Default to false if not provided
+    double C = stod(argv[4]);
+    int num_iterations = (argc >= 6) ? stoi(argv[5]) : 1; // Default to 1 iteration
 
     // Read graph once
     Graph original_graph = readGraphFromFile(filename, reverse_weight);
@@ -270,19 +261,32 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    // Calculate and output average time
+    // Calculate average time
     double avg_time = total_time / num_iterations;
 
-    cout << fixed << setprecision(6) << avg_time << '\n';
-
-    for (size_t i = 0; i < first_densest_subgraph.size(); i++) {
-        if (i > 0) cout << ' ';
-        cout << first_densest_subgraph[i];
+    // Write results to JSON file
+    ofstream json_file(output_filename);
+    if (!json_file.is_open()) {
+        cerr << "Error: Could not open output file " << output_filename << endl;
+        return 1;
     }
-    cout << '\n';
 
-    cout << first_densest_subgraph.size() << ' ';
-    cout << fixed << setprecision(6) << first_best_density << '\n';
+    json_file << fixed << setprecision(6);
+    json_file << "{\n";
+    json_file << "  \"time\": " << avg_time << ",\n";
+    json_file << "  \"nodes\": [";
+    for (size_t i = 0; i < first_densest_subgraph.size(); i++) {
+        if (i > 0) json_file << ", ";
+        json_file << first_densest_subgraph[i];
+    }
+    json_file << "],\n";
+    json_file << "  \"size\": " << first_densest_subgraph.size() << ",\n";
+    json_file << "  \"density\": " << first_best_density << "\n";
+    json_file << "}\n";
+
+    json_file.close();
+
+    cout << "Results written to " << output_filename << endl;
 
     return 0;
 }
