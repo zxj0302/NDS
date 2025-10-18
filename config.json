@@ -1,26 +1,43 @@
 {
-    "performance": {
+    "real-world": {
         "input": [
-            "/Users/zxj/Desktop/NDS/input/Abortion/Abortion.txt", 
-            "/Users/zxj/Desktop/NDS/input/Biogrid/Biogrid.txt", 
-            "/Users/zxj/Desktop/NDS/input/Brexit/Brexit.txt", 
-            "/Users/zxj/Desktop/NDS/input/Collins/Collins.txt", 
-            "/Users/zxj/Desktop/NDS/input/Election/Election.txt", 
-            "/Users/zxj/Desktop/NDS/input/Gavin/Gavin.txt", 
-            "/Users/zxj/Desktop/NDS/input/Gun/Gun.txt", 
-            "/Users/zxj/Desktop/NDS/input/Krogan-Core/Krogan-Core.txt", 
-            "/Users/zxj/Desktop/NDS/input/Krogan-Extended/Krogan-Extended.txt",
-            "/Users/zxj/Desktop/NDS/input/Partisanship/Partisanship.txt",
-            "/Users/zxj/Desktop/NDS/input/Referendum/Referendum.txt"
+            "/Users/zxj/Desktop/NDS/input/real-world/Abortion/Abortion.txt", 
+            "/Users/zxj/Desktop/NDS/input/real-world/Biogrid/Biogrid.txt", 
+            "/Users/zxj/Desktop/NDS/input/real-world/Brexit/Brexit.txt", 
+            "/Users/zxj/Desktop/NDS/input/real-world/Collins/Collins.txt", 
+            "/Users/zxj/Desktop/NDS/input/real-world/Election/Election.txt", 
+            "/Users/zxj/Desktop/NDS/input/real-world/Gavin/Gavin.txt", 
+            "/Users/zxj/Desktop/NDS/input/real-world/Gun/Gun.txt", 
+            "/Users/zxj/Desktop/NDS/input/real-world/Krogan-Core/Krogan-Core.txt", 
+            "/Users/zxj/Desktop/NDS/input/real-world/Krogan-Extended/Krogan-Extended.txt",
+            "/Users/zxj/Desktop/NDS/input/real-world/Partisanship/Partisanship.txt",
+            "/Users/zxj/Desktop/NDS/input/real-world/Referendum/Referendum.txt"
         ],
         "weight_reverse": false,
-        "output": "/Users/zxj/Desktop/NDS/output/",
+        "output": "/Users/zxj/Desktop/NDS/output/real-world/",
         "competitors": [
             {
-                "name": "NDS",
-                "exe": "/Users/zxj/Desktop/NDS/src/NDS/build/NDS",
+                "name": "LNDS",
+                "exe": "/Users/zxj/Desktop/NDS/src/LNDS/build/LNDS",
                 "params": {
                     "max_neg": 100,
+                    "num_iter": 10
+                }
+            },
+            {
+                "name": "LNDS_EP",
+                "exe": "/Users/zxj/Desktop/NDS/src/LNDS-EP/build/LNDS-EP",
+                "params": {
+                    "max_neg": 300,
+                    "num_iter": 10
+                }
+            },
+            {
+                "name": "GNDS",
+                "exe": "/Users/zxj/Desktop/NDS/src/GNDS/build/GNDS",
+                "params": {
+                    "max_neg": 300,
+                    "max_local_optima": 1000,
                     "num_iter": 10
                 }
             },
@@ -29,6 +46,13 @@
                 "exe": "/Users/zxj/Desktop/NDS/src/NEG-DSD/build/NEG-DSD",
                 "params": {
                     "C": 1,
+                    "num_iter": 10
+                }
+            },
+            {
+                "name": "DCSGreedy",
+                "exe": "/Users/zxj/Desktop/NDS/src/DCSGreedy/build/DCSGreedy",
+                "params": {
                     "num_iter": 10
                 }
             }

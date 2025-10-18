@@ -22,3 +22,4 @@ src/pads_cpp/datasets
 src/Negative-Densest-Subgraph-Discovery
 temp*
 logs
+Graph_Simulator

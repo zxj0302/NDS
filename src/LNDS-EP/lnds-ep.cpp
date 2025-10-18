@@ -138,13 +138,8 @@ Graph read_graph(const string& filename, bool reverse_weight = false) {
  * =========================================================
  * Eccentricity-based Greedy Algorithm
  * =========================================================
- *
- * pos = false inverts polarities to simulate negative polarity scenario.
- * theta is a threshold that penalizes the entropy portion in the objective.
- * max_neg_count is a cap on how many times we fail to improve the best found
- * objective before exiting.
  */
-pair<vector<Vertex>, double> ecc_greedy(Graph& G, unsigned max_neg_count = 100) {
+pair<FibHeap, double> ecc_greedy(Graph& G, unsigned max_neg_count = 100) {
     // Define null vertex
     Vertex null_v = Traits::null_vertex();
 
@@ -153,9 +148,12 @@ pair<vector<Vertex>, double> ecc_greedy(Graph& G, unsigned max_neg_count = 100) 
     for (auto e_it = edges(G); e_it.first != e_it.second; ++e_it.first) {
         if (G[*e_it.first].edge_polarity > 0) {
             pos_weights[source(*e_it.first, G)] += G[*e_it.first].edge_polarity;
-            if (source(*e_it.first, G) != target(*e_it.first, G)) {
-                pos_weights[target(*e_it.first, G)] += G[*e_it.first].edge_polarity;
-            }
+            pos_weights[target(*e_it.first, G)] += G[*e_it.first].edge_polarity;
+        }
+    }
+    for (auto v_it : make_iterator_range(vertices(G))) {
+        if (G[v_it].has_self_loop && G[v_it].self_loop_polarity > 0) {
+            pos_weights[v_it] += G[v_it].self_loop_polarity;
         }
     }
     Vertex node_promising = std::distance(pos_weights.begin(),
@@ -164,7 +162,7 @@ pair<vector<Vertex>, double> ecc_greedy(Graph& G, unsigned max_neg_count = 100) 
     // ============== Basic structures for the iteration ==============
 
     double polarity_sum = 0.0;
-    FibHeap selected_heaps, to_select_heaps;
+    FibHeap selected_heap, to_select_heap;
     // We'll store handles for each vertex in a single vector
     vector<FibHeap::handle_type> handles(num_vertices(G));
 
@@ -175,7 +173,7 @@ pair<vector<Vertex>, double> ecc_greedy(Graph& G, unsigned max_neg_count = 100) 
                                        ? G[node_promising].self_loop_polarity
                                        : 0.0;
 
-    handles[node_promising] = to_select_heaps.push(
+    handles[node_promising] = to_select_heap.push(
         {G[node_promising].priority_key, node_promising}
     );
 
@@ -184,7 +182,7 @@ pair<vector<Vertex>, double> ecc_greedy(Graph& G, unsigned max_neg_count = 100) 
     double max_f = -numeric_limits<double>::infinity();
     unsigned neg_count = 0;
     // Best-known configuration if we find a better objective
-    FibHeap best_selected_heaps = selected_heaps;
+    FibHeap best_selected_heap = selected_heap;
 
     // Continue while we have a valid next node and haven't exceeded max_neg_count
     while (next_node != null_v && neg_count < max_neg_count) {
@@ -195,11 +193,11 @@ pair<vector<Vertex>, double> ecc_greedy(Graph& G, unsigned max_neg_count = 100) 
             G[next_node].status = Status::In;
 
             // Pop from the "to_select" heap
-            auto item = to_select_heaps.top();
-            to_select_heaps.pop();
+            auto item = to_select_heap.top();
+            to_select_heap.pop();
 
             // Push into the "selected" heap (flip sign for internal tracking)
-            handles[next_node] = selected_heaps.push(
+            handles[next_node] = selected_heap.push(
                 {-item.priority_key, item.vertex}
             );
             G[next_node].priority_key = -item.priority_key;
@@ -221,14 +219,14 @@ pair<vector<Vertex>, double> ecc_greedy(Graph& G, unsigned max_neg_count = 100) 
                     double extra = G[neighbor].has_self_loop ? G[neighbor].self_loop_polarity : 0.0;
                     G[neighbor].priority_key = edge_polarity + extra;
 
-                    handles[neighbor] = to_select_heaps.push(
+                    handles[neighbor] = to_select_heap.push(
                         {G[neighbor].priority_key, neighbor}
                     );
                 }
                 else if (G[neighbor].status == Status::Fringe) {
                     // Increase priority
                     G[neighbor].priority_key += edge_polarity;
-                    to_select_heaps.update(
+                    to_select_heap.update(
                         handles[neighbor],
                         {G[neighbor].priority_key, neighbor}
                     );
@@ -236,7 +234,7 @@ pair<vector<Vertex>, double> ecc_greedy(Graph& G, unsigned max_neg_count = 100) 
                 else if (G[neighbor].status == Status::In) {
                     // Decrease priority
                     G[neighbor].priority_key -= edge_polarity;
-                    selected_heaps.update(
+                    selected_heap.update(
                         handles[neighbor],
                         {G[neighbor].priority_key, neighbor}
                     );
@@ -251,11 +249,11 @@ pair<vector<Vertex>, double> ecc_greedy(Graph& G, unsigned max_neg_count = 100) 
             G[next_node].status = Status::Fringe;
 
             // Pop from "selected" heap
-            auto item = selected_heaps.top();
-            selected_heaps.pop();
+            auto item = selected_heap.top();
+            selected_heap.pop();
 
             // Move it to "to_select" (flip sign)
-            handles[next_node] = to_select_heaps.push(
+            handles[next_node] = to_select_heap.push(
                 {-item.priority_key, item.vertex}
             );
             G[next_node].priority_key = -item.priority_key;
@@ -275,12 +273,12 @@ pair<vector<Vertex>, double> ecc_greedy(Graph& G, unsigned max_neg_count = 100) 
                     if (G[neighbor].in_neighbor_count == 0) {
                         G[neighbor].status = Status::Out;
                         G[neighbor].priority_key = 0.0;
-                        to_select_heaps.erase(handles[neighbor]);
+                        to_select_heap.erase(handles[neighbor]);
                         handles[neighbor] = FibHeap::handle_type();
                     } else {
                         // Decrease priority
                         G[neighbor].priority_key -= edge_polarity;
-                        to_select_heaps.update(
+                        to_select_heap.update(
                             handles[neighbor],
                             {G[neighbor].priority_key, neighbor}
                         );
@@ -289,7 +287,7 @@ pair<vector<Vertex>, double> ecc_greedy(Graph& G, unsigned max_neg_count = 100) 
                 else if (G[neighbor].status == Status::In) {
                     // Increase priority
                     G[neighbor].priority_key += edge_polarity;
-                    selected_heaps.update(
+                    selected_heap.update(
                         handles[neighbor],
                         {G[neighbor].priority_key, neighbor}
                     );
@@ -305,7 +303,7 @@ pair<vector<Vertex>, double> ecc_greedy(Graph& G, unsigned max_neg_count = 100) 
         }
 
         // ============== Compute the objective function ==============
-        unsigned num_selected_now = selected_heaps.size();
+        unsigned num_selected_now = selected_heap.size();
 
         double value_old = 0.0;
         if (num_selected_now > 0) {
@@ -321,8 +319,8 @@ pair<vector<Vertex>, double> ecc_greedy(Graph& G, unsigned max_neg_count = 100) 
         marginal_gains.reserve(2);
 
         // Evaluate removing from each selected_heap, and adding from each to_select_heap
-        if (!selected_heaps.empty()) {
-            auto top_item = selected_heaps.top();
+        if (!selected_heap.empty()) {
+            auto top_item = selected_heap.top();
             unsigned total_minus_1 = num_selected_now - 1;
             double new_sum = (num_selected_now > 1)
                             ? (polarity_sum + top_item.priority_key) / static_cast<double>(total_minus_1)
@@ -332,9 +330,9 @@ pair<vector<Vertex>, double> ecc_greedy(Graph& G, unsigned max_neg_count = 100) 
             marginal_gains.emplace_back(mg, top_item.vertex);
         }
 
-        // If there's something in to_select_heaps[lbl]
-        if (!to_select_heaps.empty()) {
-            auto top_item = to_select_heaps.top();
+        // If there's something in to_select_heap[lbl]
+        if (!to_select_heap.empty()) {
+            auto top_item = to_select_heap.top();
             unsigned total_plus_1 = num_selected_now + 1;
             double new_sum = (polarity_sum + top_item.priority_key) / static_cast<double>(total_plus_1);
 
@@ -381,20 +379,46 @@ pair<vector<Vertex>, double> ecc_greedy(Graph& G, unsigned max_neg_count = 100) 
             // Check if we have a new best
             if (value_old >= max_f) {
                 if (max_mg <= 0 || next_node == null_v) {
-                    best_selected_heaps = selected_heaps; // deep copy the heaps
+                    best_selected_heap = selected_heap; // deep copy the heap
                 }
             }
         }
     }
 
-    // ============== Gather final best selection ==============
-    set<Vertex> final_selected;
-    for (auto it = best_selected_heaps.ordered_begin(); it != best_selected_heaps.ordered_end(); ++it) {
-        final_selected.insert(it->vertex);
-    }
 
-    // Return the selected vertices
-    return {vector<Vertex>(final_selected.begin(), final_selected.end()), max_f};
+    // ============== Peeling phase: remove nodes to find maximum density ==============
+    // Check initial density of current selected_heap
+    if (!selected_heap.empty()) {
+        double initial_density = polarity_sum / static_cast<double>(selected_heap.size());
+        if (initial_density > max_f) {
+            max_f = initial_density;
+            best_selected_heap = selected_heap;
+        }
+    }
+    
+    // Peel nodes one by one
+    while (!selected_heap.empty()) {
+        // Remove the node with smallest priority (most negative impact)
+        auto top_item = selected_heap.top();
+        selected_heap.pop();
+        
+        // Update polarity sum (remember priority is negated)
+        polarity_sum += top_item.priority_key;
+        
+        // Calculate new density
+        if (!selected_heap.empty()) {
+            double current_density = polarity_sum / static_cast<double>(selected_heap.size());
+            
+            // Check if this is the best density found
+            if (current_density > max_f) {
+                max_f = current_density;
+                best_selected_heap = selected_heap;
+            }
+        }
+    }
+    
+    // Return the configuration with maximum density found during peeling
+    return {best_selected_heap, max_f};
 }
 
 /*
@@ -436,7 +460,9 @@ int main(int argc, char* argv[]) {
 
             // Store first iteration results for output
             if (iteration == 0) {
-                first_selected = result.first;
+                for (auto it = result.first.ordered_begin(); it != result.first.ordered_end(); ++it) {
+                    first_selected.push_back(it->vertex);
+                }
                 first_density = result.second;
             }
         }
