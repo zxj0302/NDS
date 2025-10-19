@@ -373,6 +373,21 @@ pair<FibHeap, double> ecc_greedy(Graph& G, unsigned max_neg_count = 100) {
         // Remove the node with smallest priority (most negative impact)
         auto top_item = selected_heap.top();
         selected_heap.pop();
+        G[top_item.vertex].status = Status::Out;
+
+        // Update the priority key of other nodes in selected_heap
+        for (auto e = out_edges(top_item.vertex, G); e.first != e.second; ++e.first) {
+            Vertex neighbor = target(*e.first, G);
+            // Skip if neighbor is not in selected_heap
+            if (G[neighbor].status != Status::In) continue;
+
+            double edge_polarity = G[*e.first].edge_polarity;
+            G[neighbor].priority_key += edge_polarity;
+            selected_heap.update(
+                handles[neighbor],
+                {G[neighbor].priority_key, neighbor}
+            );
+        }
         
         // Update polarity sum (remember priority is negated)
         polarity_sum += top_item.priority_key;

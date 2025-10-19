@@ -90,7 +90,7 @@
                 "exe": "/Users/zxj/Desktop/NDS/src/GNDS/build/GNDS",
                 "params": {
                     "max_neg": 500,
-                    "max_local_optima": 20,
+                    "max_local_optima": 200,
                     "num_iter": 1
                 }
             },
