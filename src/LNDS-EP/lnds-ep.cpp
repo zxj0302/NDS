@@ -314,88 +314,60 @@ pair<FibHeap, double> ecc_greedy(Graph& G, unsigned max_neg_count = 100) {
         }
 
         // ============== Compute marginal gains for top of each heap ==============
-        vector<pair<double, Vertex>> marginal_gains;
-        vector<unsigned> addition_idx;
-        marginal_gains.reserve(2);
+        double best_mg = -numeric_limits<double>::infinity();
+        Vertex best_node = null_v;
+        bool best_is_addition = false;
 
-        // Evaluate removing from each selected_heap, and adding from each to_select_heap
+        // Evaluate removing from selected_heap
         if (!selected_heap.empty()) {
             auto top_item = selected_heap.top();
-            unsigned total_minus_1 = num_selected_now - 1;
             double new_sum = (num_selected_now > 1)
-                            ? (polarity_sum + top_item.priority_key) / static_cast<double>(total_minus_1)
+                            ? (polarity_sum + top_item.priority_key) / static_cast<double>(num_selected_now - 1)
                             : 0.0;
-
             double mg = new_sum - value_old;
-            marginal_gains.emplace_back(mg, top_item.vertex);
+            if (mg > best_mg) {
+                best_mg = mg;
+                best_node = top_item.vertex;
+            }
         }
 
-        // If there's something in to_select_heap[lbl]
+        // Evaluate adding from to_select_heap
         if (!to_select_heap.empty()) {
             auto top_item = to_select_heap.top();
-            unsigned total_plus_1 = num_selected_now + 1;
-            double new_sum = (polarity_sum + top_item.priority_key) / static_cast<double>(total_plus_1);
-
+            double new_sum = (polarity_sum + top_item.priority_key) / static_cast<double>(num_selected_now + 1);
             double mg = new_sum - value_old;
-            marginal_gains.emplace_back(mg, top_item.vertex);
-            // We'll track which of these are "additions"
-            addition_idx.push_back(marginal_gains.size() - 1);
+            if (mg > best_mg) {
+                best_mg = mg;
+                best_node = top_item.vertex;
+                best_is_addition = true;
+            }
         }
 
-        if (marginal_gains.empty()) {
+        // Determine next node based on best marginal gain
+        if (best_node == null_v) {
             next_node = null_v;
         } else {
-            // Find the node with the maximum marginal gain
-            auto max_mg_it = max_element(
-                marginal_gains.begin(), marginal_gains.end(),
-                [](auto& a, auto& b) { return a.first < b.first; }
-            );
-            double max_mg = max_mg_it->first;
-            Vertex max_mg_node = max_mg_it->second;
-
             // If the best improvement cannot exceed current best, increment counter
-            if ((value_old + max_mg) <= max_f) {
+            if ((value_old + best_mg) <= max_f || next_node == best_node) {
                 neg_count++;
-                if (addition_idx.empty()) {
-                    next_node = null_v;
-                } else {
-                    // Among additions, pick the best one
-                    double best_add = -numeric_limits<double>::infinity();
-                    Vertex candidate_node = null_v;
-                    for (auto idx : addition_idx) {
-                        if (marginal_gains[idx].first > best_add) {
-                            best_add = marginal_gains[idx].first;
-                            candidate_node = marginal_gains[idx].second;
-                        }
-                    }
-                    next_node = candidate_node;
-                }
+                // Among additions only, use the best one (if it was an addition)
+                next_node = best_is_addition ? best_node : (to_select_heap.empty() ? null_v : to_select_heap.top().vertex);
             } else {
-                // We can still improve upon best_f
+                // We can still improve upon max_f
                 neg_count = 0;
-                next_node = max_mg_node;
+                next_node = best_node;
             }
 
             // Check if we have a new best
             if (value_old >= max_f) {
-                if (max_mg <= 0 || next_node == null_v) {
+                if (best_mg <= 0 || next_node == null_v) {
                     best_selected_heap = selected_heap; // deep copy the heap
                 }
             }
         }
     }
 
-
-    // ============== Peeling phase: remove nodes to find maximum density ==============
-    // Check initial density of current selected_heap
-    if (!selected_heap.empty()) {
-        double initial_density = polarity_sum / static_cast<double>(selected_heap.size());
-        if (initial_density > max_f) {
-            max_f = initial_density;
-            best_selected_heap = selected_heap;
-        }
-    }
-    
+    // ============== Peeling phase: remove nodes to find maximum density ==============    
     // Peel nodes one by one
     while (!selected_heap.empty()) {
         // Remove the node with smallest priority (most negative impact)

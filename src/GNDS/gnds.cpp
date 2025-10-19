@@ -259,10 +259,8 @@ pair<FibHeap, double> ecc_greedy(Graph& G, const vector<bool>& is_removed, unsig
             // Update neighbors
             for (auto oe = out_edges(next_node, G); oe.first != oe.second; ++oe.first) {
                 Vertex neighbor = target(*oe.first, G);
-                
-                // Skip if neighbor is removed or is a self-loop
                 if (is_removed[neighbor] || neighbor == next_node) continue;
-
+                
                 double edge_polarity = G[*oe.first].edge_polarity;
                 G[neighbor].in_neighbor_count += 1;
 
@@ -275,7 +273,7 @@ pair<FibHeap, double> ecc_greedy(Graph& G, const vector<bool>& is_removed, unsig
 
                     handles[neighbor] = to_select_heap.push(
                         {G[neighbor].priority_key, neighbor}
-                    );
+                    );  
                 }
                 else if (G[neighbor].status == Status::Fringe) {
                     // Increase priority
@@ -292,6 +290,9 @@ pair<FibHeap, double> ecc_greedy(Graph& G, const vector<bool>& is_removed, unsig
                         handles[neighbor],
                         {G[neighbor].priority_key, neighbor}
                     );
+                }
+                else {
+                    throw invalid_argument("Invalid neighbor status encountered.");
                 }
             }
         }
@@ -314,7 +315,6 @@ pair<FibHeap, double> ecc_greedy(Graph& G, const vector<bool>& is_removed, unsig
             // Update neighbors
             for (auto oe = out_edges(next_node, G); oe.first != oe.second; ++oe.first) {
                 Vertex neighbor = target(*oe.first, G);
-                
                 // Skip if neighbor is removed or is a self-loop
                 if (is_removed[neighbor] || neighbor == next_node) continue;
 
@@ -345,6 +345,9 @@ pair<FibHeap, double> ecc_greedy(Graph& G, const vector<bool>& is_removed, unsig
                         {G[neighbor].priority_key, neighbor}
                     );
                 }
+                else {
+                    throw invalid_argument("Invalid neighbor status encountered.");
+                }
             }
         }
         else {
@@ -364,92 +367,80 @@ pair<FibHeap, double> ecc_greedy(Graph& G, const vector<bool>& is_removed, unsig
         }
 
         // ============== Compute marginal gains for top of each heap ==============
-        vector<pair<double, Vertex>> marginal_gains;
-        vector<unsigned> addition_idx;
-        marginal_gains.reserve(2);
+        double best_mg = -numeric_limits<double>::infinity();
+        Vertex best_node = null_v;
+        bool best_is_addition = false;
 
         // Evaluate removing from selected_heap
         if (!selected_heap.empty()) {
             auto top_item = selected_heap.top();
-            unsigned total_minus_1 = num_selected_now - 1;
             double new_sum = (num_selected_now > 1)
-                            ? (polarity_sum + top_item.priority_key) / static_cast<double>(total_minus_1)
+                            ? (polarity_sum + top_item.priority_key) / static_cast<double>(num_selected_now - 1)
                             : 0.0;
-
             double mg = new_sum - value_old;
-            marginal_gains.emplace_back(mg, top_item.vertex);
+            if (mg > best_mg) {
+                best_mg = mg;
+                best_node = top_item.vertex;
+            }
         }
 
         // Evaluate adding from to_select_heap
         if (!to_select_heap.empty()) {
             auto top_item = to_select_heap.top();
-            unsigned total_plus_1 = num_selected_now + 1;
-            double new_sum = (polarity_sum + top_item.priority_key) / static_cast<double>(total_plus_1);
-
+            double new_sum = (polarity_sum + top_item.priority_key) / static_cast<double>(num_selected_now + 1);
             double mg = new_sum - value_old;
-            marginal_gains.emplace_back(mg, top_item.vertex);
-            addition_idx.push_back(marginal_gains.size() - 1);
+            if (mg > best_mg) {
+                best_mg = mg;
+                best_node = top_item.vertex;
+                best_is_addition = true;
+            }
         }
 
-        if (marginal_gains.empty()) {
+        // Determine next node based on best marginal gain
+        if (best_node == null_v) {
             next_node = null_v;
         } else {
-            // Find the node with the maximum marginal gain
-            auto max_mg_it = max_element(
-                marginal_gains.begin(), marginal_gains.end(),
-                [](auto& a, auto& b) { return a.first < b.first; }
-            );
-            double max_mg = max_mg_it->first;
-            Vertex max_mg_node = max_mg_it->second;
-
             // If the best improvement cannot exceed current best, increment counter
-            if ((value_old + max_mg) <= max_f) {
+            if ((value_old + best_mg) <= max_f || next_node == best_node) {
                 neg_count++;
-                if (addition_idx.empty()) {
-                    next_node = null_v;
-                } else {
-                    // Among additions, pick the best one
-                    double best_add = -numeric_limits<double>::infinity();
-                    Vertex candidate_node = null_v;
-                    for (auto idx : addition_idx) {
-                        if (marginal_gains[idx].first > best_add) {
-                            best_add = marginal_gains[idx].first;
-                            candidate_node = marginal_gains[idx].second;
-                        }
-                    }
-                    next_node = candidate_node;
-                }
+                // Among additions only, use the best one (if it was an addition)
+                next_node = best_is_addition ? best_node : (to_select_heap.empty() ? null_v : to_select_heap.top().vertex);
             } else {
-                // We can still improve upon best_f
+                // We can still improve upon max_f
                 neg_count = 0;
-                next_node = max_mg_node;
+                next_node = best_node;
             }
 
             // Check if we have a new best
             if (value_old >= max_f) {
-                if (max_mg <= 0 || next_node == null_v) {
+                if (best_mg <= 0 || next_node == null_v) {
                     best_selected_heap = selected_heap; // deep copy the heap
                 }
             }
         }
     }
 
-
-    // ============== Peeling phase: remove nodes to find maximum density ==============
-    // Check initial density of current selected_heap
-    if (!selected_heap.empty()) {
-        double initial_density = polarity_sum / static_cast<double>(selected_heap.size());
-        if (initial_density > max_f) {
-            max_f = initial_density;
-            best_selected_heap = selected_heap;
-        }
-    }
-    
+    // ============== Peeling phase: remove nodes to find maximum density ==============    
     // Peel nodes one by one
     while (!selected_heap.empty()) {
         // Remove the node with smallest priority (most negative impact)
         auto top_item = selected_heap.top();
         selected_heap.pop();
+        G[top_item.vertex].status = Status::Out;
+
+        // Update the priority key of other nodes in selected_heap
+        for (auto e = out_edges(top_item.vertex, G); e.first != e.second; ++e.first) {
+            Vertex neighbor = target(*e.first, G);
+            // Skip if neighbor is removed or not in selected_heap
+            if (is_removed[neighbor] || G[neighbor].status != Status::In) continue;
+
+            double edge_polarity = G[*e.first].edge_polarity;
+            G[neighbor].priority_key += edge_polarity;
+            selected_heap.update(
+                handles[neighbor],
+                {G[neighbor].priority_key, neighbor}
+            );
+        }
         
         // Update polarity sum (remember priority is negated)
         polarity_sum += top_item.priority_key;
@@ -481,7 +472,7 @@ struct SubgraphResult {
     double density;
 };
 
-SubgraphResult find_multi_local_optima(Graph& G, unsigned max_neg_count = 100, unsigned max_iterations = 10) {
+SubgraphResult find_multi_local_optima(Graph& G, unsigned max_neg_count = 100, unsigned max_local_optima = 10) {
     double global_max_density = -numeric_limits<double>::infinity();
     vector<Vertex> best_subgraph;
     
@@ -491,7 +482,7 @@ SubgraphResult find_multi_local_optima(Graph& G, unsigned max_neg_count = 100, u
     // Reusable buffer for positive weights
     vector<double> pos_weights(num_vertices(G));
     
-    for (unsigned iter = 0; iter < max_iterations; ++iter) {
+    for (unsigned iter = 0; iter < max_local_optima; ++iter) {
         // Compute positive edge sums for current active nodes
         compute_positive_edge_sums(G, is_removed, pos_weights);
         
@@ -510,6 +501,7 @@ SubgraphResult find_multi_local_optima(Graph& G, unsigned max_neg_count = 100, u
         
         // Find a local densest subgraph (pass is_removed to avoid creating subgraph)
         auto result = ecc_greedy(G, is_removed, max_neg_count);
+
         double current_density = result.second;
         
         // If no valid result, break
@@ -531,12 +523,12 @@ SubgraphResult find_multi_local_optima(Graph& G, unsigned max_neg_count = 100, u
             best_subgraph = current_subgraph_vec;
         }
         
-        // Mark nodes for removal: those in current subgraph + those with pos_weight < current_density
+        // Mark nodes for removal: those in current subgraph + those with pos_weight < global_max_density
         size_t nodes_marked = 0;
         for (Vertex v = 0; v < num_vertices(G); ++v) {
             if (!is_removed[v]) {
                 if (current_subgraph_set.find(v) != current_subgraph_set.end() || 
-                    pos_weights[v] < current_density) {
+                    pos_weights[v] < global_max_density) {
                     is_removed[v] = true;
                     nodes_marked++;
                 }
