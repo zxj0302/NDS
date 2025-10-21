@@ -307,11 +307,9 @@ DensestSubgraphResult qpbo_mip(const Graph& G, unsigned max_iterations = 10, dou
         }
     }
     for (size_t i = 0; i < num_vertices(G); i++) {
-        if (G[i].has_self_loop) {
-            if (G[i].self_loop_polarity > best_density) {
-                best_density = G[i].self_loop_polarity;
-                best_solution = {i};
-            }
+        if (G[i].self_loop_polarity > best_density) {
+            best_density = G[i].self_loop_polarity;
+            best_solution = {i};
         }
     }
     double lambda = best_density;
