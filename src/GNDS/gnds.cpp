@@ -159,7 +159,7 @@ void compute_positive_edge_sums(const Graph& G, const vector<bool>& is_removed, 
     
     // Add contributions from self-loops
     for (Vertex v = 0; v < num_vertices(G); ++v) {
-        if (!is_removed[v] && G[v].has_self_loop && G[v].self_loop_polarity > 0) {
+        if (!is_removed[v] && G[v].has_self_loop) {
             pos_weights[v] += G[v].self_loop_polarity;
         }
     }
@@ -200,7 +200,7 @@ pair<FibHeap, double> ecc_greedy(Graph& G, const vector<bool>& is_removed, unsig
     Vertex node_promising = null_v;
     double max_weight = -numeric_limits<double>::infinity();
     for (Vertex v = 0; v < num_vertices(G); ++v) {
-        if (!is_removed[v] && pos_weights[v] > max_weight) {
+        if (!is_removed[v] && pos_weights[v] > max_weight && pos_weights[v] > 0.0) {
             max_weight = pos_weights[v];
             node_promising = v;
         }
@@ -550,7 +550,7 @@ SubgraphResult find_multi_local_optima(Graph& G, unsigned max_neg_count = 100, u
  * =========================================================
  */
 int main(int argc, char* argv[]) {
-    if (argc < 4 || argc > 7) {
+    if (argc < 5 || argc > 7) {
         cerr << "Usage: " << argv[0] << " <filename> <output_filename> <reverse_weight> <max #neg-steps> [num_its] [max_local_optima]" << endl;
         return EXIT_FAILURE;
     }

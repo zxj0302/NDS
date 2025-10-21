@@ -377,7 +377,7 @@ pair<FibHeap, double> ecc_greedy(Graph& G, unsigned max_neg_count = 100) {
  * =========================================================
  */
 int main(int argc, char* argv[]) {
-    if (argc < 4 || argc > 6) {
+    if (argc < 5 || argc > 6) {
         cerr << "Usage: " << argv[0] << " <filename> <output_filename> <reverse_weight> <max #neg-steps> [num_its]" << endl;
         return EXIT_FAILURE;
     }

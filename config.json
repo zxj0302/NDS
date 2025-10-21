@@ -42,6 +42,15 @@
                 }
             },
             {
+                "name": "QPBO_MIP",
+                "exe": "/Users/zxj/Desktop/NDS/src/QPBO_MIP/build/QPBO_MIP",
+                "params": {
+                    "dinkelbach_iterations": 20,
+                    "epsilon": 0.001,
+                    "num_iter": 10
+                }
+            },
+            {
                 "name": "NEG_DSD",
                 "exe": "/Users/zxj/Desktop/NDS/src/NEG-DSD/build/NEG-DSD",
                 "params": {
@@ -90,7 +99,16 @@
                 "exe": "/Users/zxj/Desktop/NDS/src/GNDS/build/GNDS",
                 "params": {
                     "max_neg": 500,
-                    "max_local_optima": 200,
+                    "max_local_optima": 20,
+                    "num_iter": 1
+                }
+            },
+            {
+                "name": "QPBO_MIP",
+                "exe": "/Users/zxj/Desktop/NDS/src/QPBO_MIP/build/QPBO_MIP",
+                "params": {
+                    "dinkelbach_iterations": 10,
+                    "epsilon": 0.01,
                     "num_iter": 1
                 }
             },
