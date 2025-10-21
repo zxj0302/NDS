@@ -170,6 +170,8 @@ QPBOResult run_qpbo(const Graph& G, double lambda) {
     
     qpbo->Solve();
     qpbo->ComputeWeakPersistencies();
+    // qpbo->Improve();
+    // qpbo->MergeParallelEdges();
     
     QPBOResult result;
     result.labels.resize(n);
@@ -297,19 +299,22 @@ DensestSubgraphResult qpbo_mip(const Graph& G, unsigned max_iterations = 10, dou
     size_t n = num_vertices(G);    
     vector<Vertex> best_solution;
     double best_density = -numeric_limits<double>::infinity();
-    double lambda = 0.0;
-    // set initial lambda
-    double init_density = 0.0;
     for (auto e : make_iterator_range(edges(G))) {
         double new_density = (G[e].polarity + G[source(e, G)].self_loop_polarity + G[target(e, G)].self_loop_polarity) / 2.0;
-        init_density = max(init_density, new_density);
+        if (new_density > best_density) {
+            best_density = new_density;
+            best_solution = {source(e, G), target(e, G)};
+        }
     }
     for (size_t i = 0; i < num_vertices(G); i++) {
         if (G[i].has_self_loop) {
-            init_density = max(init_density, G[i].self_loop_polarity);
+            if (G[i].self_loop_polarity > best_density) {
+                best_density = G[i].self_loop_polarity;
+                best_solution = {i};
+            }
         }
     }
-    lambda = init_density;
+    double lambda = best_density;
 
     for (int iter = 0; iter < max_iterations; iter++) {
         // Step 1: Run QPBO with current lambda
@@ -318,21 +323,23 @@ DensestSubgraphResult qpbo_mip(const Graph& G, unsigned max_iterations = 10, dou
         vector<Vertex> current_solution;
         
         // Step 2: Check if QPBO solved everything
-        if (qpbo_result.undecided.empty()) {
+        if (qpbo_result.undecided.empty() && !qpbo_result.fixed_in.empty()) {
+            cout << "Iteration " << iter + 1 << ": QPBO solved all nodes for lambda = " << lambda << endl;
+            cout << "  Fixed in: " << qpbo_result.fixed_in.size() << ", Fixed out: " << qpbo_result.fixed_out.size() << endl;
+            cout << "  Current density: " << compute_density(G, qpbo_result.fixed_in) << endl;
             current_solution = qpbo_result.fixed_in;
+        } else if (qpbo_result.undecided.empty() && qpbo_result.fixed_in.empty()) {
+            return {best_solution, best_density};
         } else {            
             // Step 4: Solve MIP on undecided nodes (seeded with heuristic)
+            cout << "Iteration " << iter + 1 << ": Solving MIP on " << qpbo_result.undecided.size() << " undecided nodes for lambda = " << lambda << endl;
             current_solution = solve_mip_on_undecided(G, qpbo_result, lambda);
         }
 
         // Handle empty solutions properly
         double density;
         if (current_solution.empty()) {
-            density = 0.0;
-            // If lambda is already close to 0, we've converged to empty set
-            if (abs(lambda) < epsilon) {
-                break;
-            }
+            return {best_solution, best_density};
         } else {
             density = compute_density(G, current_solution);
             
@@ -350,10 +357,6 @@ DensestSubgraphResult qpbo_mip(const Graph& G, unsigned max_iterations = 10, dou
         
         // Update lambda for next iteration
         lambda = density;
-    }
-
-    if (best_solution.empty()) {
-        best_density = 0.0;
     }
     
     return {best_solution, best_density};

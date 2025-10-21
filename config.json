@@ -104,6 +104,15 @@
                 }
             },
             {
+                "name": "GNDS_QPBO_MIP",
+                "exe": "/Users/zxj/Desktop/NDS/src/GNDS_QPBO_MIP/build/GNDS_QPBO_MIP",
+                "params": {
+                    "dinkelbach_iterations": 10,
+                    "epsilon": 0.01,
+                    "num_iter": 1
+                }
+            },
+            {
                 "name": "QPBO_MIP",
                 "exe": "/Users/zxj/Desktop/NDS/src/QPBO_MIP/build/QPBO_MIP",
                 "params": {

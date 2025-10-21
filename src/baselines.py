@@ -113,6 +113,21 @@ def QPBO_MIP(config):
     return result['time'], result['density'], result['nodes']
 
 
+def GNDS_QPBO_MIP(config):
+    program = config.get('exe')
+    params = config.get('params')
+    input = params.get('input')
+    output = params.get('output')
+    reverse = params.get('reverse')
+    dinkelbach_iterations = params.get('dinkelbach_iterations')
+    epsilon = params.get('epsilon')
+    num_iter = params.get('num_iter', 1)
+    subprocess.run([program, input, output, "1" if reverse else "0", str(dinkelbach_iterations), str(epsilon), str(num_iter)], check=True)
+    # readin the output file
+    result = json.load(open(output))
+    return result['time'], result['density'], result['nodes']
+
+
 def NEG_DSD(config):
     program = config.get('exe')
     params = config.get('params')
