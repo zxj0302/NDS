@@ -631,7 +631,7 @@ vector<Vertex> solve_mip_on_undecided(const Graph& G, const QPBOResult& qpbo_res
 // =========================================================
 // Dinkelbach algorithm with GNDS initialization
 // =========================================================
-DensestSubgraphResult gnds_qpbo_mip(Graph& G, unsigned max_iterations = 10, double epsilon = 1e-3, 
+DensestSubgraphResult gnds_qpbo_mip_ud(Graph& G, double step_size = 1.2, unsigned max_iterations = 10, double epsilon = 1e-3, 
                                unsigned gnds_max_neg = 100, unsigned gnds_max_optima = 10) {
     size_t n = num_vertices(G);
     
@@ -640,38 +640,44 @@ DensestSubgraphResult gnds_qpbo_mip(Graph& G, unsigned max_iterations = 10, doub
     
     vector<Vertex> best_solution = gnds_result.nodes;
     double best_density = gnds_result.density;
-    double lambda = best_density;
-    
-    for (int iter = 0; iter < max_iterations; iter++) {
-        QPBOResult qpbo_result = run_qpbo(G, lambda);
-        
-        vector<Vertex> current_solution;
-        
-        if (qpbo_result.undecided.empty() && !qpbo_result.fixed_in.empty()) {
-            current_solution = qpbo_result.fixed_in;
-        } else if (qpbo_result.undecided.empty() && qpbo_result.fixed_in.empty()) {
-            return {best_solution, best_density};
-        } else {            
-            current_solution = solve_mip_on_undecided(G, qpbo_result, lambda);
-        }
 
-        double density;
-        if (current_solution.empty()) {
-            return {best_solution, best_density};
-        } else {
-            density = compute_density(G, current_solution);
-            
-            if (density > best_density) {
-                best_density = density;
-                best_solution = current_solution;
-            }
-        }
-        
-        if (abs(density - lambda) < epsilon) {
+    // if qpbo_result.undecided is empty and fixed_in is empty, we can directly return result found by GNDS as Optimal
+    QPBOResult qpbo_result_pre = run_qpbo(G, best_density);
+    if (qpbo_result_pre.undecided.empty() && qpbo_result_pre.fixed_in.empty()) {
+        return {best_solution, best_density};
+    }
+
+    // otherwise, find an upper bound which always makes the QPBO label all nodes to fixed_out
+    double lambda_ub = best_density * step_size;
+    while (true) {
+        QPBOResult qpbo_result_step = run_qpbo(G, lambda_ub);
+        if (qpbo_result_step.undecided.empty() && qpbo_result_step.fixed_in.empty()) {
             break;
         }
-        
-        lambda = density;
+        lambda_ub *= step_size;
+    }
+
+    // find optimal solution with binary search on lambda
+    double lambda = (best_density + lambda_ub) / 2.0;
+    for (int iter = 0; iter < max_iterations; iter++) {
+        QPBOResult qpbo_result = run_qpbo(G, lambda);
+        vector<Vertex> current_solution = qpbo_result.undecided.empty() ? qpbo_result.fixed_in : solve_mip_on_undecided(G, qpbo_result, lambda);
+
+        if (current_solution.empty()) {
+            lambda_ub = lambda;
+        } else {
+            double density = compute_density(G, current_solution);
+            if (density >= best_density) {
+                best_density = density;
+                best_solution = current_solution;
+            } else {
+                cout << "Should not reach here!" << endl;
+            }
+        }
+        lambda = (best_density + lambda_ub) / 2.0;
+        if (abs(best_density - lambda_ub) < epsilon) {
+            break;
+        }
     }
     
     return {best_solution, best_density};
@@ -681,19 +687,20 @@ DensestSubgraphResult gnds_qpbo_mip(Graph& G, unsigned max_iterations = 10, doub
 // Main Function
 // =========================================================
 int main(int argc, char* argv[]) {
-    if (argc < 8 || argc > 9) {
-        cerr << "Usage: " << argv[0] << " <filename> <output_filename> <reverse_weight> "
+    if (argc < 9 || argc > 10) {
+        cerr << "Usage: " << argv[0] << " <filename> <output_filename> <reverse_weight> <step_size> "
              << "<dinkelbach_iterations> <epsilon> <gnds_max_neg> <gnds_max_optima> [num_its]" << endl;
         return EXIT_FAILURE;
     }
     string filename = argv[1];
     string output_filename = argv[2];
     bool reverse_weight = (string(argv[3]) == "1");
-    unsigned dinkelbach_iterations = stoul(argv[4], nullptr);
-    double epsilon = stod(argv[5]);
-    unsigned gnds_max_neg = stoul(argv[6], nullptr);
-    unsigned gnds_max_optima = stoul(argv[7], nullptr);
-    unsigned num_its = (argc >= 9) ? stoul(argv[8], nullptr) : 1;
+    double step_size = stod(argv[4]);
+    unsigned dinkelbach_iterations = stoul(argv[5], nullptr);
+    double epsilon = stod(argv[6]);
+    unsigned gnds_max_neg = stoul(argv[7], nullptr);
+    unsigned gnds_max_optima = stoul(argv[8], nullptr);
+    unsigned num_its = (argc >= 10) ? stoul(argv[9], nullptr) : 1;
 
     try {
         Graph G = read_graph(filename, reverse_weight);
@@ -704,7 +711,7 @@ int main(int argc, char* argv[]) {
 
         for (unsigned iteration = 0; iteration < num_its; ++iteration) {
             auto start = chrono::high_resolution_clock::now();
-            auto result = gnds_qpbo_mip(G, dinkelbach_iterations, epsilon, gnds_max_neg, gnds_max_optima);
+            auto result = gnds_qpbo_mip_ud(G, step_size, dinkelbach_iterations, epsilon, gnds_max_neg, gnds_max_optima);
             auto end = chrono::high_resolution_clock::now();
             double elapsed = static_cast<double>(chrono::duration_cast<chrono::nanoseconds>(end - start).count()) / 1e9;
             total_elapsed += elapsed;

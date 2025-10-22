@@ -16,6 +16,8 @@ def run(config, single=True):
 
             dataset_name = dataset.split('/')[-1].split('.')[0]
             for competitor in config.get('competitors'):
+                if not competitor.get('toggle', False):
+                    continue
                 comp_name = competitor.get('name')
                 competitor['params']['input'] = dataset
                 output = os.path.join(output_folder, f'{dataset_name}', f'{dataset_name}_{comp_name}{'_r' if reverse else ''}.json')
@@ -34,10 +36,11 @@ def run(config, single=True):
         for input_folder in config.get('input_folder'):
             logger.info(f'Running on input folder: {input_folder}')
             for graph_file in tqdm(natsort.natsorted([f for f in os.listdir(input_folder) if f.endswith('.txt')])):
-                print()
                 logger.info(f'Processing graph file: {graph_file}')
                 file_name = graph_file.split('.')[0]
                 for competitor in config.get('competitors'):
+                    if not competitor.get('toggle', False):
+                        continue
                     comp_name = competitor.get('name')
                     competitor['params']['input'] = os.path.join(input_folder, graph_file)
                     output = os.path.join(input_folder.replace('input', 'output'), f'{file_name}', f'{file_name}_{comp_name}{'_r' if reverse else ''}.json')
@@ -121,8 +124,28 @@ def GNDS_QPBO_MIP(config):
     reverse = params.get('reverse')
     dinkelbach_iterations = params.get('dinkelbach_iterations')
     epsilon = params.get('epsilon')
+    max_neg = params.get('max_neg')
+    max_local_optima = params.get('max_local_optima')
     num_iter = params.get('num_iter', 1)
-    subprocess.run([program, input, output, "1" if reverse else "0", str(dinkelbach_iterations), str(epsilon), str(num_iter)], check=True)
+    subprocess.run([program, input, output, "1" if reverse else "0", str(dinkelbach_iterations), str(epsilon), str(max_neg), str(max_local_optima), str(num_iter)], check=True)
+    # readin the output file
+    result = json.load(open(output))
+    return result['time'], result['density'], result['nodes']
+
+
+def GNDS_QPBO_MIP_UD(config):
+    program = config.get('exe')
+    params = config.get('params')
+    input = params.get('input')
+    output = params.get('output')
+    reverse = params.get('reverse')
+    step_size = params.get('step_size')
+    dinkelbach_iterations = params.get('dinkelbach_iterations')
+    epsilon = params.get('epsilon')
+    max_neg = params.get('max_neg')
+    max_local_optima = params.get('max_local_optima')
+    num_iter = params.get('num_iter', 1)
+    subprocess.run([program, input, output, "1" if reverse else "0", str(step_size), str(dinkelbach_iterations), str(epsilon), str(max_neg), str(max_local_optima), str(num_iter)], check=True)
     # readin the output file
     result = json.load(open(output))
     return result['time'], result['density'], result['nodes']
