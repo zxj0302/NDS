@@ -6,7 +6,7 @@ from tqdm import tqdm
 import natsort
 
 
-def run(config, single=True):
+def run(config, single=True, skip=True):
     if single:
         datasets = config.get('input')
         output_folder = config.get('output')
@@ -23,6 +23,8 @@ def run(config, single=True):
                 output = os.path.join(output_folder, f'{dataset_name}', f'{dataset_name}_{comp_name}{'_r' if reverse else ''}.json')
                 if not os.path.exists(os.path.dirname(output)):
                     os.makedirs(os.path.dirname(output))
+                if skip and os.path.exists(output):
+                    continue
                 competitor['params']['output'] = output
                 competitor['params']['reverse'] = reverse
 
@@ -34,10 +36,13 @@ def run(config, single=True):
     else:
         reverse = config.get('weight_reverse', False)
         for input_folder in config.get('input_folder'):
+            if input_folder.get('toggle') is False:
+                continue
+            input_folder = input_folder.get('path')
             logger.info(f'Running on input folder: {input_folder}')
             for graph_file in tqdm(natsort.natsorted([f for f in os.listdir(input_folder) if f.endswith('.txt')])):
                 logger.info(f'Processing graph file: {graph_file}')
-                file_name = graph_file.split('.')[0]
+                file_name = os.path.splitext(graph_file)[0]
                 for competitor in config.get('competitors'):
                     if not competitor.get('toggle', False):
                         continue
@@ -46,6 +51,8 @@ def run(config, single=True):
                     output = os.path.join(input_folder.replace('input', 'output'), f'{file_name}', f'{file_name}_{comp_name}{'_r' if reverse else ''}.json')
                     if not os.path.exists(os.path.dirname(output)):
                         os.makedirs(os.path.dirname(output))
+                    if skip and os.path.exists(output):
+                        continue
                     competitor['params']['output'] = output
                     competitor['params']['reverse'] = reverse
 
@@ -56,34 +63,6 @@ def run(config, single=True):
                     logger.info(f'{comp_name:<9}: time: {result[0]:.6f}s, density: {result[1]:.6f}')
 
     logger.success('All done!')
-
-
-def LNDS(config):
-    program = config.get('exe')
-    params = config.get('params')
-    input = params.get('input')
-    output = params.get('output')
-    reverse = params.get('reverse')
-    max_neg = params.get('max_neg')
-    num_iter = params.get('num_iter', 1)
-    subprocess.run([program, input, output, "1" if reverse else "0", str(max_neg), str(num_iter)], check=True)
-    # readin the output file
-    result = json.load(open(output))
-    return result['time'], result['density'], result['nodes']
-
-
-def LNDS_EP(config):
-    program = config.get('exe')
-    params = config.get('params')
-    input = params.get('input')
-    output = params.get('output')
-    reverse = params.get('reverse')
-    max_neg = params.get('max_neg')
-    num_iter = params.get('num_iter', 1)
-    subprocess.run([program, input, output, "1" if reverse else "0", str(max_neg), str(num_iter)], check=True)
-    # readin the output file
-    result = json.load(open(output))
-    return result['time'], result['density'], result['nodes']
 
 
 def GNDS(config):
@@ -157,9 +136,9 @@ def NEG_DSD(config):
     input = params.get('input')
     output = params.get('output')
     reverse = params.get('reverse')
-    C = params.get('C')
+    C_values = params.get('C_values', "1.0")
     num_iter = params.get('num_iter', 1)
-    subprocess.run([program, input, output, "1" if reverse else "0", str(C), str(num_iter)], check=True)
+    subprocess.run([program, input, output, "1" if reverse else "0", str(C_values), str(num_iter)], check=True)
     # readin the output file
     result = json.load(open(output))
     return result['time'], result['density'], result['nodes']
@@ -173,6 +152,22 @@ def DCSGreedy(config):
     reverse = params.get('reverse')
     num_iter = params.get('num_iter', 1)
     subprocess.run([program, input, output, "1" if reverse else "0", str(num_iter)], check=True)
+    # readin the output file
+    result = json.load(open(output))
+    return result['time'], result['density'], result['nodes']
+
+
+def CEP(config):
+    program = config.get('exe')
+    params = config.get('params')
+    input = params.get('input')
+    output = params.get('output')
+    reverse = params.get('reverse')
+    max_neg = params.get('max_neg')
+    max_local_optima = params.get('max_local_optima')
+    do_peeling = params.get('do_peeling', False)
+    num_iter = params.get('num_iter', 1)
+    subprocess.run([program, input, output, "1" if reverse else "0", str(max_neg), str(max_local_optima), "1" if do_peeling else "0", str(num_iter)], check=True)
     # readin the output file
     result = json.load(open(output))
     return result['time'], result['density'], result['nodes']

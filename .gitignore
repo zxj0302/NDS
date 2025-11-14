@@ -24,4 +24,4 @@ temp*
 logs
 src/Graph_Simulator
 input/synthetic
-backups
+backup*

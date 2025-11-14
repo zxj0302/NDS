@@ -551,7 +551,7 @@ SubgraphResult find_multi_local_optima(Graph& G, unsigned max_neg_count = 100, u
  */
 int main(int argc, char* argv[]) {
     if (argc < 5 || argc > 7) {
-        cerr << "Usage: " << argv[0] << " <filename> <output_filename> <reverse_weight> <max #neg-steps> [num_its] [max_local_optima]" << endl;
+        cerr << "Usage: " << argv[0] << " <filename> <output_filename> <reverse_weight> <max #neg-steps> [max_local_optima] [num_its]" << endl;
         return EXIT_FAILURE;
     }
     string filename = argv[1];
