@@ -1,25 +1,25 @@
 {
     "real-world": {
         "input": [
-            "/Users/zxj/Desktop/NDS/input/real-world/Abortion/Abortion.txt", 
-            "/Users/zxj/Desktop/NDS/input/real-world/Biogrid/Biogrid.txt", 
-            "/Users/zxj/Desktop/NDS/input/real-world/Brexit/Brexit.txt", 
-            "/Users/zxj/Desktop/NDS/input/real-world/Collins/Collins.txt", 
-            "/Users/zxj/Desktop/NDS/input/real-world/Election/Election.txt", 
-            "/Users/zxj/Desktop/NDS/input/real-world/Gavin/Gavin.txt", 
-            "/Users/zxj/Desktop/NDS/input/real-world/Gun/Gun.txt", 
-            "/Users/zxj/Desktop/NDS/input/real-world/Krogan-Core/Krogan-Core.txt", 
-            "/Users/zxj/Desktop/NDS/input/real-world/Krogan-Extended/Krogan-Extended.txt",
-            "/Users/zxj/Desktop/NDS/input/real-world/Partisanship/Partisanship.txt",
-            "/Users/zxj/Desktop/NDS/input/real-world/Referendum/Referendum.txt"
+            "./input/real-world/Abortion/Abortion.txt", 
+            "./input/real-world/Biogrid/Biogrid.txt", 
+            "./input/real-world/Brexit/Brexit.txt", 
+            "./input/real-world/Collins/Collins.txt", 
+            "./input/real-world/Election/Election.txt", 
+            "./input/real-world/Gavin/Gavin.txt", 
+            "./input/real-world/Gun/Gun.txt", 
+            "./input/real-world/Krogan-Core/Krogan-Core.txt", 
+            "./input/real-world/Krogan-Extended/Krogan-Extended.txt",
+            "./input/real-world/Partisanship/Partisanship.txt",
+            "./input/real-world/Referendum/Referendum.txt"
         ],
         "weight_reverse": true,
-        "output": "/Users/zxj/Desktop/NDS/output/real-world/",
+        "output": ".output/real-world/",
         "competitors": [
             {
                 "name": "GNDS_QPBO_MIP_UD",
                 "toggle": true,
-                "exe": "/Users/zxj/Desktop/NDS/src/GNDS_QPBO_MIP_UD/build/GNDS_QPBO_MIP_UD",
+                "exe": "./src/GNDS_QPBO_MIP_UD/build/GNDS_QPBO_MIP_UD",
                 "params": {
                     "step_size": 1.2,
                     "dinkelbach_iterations": 10,
@@ -32,7 +32,7 @@
             {
                 "name": "GNDS_QPBO_MIP",
                 "toggle": true,
-                "exe": "/Users/zxj/Desktop/NDS/src/GNDS_QPBO_MIP/build/GNDS_QPBO_MIP",
+                "exe": "./src/GNDS_QPBO_MIP/build/GNDS_QPBO_MIP",
                 "params": {
                     "dinkelbach_iterations": 10,
                     "epsilon": 0.01,
@@ -44,7 +44,7 @@
             {
                 "name": "QPBO_MIP",
                 "toggle": true,
-                "exe": "/Users/zxj/Desktop/NDS/src/QPBO_MIP/build/QPBO_MIP",
+                "exe": "./src/QPBO_MIP/build/QPBO_MIP",
                 "params": {
                     "dinkelbach_iterations": 10,
                     "epsilon": 0.01,
@@ -54,7 +54,7 @@
             {
                 "name": "NEG_DSD",
                 "toggle": true,
-                "exe": "/Users/zxj/Desktop/NDS/src/NEG-DSD/build/NEG-DSD",
+                "exe": "./src/NEG-DSD/build/NEG-DSD",
                 "params": {
                     "C": 1,
                     "num_iter": 10
@@ -63,7 +63,7 @@
             {
                 "name": "DCSGreedy",
                 "toggle": true,
-                "exe": "/Users/zxj/Desktop/NDS/src/DCSGreedy/build/DCSGreedy",
+                "exe": "./src/DCSGreedy/build/DCSGreedy",
                 "params": {
                     "num_iter": 10
                 }
@@ -73,33 +73,33 @@
     "synthetic": {
         "input_folder": [
             {
-                "path": "/Users/zxj/Desktop/NDS/input/synthetic/RGG/",
-                "toggle": false
+                "path": "./input/synthetic/BA/",
+                "toggle": true
             },
             {
-                "path": "/Users/zxj/Desktop/NDS/input/synthetic/WS/",
-                "toggle": false
+                "path": "./input/synthetic/ER/",
+                "toggle": true
             },
             {
-                "path": "/Users/zxj/Desktop/NDS/input/synthetic/BA/",
-                "toggle": false
+                "path": "./input/synthetic/RGG/",
+                "toggle": true
             },
             {
-                "path": "/Users/zxj/Desktop/NDS/input/synthetic/ER/",
-                "toggle": false
+                "path": "./input/synthetic/SBM/",
+                "toggle": true
             },
             {
-                "path": "/Users/zxj/Desktop/NDS/input/synthetic/SBM/",
+                "path": "./input/synthetic/WS/",
                 "toggle": true
             }
         ],
         "weight_reverse": false,
-        "output": "/Users/zxj/Desktop/NDS/output/synthetic/",
+        "output": "./output/synthetic/",
         "competitors": [
             {
                 "name": "GNDS",
                 "toggle": false,
-                "exe": "/Users/zxj/Desktop/NDS/src/GNDS/build/GNDS",
+                "exe": "./src/GNDS/build/GNDS",
                 "params": {
                     "max_neg": 100,
                     "max_local_optima": 10,
@@ -109,7 +109,7 @@
             {
                 "name": "GNDS_QPBO_MIP_UD",
                 "toggle": false,
-                "exe": "/Users/zxj/Desktop/NDS/src/GNDS_QPBO_MIP_UD/build/GNDS_QPBO_MIP_UD",
+                "exe": "./src/GNDS_QPBO_MIP_UD/build/GNDS_QPBO_MIP_UD",
                 "params": {
                     "step_size": 1.05,
                     "dinkelbach_iterations": 10,
@@ -122,7 +122,7 @@
             {
                 "name": "GNDS_QPBO_MIP",
                 "toggle": false,
-                "exe": "/Users/zxj/Desktop/NDS/src/GNDS_QPBO_MIP/build/GNDS_QPBO_MIP",
+                "exe": "./src/GNDS_QPBO_MIP/build/GNDS_QPBO_MIP",
                 "params": {
                     "dinkelbach_iterations": 10,
                     "epsilon": 0.01,
@@ -134,7 +134,7 @@
             {
                 "name": "QPBO_MIP",
                 "toggle": false,
-                "exe": "/Users/zxj/Desktop/NDS/src/QPBO_MIP/build/QPBO_MIP",
+                "exe": "./src/QPBO_MIP/build/QPBO_MIP",
                 "params": {
                     "dinkelbach_iterations": 10,
                     "epsilon": 0.01,
@@ -144,7 +144,7 @@
             {
                 "name": "NEG_DSD",
                 "toggle": true,
-                "exe": "/Users/zxj/Desktop/NDS/src/NEG_DSD/build/NEG_DSD",
+                "exe": "./src/NEG_DSD/build/NEG_DSD",
                 "params": {
                     "C_values": "0.9,1.0,1.1,1.2",
                     "num_iter": 1
@@ -153,7 +153,7 @@
             {
                 "name": "DCSGreedy",
                 "toggle": true,
-                "exe": "/Users/zxj/Desktop/NDS/src/DCSGreedy/build/DCSGreedy",
+                "exe": "./src/DCSGreedy/build/DCSGreedy",
                 "params": {
                     "num_iter": 1
                 }
@@ -161,10 +161,10 @@
             {
                 "name": "CEP",
                 "toggle": true,
-                "exe": "/Users/zxj/Desktop/NDS/src/CEP/build/CEP",
+                "exe": "./src/CEP/build/CEP",
                 "params": {
-                    "max_neg": 2000,
-                    "max_local_optima": 5,
+                    "max_neg": 200,
+                    "max_local_optima": 10,
                     "do_peeling": true,
                     "num_iter": 1
                 }
@@ -173,15 +173,15 @@
     },
     "test": {
         "input": [
-            "/Users/zxj/Desktop/NDS/input/synthetic/SBM/SBM_n10000_blocks4_setting28_inst0.txt" 
+            "./input/synthetic/SBM/SBM_n10000_blocks4_setting28_inst0.txt" 
         ],
         "weight_reverse": false,
-        "output": "/Users/zxj/Desktop/NDS/output/test/",
+        "output": ".output/test/",
         "competitors": [
             {
                 "name": "DCSGreedy",
                 "toggle": true,
-                "exe": "/Users/zxj/Desktop/NDS/src/DCSGreedy/build/DCSGreedy",
+                "exe": "./src/DCSGreedy/build/DCSGreedy",
                 "params": {
                     "num_iter": 1
                 }
