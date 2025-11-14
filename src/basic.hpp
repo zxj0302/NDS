@@ -1,38 +1,3 @@
-/*
-    * basic.hpp
-    * author: Zhu Xiangju
-    * 
-    * Note: For all classes:
-    * Note: I am using Fibonacci_heap from BGL. However, I find that for WS_setting_140:
-    * Note: Runtime(smaller better): std::priority_queue + lazy update(label stale) 0.42s < BGL Fibonacci_heap with update_lazy() 0.52s < BGL Fibonacci_heap with update() (no lazy update) 0.59s < std::set without lazy update 0.98s
-    * Note: This is because of Fibonacci_heap's complex structure and high constant overhead and the freqent update (erase + insert) operations.
-    * Note: Priority_queue does not need to update keys, just insert new keys and label old keys as stale.
-    * Note: Can change all update() to update_lazy() if wanted.
-    * Note: Another thing, I know I don't need to store the id of each vertex in VertexProperty because of vecS, but I just want to eaze the further changes of graph to listS if needed.
-    * 
-    * Note: For CEP:
-    * Note: Can use update_lazy() for Fibonacci_heap. Found it can make LocalGreedy a little faster
-    * Note: The main bottleneck in CEP(apart from the peeling) is the initialization and update of the std::set/Fibonacci_heap/vector for storing the positive degree of nodes (can be 95%+ runtime ratio).
-    * Note: I find that using a set is(can be, in many cases) more time-consuming than compute the positive weights on the fly in each local search iteration.
-    * Note: This is because of the high overhead of set operations(especially when pruning all nodes wight positive weights smaller than a density).
-    * Note: However, eventhough, the Peeling() at the beginning of Run() is still dominating (or have similar) the total runtime.
-    * Note: If the local search iterations are more enought, the overhead of maintaining the set can be amortized, and using set can be faster.
-    * Note: Otherwise, it is better to compute the positive weights on the fly.
-    * 
-    * Note: Comparison of using set or vector to store positive degrees in CEP (According to WS_setting_140):
-    * Note: If using set, the initialization of the set and pruning a lot of nodes (possibly in the first one/few iterations) can be very time-consuming.
-    * Note: However, as items are removed from the set, the size of the set decreases, and the update operations largely decreases.
-    * Note: Thus the runtime for each local search iteration may decrease (maybe significantly) as the iterations proceed.
-    * Note: The total runtime will keep roughly stable as the number of local search iterations increases.
-    * Note: If using vector, the initialization is fast, and no pruning overhead. However, the total time for the Run() increasely nearly 
-    * Note: (but not linear, because as more nodes invalidated, the on-the-fly computation decreases) linearly with the number of local search iterations.
-    * Note: Thus I am using hybrid approach now: start with using vector, and switch to set after some iterations. To amortize the overhead of initialization and pruning,
-    * Note: changing to set is only toggled when the number of local search iterations are still left a lot.
-    * Note: And as the abs(pos_weight) decreases, I am using two Fibonacci_heap to store the positive and the reverse of positive degree separately.
-    * Note: This is faster than using one set, as Fibonacci_heap can finish the decrease_key operation in O(1) time.
-*/
-
-
 #pragma once
 
 #include <boost/graph/adjacency_list.hpp>
@@ -50,21 +15,18 @@
 #include <iomanip>
 #include <chrono>
 #include <set>
+#include <unordered_set>
 
 using namespace std;
 using namespace boost;
 
 class PGraph {
 protected:
-    struct VertexProperty {
-        size_t id = 0;
-    };
-
     struct EdgeProperty {
         double weight = 0.0;
     };
 
-    using Graph = adjacency_list<vecS, vecS, undirectedS, VertexProperty, EdgeProperty>;
+    using Graph = adjacency_list<vecS, vecS, undirectedS, no_property, EdgeProperty>;
     using Vertex = graph_traits<Graph>::vertex_descriptor;
     using Edge = graph_traits<Graph>::edge_descriptor;
     using Traits = graph_traits<Graph>;
@@ -90,31 +52,25 @@ public:
     }
 
     virtual void ReadGraph(const string& input, bool reverse_weight) {
-        try {
-            ifstream infile(input);
-            size_t n = 0, m = 0;
-            string line;
-            getline(infile, line);
-            istringstream iss_first(line);
-            iss_first >> n >> m;
-            for (size_t i = 0; i < n; ++i) {
-                Vertex v = add_vertex(G);
-                G[v].id = i;
-            }
-            valid = vector<bool>(n, true);
-            
-            while (getline(infile, line)) {
-                istringstream iss(line);
-                size_t u, v;
-                double weight;
-                iss >> u >> v >> weight;
-                weight *= (reverse_weight ? -1.0 : 1.0);
-                add_edge(u, v, EdgeProperty{weight}, G);
-                total_weight += weight;
-            }
-        } catch(const std::exception& e) {
-            cerr << e.what() << '\n';
-            exit(EXIT_FAILURE);
+        ifstream infile(input);
+        size_t n = 0, m = 0;
+        string line;
+        getline(infile, line);
+        istringstream iss_first(line);
+        iss_first >> n >> m;
+        for (size_t i = 0; i < n; ++i) {
+            Vertex v = add_vertex(G);
+        }
+        valid = vector<bool>(n, true);
+        
+        while (getline(infile, line)) {
+            istringstream iss(line);
+            size_t u, v;
+            double weight;
+            iss >> u >> v >> weight;
+            weight *= (reverse_weight ? -1.0 : 1.0);
+            add_edge(u, v, EdgeProperty{weight}, G);
+            total_weight += weight;
         }
     }
 
@@ -179,7 +135,7 @@ public:
         vector<MinHeap::handle_type> handles(num_vertices(G));
         for (auto [vi, ve] = vertices(G); vi != ve; ++vi) {
             auto h = pq.push(MinHeapNode{C * pos_deg[*vi] - neg_deg[*vi], *vi});
-            handles[G[*vi].id] = h;
+            handles[*vi] = h;
         }
         auto current_weight_sum = total_weight;
         auto current_vertex_count = num_vertices(G);
@@ -192,18 +148,18 @@ public:
         while (!pq.empty()) {
             auto u = pq.top().node;
             pq.pop();
-            valid[G[u].id] = false;
-            remove_order.push_back(G[u].id);
+            valid[u] = false;
+            remove_order.push_back(u);
             current_vertex_count--;
 
-            for (auto [edge_it, edge_end] = out_edges(u, G); edge_it != edge_end; ++edge_it) {
-                auto v = target(*edge_it, G);
-                if (valid[G[v].id] || v == u) {
-                    double weight = G[*edge_it].weight;
+            for (auto [ei, ee] = out_edges(u, G); ei != ee; ++ei) {
+                auto v = target(*ei, G);
+                if (valid[v] || v == u) {
+                    double weight = G[*ei].weight;
                     current_weight_sum -= weight;
                     if (u == v) continue;
-                    auto new_key = (*handles[G[v].id]).key - (weight > 0 ? C * weight : weight);
-                    pq.update(handles[G[v].id], MinHeapNode{new_key, v});
+                    auto new_key = (*handles[v]).key - (weight > 0 ? C * weight : weight);
+                    pq.update(handles[v], MinHeapNode{new_key, v});
                 }
             }
 
@@ -243,7 +199,9 @@ public:
                 max_edge = *ei;
             }
         }
-        return {{G[source(max_edge, G)].id, G[target(max_edge, G)].id}, max_weight / 2};
+        auto u = source(max_edge, G);
+        auto v = target(max_edge, G);
+        return ((u == v) ? SubgraphResult{{u}, max_weight} : SubgraphResult{{u, v}, max_weight / 2});
     }
 
     SubgraphResult Peeling(bool positive_only = false) {
@@ -252,14 +210,13 @@ public:
         vector<MinHeap::handle_type> handles(num_vertices(G));
         for (auto [vi, ve] = vertices(G); vi != ve; ++vi) {
             double degree = 0.0;
-            for (auto [edge_it, edge_end] = out_edges(*vi, G); edge_it != edge_end; ++edge_it) {
-                double weight = G[*edge_it].weight;
+            for (auto [ei, ee] = out_edges(*vi, G); ei != ee; ++ei) {
+                double weight = G[*ei].weight;
                 if (!positive_only || weight > 0) {
                     degree += weight;
                 }
             }
-            auto h = pq.push(MinHeapNode{degree, *vi});
-            handles[G[*vi].id] = h;
+            handles[*vi] = pq.push(MinHeapNode{degree, *vi});
         }
         auto current_weight_sum = total_weight;
         if (positive_only) {
@@ -280,19 +237,19 @@ public:
         while (!pq.empty()) {
             auto u = pq.top().node;
             pq.pop();
-            valid[G[u].id] = false;
-            remove_order.push_back(G[u].id);
+            valid[u] = false;
+            remove_order.push_back(u);
             current_vertex_count--;
 
-            for (auto [edge_it, edge_end] = out_edges(u, G); edge_it != edge_end; ++edge_it) {
-                auto v = target(*edge_it, G);
-                double weight = G[*edge_it].weight;
+            for (auto [ei, ee] = out_edges(u, G); ei != ee; ++ei) {
+                auto v = target(*ei, G);
+                double weight = G[*ei].weight;
                 if (positive_only && weight < 0) continue;
-                if (valid[G[v].id] || v == u) {
+                if (valid[v] || v == u) {
                     current_weight_sum -= weight;
                     if (u == v) continue;
-                    auto new_key = (*handles[G[v].id]).key - weight;
-                    pq.update(handles[G[v].id], MinHeapNode{new_key, v});
+                    auto new_key = (*handles[v]).key - weight;
+                    pq.update(handles[v], MinHeapNode{new_key, v});
                 }
             }
 
@@ -302,12 +259,31 @@ public:
                 best_step = remove_order.size();
             }
         }
+
+        if (positive_only) {
+            // compute the real density
+            vector<bool> selected(num_vertices(G), false);
+            for (auto p = remove_order.begin() + best_step; p != remove_order.end(); ++p) {
+                selected[*p] = true;
+            }
+            double total_weight_sum = 0.0;
+            for (auto [ei, ee] = edges(G); ei != ee; ++ei) {
+                size_t u = source(*ei, G);
+                size_t v = target(*ei, G);
+                if (selected[u] && selected[v] && u <= v) {
+                    total_weight_sum += G[*ei].weight;
+                }
+            }
+            best_density = total_weight_sum / (remove_order.size() - best_step);
+        }
+
         return {{remove_order.begin() + best_step, remove_order.end()}, best_density};
     }
 
     SubgraphResult MaxConnectedComponent(const vector<size_t>& nodes) {
-        set<size_t> node_set(nodes.begin(), nodes.end());
-        set<size_t> visited;
+        std::unordered_set<size_t> node_set(nodes.begin(), nodes.end());
+        std::unordered_set<size_t> visited;
+        visited.reserve(nodes.size());
         SubgraphResult best {{}, -numeric_limits<double>::infinity()};
 
         for (auto start : nodes) {
@@ -318,24 +294,22 @@ public:
             visited.insert(start);
             
             for (size_t i = 0; i < component.size(); i++) {
-                Vertex u = vertex(component[i], G);
-                for (auto [e, e_end] = out_edges(u, G); e != e_end; ++e) {
-                    // if (G[*e].weight == 0.0) continue;
-                    size_t v_id = G[target(*e, G)].id;
-                    if (node_set.count(v_id) && !visited.count(v_id)) {
-                        visited.insert(v_id);
-                        component.push_back(v_id);
+                Vertex u = component[i];
+                for (auto [ei, ee] = out_edges(u, G); ei != ee; ++ei) {
+                    size_t v = target(*ei, G);
+                    if (node_set.count(v) && !visited.count(v)) {
+                        visited.insert(v);
+                        component.push_back(v);
                     }
                 }
             }
             
             double total_weight = 0.0;
-            for (auto u_id : component) {
-                Vertex u = vertex(u_id, G);
-                for (auto [e, e_end] = out_edges(u, G); e != e_end; ++e) {
-                    size_t v_id = G[target(*e, G)].id;
-                    if (node_set.count(v_id) && u_id <= v_id) {
-                        total_weight += G[*e].weight;
+            for (auto u : component) {
+                for (auto [ei, ee] = out_edges(u, G); ei != ee; ++ei) {
+                    size_t v = target(*ei, G);
+                    if (node_set.count(v) && u <= v) {
+                        total_weight += G[*ei].weight;
                     }
                 }
             }
@@ -343,8 +317,7 @@ public:
             if (density > best.density) {
                 best = {component, density};
             }
-        }
-        
+        }        
         return best;
     }
 
@@ -368,7 +341,7 @@ private:
         double key;
         Vertex node;
         bool operator<(const MaxHeapNode& other) const {
-            return key < other.key || (key == other.key && node < other.node);
+            return (key < other.key) || (key == other.key && node < other.node);
         }
     };
     using MaxHeap = heap::fibonacci_heap<MaxHeapNode>;
@@ -377,65 +350,50 @@ private:
         Fringe,
         In
     };
-
     vector<Status> status;
     vector<double> loop_weight;
     vector<size_t> neighbor_in_count;
-    // TODO: use set first, need to change to Fibonacci heap later to see performance
+    vector<double> pos_weight;
+    bool pruning_set_on = false;
     set<MaxHeapNode> pruning_set;
     vector<set<MaxHeapNode>::iterator> pruning_handles;
+
+    const unsigned toggle_done = 2;
+    const unsigned toggle_left = 20;
 
 public:
     CEP(const string& input, bool reverse_weight) {
         ReadGraph(input, reverse_weight);
     }
 
-    void InitPruningSet() {
-        pruning_handles.resize(num_vertices(G));
-        for (auto [vi, ve] = vertices(G); vi != ve; ++vi) {
-            double degree = loop_weight[G[*vi].id];
-            for (auto [edge_it, edge_end] = out_edges(*vi, G); edge_it != edge_end; ++edge_it) {
-                if (G[*edge_it].weight > 0) {
-                    degree += G[*edge_it].weight;
-                }
-            }
-            pruning_handles[G[*vi].id] = pruning_set.insert({degree, *vi}).first;
-        }
-    }
-
     void ReadGraph(const string& input, bool reverse_weight) override {
-        try {
-            ifstream infile(input);
-            size_t n = 0, m = 0;
-            string line;
-            getline(infile, line);
-            istringstream iss_first(line);
-            iss_first >> n >> m;
-            for (size_t i = 0; i < n; ++i) {
-                Vertex v = add_vertex(G);
-                G[v].id = i;
+        ifstream infile(input);
+        size_t n = 0, m = 0;
+        string line;
+        getline(infile, line);
+        istringstream iss_first(line);
+        iss_first >> n >> m;
+        for (size_t i = 0; i < n; ++i) {
+            Vertex v = add_vertex(G);
+        }
+        valid = vector<bool>(n, true);
+        status = vector<Status>(n, Status::Out);
+        loop_weight = vector<double>(n, 0.0);
+        neighbor_in_count = vector<size_t>(n, 0);
+        pos_weight = vector<double>(n, 0.0);
+        
+        while (getline(infile, line)) {
+            istringstream iss(line);
+            size_t u, v;
+            double weight;
+            iss >> u >> v >> weight;
+            weight *= (reverse_weight ? -1.0 : 1.0);
+            if (u == v) {
+                loop_weight[u] += weight;
+            } else {
+                add_edge(u, v, EdgeProperty{weight}, G);
             }
-            valid = vector<bool>(n, true);
-            status = vector<Status>(n, Status::Out);
-            loop_weight = vector<double>(n, 0.0);
-            neighbor_in_count = vector<size_t>(n, 0);
-            
-            while (getline(infile, line)) {
-                istringstream iss(line);
-                size_t u, v;
-                double weight;
-                iss >> u >> v >> weight;
-                weight *= (reverse_weight ? -1.0 : 1.0);
-                if (u == v) {
-                    loop_weight[u] += weight;
-                } else {
-                    add_edge(u, v, EdgeProperty{weight}, G);
-                }
-                total_weight += weight;
-            }
-        } catch(const std::exception& e) {
-            cerr << e.what() << '\n';
-            exit(EXIT_FAILURE);
+            total_weight += weight;
         }
     }
 
@@ -443,12 +401,12 @@ public:
         MinHeap pq;
         vector<MinHeap::handle_type> handles(num_vertices(G));
         for (auto [vi, ve] = vertices(G); vi != ve; ++vi) {
-            double degree = loop_weight[G[*vi].id];
-            for (auto [edge_it, edge_end] = out_edges(*vi, G); edge_it != edge_end; ++edge_it) {
-                degree += G[*edge_it].weight;
+            double degree = loop_weight[*vi];
+            for (auto [ei, ee] = out_edges(*vi, G); ei != ee; ++ei) {
+                degree += G[*ei].weight;
             }
             auto h = pq.push(MinHeapNode{degree, *vi});
-            handles[G[*vi].id] = h;
+            handles[*vi] = h;
         }
         auto current_weight_sum = total_weight;
         auto current_vertex_count = num_vertices(G);
@@ -461,18 +419,18 @@ public:
         while (!pq.empty()) {
             auto u = pq.top().node;
             pq.pop();
-            valid[G[u].id] = false;
-            remove_order.push_back(G[u].id);
+            valid[u] = false;
+            remove_order.push_back(u);
             current_vertex_count--;
-            current_weight_sum -= loop_weight[G[u].id];
+            current_weight_sum -= loop_weight[u];
 
-            for (auto [edge_it, edge_end] = out_edges(u, G); edge_it != edge_end; ++edge_it) {
-                auto v = target(*edge_it, G);
-                double weight = G[*edge_it].weight;
-                if (valid[G[v].id]) {
+            for (auto [ei, ee] = out_edges(u, G); ei != ee; ++ei) {
+                auto v = target(*ei, G);
+                double weight = G[*ei].weight;
+                if (valid[v]) {
                     current_weight_sum -= weight;
-                    auto new_key = (*handles[G[v].id]).key - weight;
-                    pq.update(handles[G[v].id], MinHeapNode{new_key, v});
+                    auto new_key = (*handles[v]).key - weight;
+                    pq.update(handles[v], MinHeapNode{new_key, v});
                 }
             }
 
@@ -486,44 +444,42 @@ public:
         return {{remove_order.begin() + best_step, remove_order.end()}, best_density};
     }
 
-    void Pruning(double threshold_density) {
-        while (!pruning_set.empty() && pruning_set.begin()->key < threshold_density) {
-            auto it = pruning_set.begin();
-            auto u = it->node;
-            pruning_set.erase(it);
-            valid[G[u].id] = false;
-            // pruning_handles[G[u].id] = MaxHeap::handle_type();
+    vector<double> InitializePositiveWeights() {
+        for (auto [ei, ee] = edges(G); ei != ee; ++ei) {
+            double weight = G[*ei].weight;
+            if (weight > 0) {
+                pos_weight[source(*ei, G)] += weight;
+                pos_weight[target(*ei, G)] += weight;
+            }
+        }
+        for (auto [vi, ve] = vertices(G); vi != ve; ++vi) {
+            pos_weight[*vi] += loop_weight[*vi];
+        }
+        return pos_weight;
+    }
 
-            for (auto [edge_it, edge_end] = out_edges(u, G); edge_it != edge_end; ++edge_it) {
-                auto v = target(*edge_it, G);
-                if (valid[G[v].id] && G[*edge_it].weight > 0) {
-                    auto v_it = pruning_handles[G[v].id];
-                    auto new_key = v_it->key - G[*edge_it].weight;
-                    pruning_set.erase(v_it);
-                    pruning_handles[G[v].id] = pruning_set.insert({new_key, v}).first;
+    void PruningModeToggle (unsigned it, unsigned max_local_optima) {
+        if (!pruning_set_on) {
+            if (it >= toggle_done && max_local_optima - it >= toggle_left) {
+                pruning_set_on = true;
+                pruning_handles.resize(num_vertices(G));
+                for (auto [vi, ve] = vertices(G); vi != ve; ++vi) {
+                    if (valid[*vi]) {
+                        pruning_handles[*vi] = pruning_set.insert({pos_weight[*vi], *vi}).first;
+                    }
                 }
             }
         }
     }
 
-    void Pruning(const SubgraphResult& result) {
-        for (auto node_id : result.nodes) {
-            auto u = vertex(node_id, G);
-            pruning_set.erase(pruning_handles[G[u].id]);
-            valid[G[u].id] = false;
-            // pruning_handles[G[u].id] = MaxHeap::handle_type();
-
-            for (auto [edge_it, edge_end] = out_edges(u, G); edge_it != edge_end; ++edge_it) {
-                auto v = target(*edge_it, G);
-                if (valid[G[v].id] && G[*edge_it].weight > 0) {
-                    auto v_it = pruning_handles[G[v].id];
-                    auto new_key = v_it->key - G[*edge_it].weight;
-                    pruning_set.erase(v_it);
-                    pruning_handles[G[v].id] = pruning_set.insert({new_key, v}).first;
-                }
-            }
+    Vertex FindAnchor() {
+        if (pruning_set_on) {
+            return pruning_set.empty() ? Traits::null_vertex() : pruning_set.begin()->node;
+        } else {
+            return std::distance(pos_weight.begin(), max_element(pos_weight.begin(), pos_weight.end()));
         }
     }
+
 
     SubgraphResult LocalGreedy(Vertex anchor, unsigned max_neg) {
         // ============== Clear and initialization ==============
@@ -533,71 +489,69 @@ public:
         double max_f = -numeric_limits<double>::infinity();
         MaxHeap selected, fringe, best;
         vector<MaxHeap::handle_type> handles(num_vertices(G));
-        status[G[anchor].id] = Status::Fringe;
-        handles[G[anchor].id] = fringe.push({loop_weight[G[anchor].id], anchor});
+        status[anchor] = Status::Fringe;
+        handles[anchor] = fringe.push({loop_weight[anchor], anchor});
         unsigned neg_count = 0;
         Vertex next = anchor;
 
         // ============== Main loop ==============
         while (next != Traits::null_vertex() && neg_count < max_neg) {
-            if (status[G[next].id] == Status::Fringe) {
+            if (status[next] == Status::Fringe) {
                 // ============== If node is "fringe" → move it to "in" ==============
-                status[G[next].id] = Status::In;
+                status[next] = Status::In;
                 auto item = fringe.top();
                 fringe.pop();
-                handles[G[next].id] = selected.push({-item.key, next});
+                handles[next] = selected.push({-item.key, next});
                 current_weight_sum += item.key;
-                for (auto [edge_it, edge_end] = out_edges(next, G); edge_it != edge_end; ++edge_it) {
-                    auto neighbor = target(*edge_it, G);
-                    auto neighbor_id = G[neighbor].id;
-                    if (!valid[neighbor_id]) continue;
+                for (auto [ei, ee] = out_edges(next, G); ei != ee; ++ei) {
+                    auto neighbor = target(*ei, G);
+                    if (!valid[neighbor]) continue;
 
-                    double edge_weight = G[*edge_it].weight;
-                    neighbor_in_count[neighbor_id] += 1;
-                    if (status[neighbor_id] == Status::Out) {
+                    double edge_weight = G[*ei].weight;
+                    neighbor_in_count[neighbor] += 1;
+                    if (status[neighbor] == Status::Out) {
                         // Move out → fringe
-                        status[neighbor_id] = Status::Fringe;
-                        double priority_key = edge_weight + loop_weight[neighbor_id];
-                        handles[neighbor_id] = fringe.push({priority_key, neighbor});
-                    } else if (status[neighbor_id] == Status::Fringe) {
+                        status[neighbor] = Status::Fringe;
+                        double priority_key = edge_weight + loop_weight[neighbor];
+                        handles[neighbor] = fringe.push({priority_key, neighbor});
+                    } else if (status[neighbor] == Status::Fringe) {
                         // Update fringe neighbor's key
-                        auto h = handles[neighbor_id];
+                        auto h = handles[neighbor];
                         fringe.update(h, {(*h).key + edge_weight, neighbor});
-                    } else if (status[neighbor_id] == Status::In) {
+                    } else if (status[neighbor] == Status::In) {
                         // Update selected neighbor's key
-                        auto h = handles[neighbor_id];
+                        auto h = handles[neighbor];
                         selected.update(h, {(*h).key - edge_weight, neighbor});
                     } else {
                         throw runtime_error("Invalid status in LocalGreedy");
                     }
                 }
-            } else if (status[G[next].id] == Status::In) {
+            } else if (status[next] == Status::In) {
                 // ============== If node is "in" → move it to "fringe" ==============
-                status[G[next].id] = Status::Fringe;
+                status[next] = Status::Fringe;
                 auto item = selected.top();
                 selected.pop();
-                handles[G[next].id] = fringe.push({-item.key, next});
+                handles[next] = fringe.push({-item.key, next});
                 current_weight_sum += item.key;
-                for (auto [edge_it, edge_end] = out_edges(next, G); edge_it != edge_end; ++edge_it) {
-                    auto neighbor = target(*edge_it, G);
-                    auto neighbor_id = G[neighbor].id;
-                    if (!valid[neighbor_id]) continue;
+                for (auto [ei, ee] = out_edges(next, G); ei != ee; ++ei) {
+                    auto neighbor = target(*ei, G);
+                    if (!valid[neighbor]) continue;
 
-                    double edge_weight = G[*edge_it].weight;
-                    neighbor_in_count[neighbor_id] -= 1;
-                    if (status[neighbor_id] == Status::Fringe) {
+                    double edge_weight = G[*ei].weight;
+                    neighbor_in_count[neighbor] -= 1;
+                    if (status[neighbor] == Status::Fringe) {
                         // Possibly move fringe → out if in_neighbor_count == 0
-                        if (neighbor_in_count[neighbor_id] == 0) {
-                            status[neighbor_id] = Status::Out;
-                            fringe.erase(handles[neighbor_id]);
-                            handles[neighbor_id] = MaxHeap::handle_type();
+                        if (neighbor_in_count[neighbor] == 0) {
+                            status[neighbor] = Status::Out;
+                            fringe.erase(handles[neighbor]);
+                            handles[neighbor] = MaxHeap::handle_type();
                         } else {
-                            auto new_key = (*handles[neighbor_id]).key - edge_weight;
-                            fringe.update(handles[neighbor_id], {new_key, neighbor});
+                            auto new_key = (*handles[neighbor]).key - edge_weight;
+                            fringe.update(handles[neighbor], {new_key, neighbor});
                         }
-                    } else if (status[neighbor_id] == Status::In) {
+                    } else if (status[neighbor] == Status::In) {
                         // Update selected neighbor's key
-                        auto h = handles[neighbor_id];
+                        auto h = handles[neighbor];
                         selected.update(h, {(*h).key + edge_weight, neighbor});
                     } else {
                         throw runtime_error("Invalid status in LocalGreedy");
@@ -659,15 +613,13 @@ public:
         while (!selected.empty()) {
             auto top_item = selected.top();
             selected.pop();
-            auto top_id = G[top_item.node].id;
-            remove_order.push_back(top_id);
-            status[top_id] = Status::Out;
-            for (auto [edge_it, edge_end] = out_edges(top_item.node, G); edge_it != edge_end; ++edge_it) {
-                auto neighbor = target(*edge_it, G);
-                auto neighbor_id = G[neighbor].id;
-                if (!valid[neighbor_id] || status[neighbor_id] != Status::In) continue;
-                auto h = handles[neighbor_id];
-                selected.update(h, {(*h).key + G[*edge_it].weight, neighbor});
+            remove_order.push_back(top_item.node);
+            status[top_item.node] = Status::Out;
+            for (auto [ei, ee] = out_edges(top_item.node, G); ei != ee; ++ei) {
+                auto neighbor = target(*ei, G);
+                if (!valid[neighbor] || status[neighbor] != Status::In) continue;
+                auto h = handles[neighbor];
+                selected.update(h, {(*h).key + G[*ei].weight, neighbor});
             }
             current_weight_sum += top_item.key;
             if (!selected.empty()) {
@@ -683,26 +635,89 @@ public:
         } else {
             vector<size_t> best_nodes;
             for (auto& item : best) {
-                best_nodes.push_back(G[item.node].id);
+                best_nodes.push_back(item.node);
             }
             return {best_nodes, max_f};
         }
     }
 
+    void PruningSet(const vector<size_t>& nodes, double threshold_density) {
+        for (auto node : nodes) {
+            pruning_set.erase(pruning_handles[node]);
+            valid[node] = false;
+            for (auto [ei, ee] = out_edges(node, G); ei != ee; ++ei) {
+                auto v = target(*ei, G);
+                if (valid[v] && G[*ei].weight > 0) {
+                    auto v_it = pruning_handles[v];
+                    auto new_key = v_it->key - G[*ei].weight;
+                    pruning_set.erase(v_it);
+                    pruning_handles[v] = pruning_set.insert({new_key, v}).first;
+                }
+            }
+        }
+        while (!pruning_set.empty() && pruning_set.begin()->key < threshold_density) {
+            auto it = pruning_set.begin();
+            auto u = it->node;
+            pruning_set.erase(it);
+            valid[u] = false;
+            for (auto [ei, ee] = out_edges(u, G); ei != ee; ++ei) {
+                auto v = target(*ei, G);
+                if (valid[v] && G[*ei].weight > 0) {
+                    auto v_it = pruning_handles[v];
+                    auto new_key = v_it->key - G[*ei].weight;
+                    pruning_set.erase(v_it);
+                    pruning_handles[v] = pruning_set.insert({new_key, v}).first;
+                }
+            }
+        }
+    }
+
+    void PruningVector(const vector<size_t>& nodes, double threshold_density) {
+        for (auto node : nodes) {
+            valid[node] = false;
+            pos_weight[node] = -numeric_limits<double>::infinity();
+            for (auto [ei, ee] = out_edges(node, G); ei != ee; ++ei) {
+                auto v = target(*ei, G);
+                if (valid[v]) {
+                    double weight = G[*ei].weight;
+                    if (weight > 0) {
+                        pos_weight[v] -= weight;
+                    }
+                }
+            }
+        }
+        for (size_t i = 0; i != pos_weight.size(); ++i) {
+            if (valid[i] && pos_weight[i] < threshold_density) {
+                valid[i] = false;
+                pos_weight[i] = -numeric_limits<double>::infinity();
+                for (auto [ei, ee] = out_edges(i, G); ei != ee; ++ei) {
+                    auto v = target(*ei, G);
+                    if (valid[v]) {
+                        double weight = G[*ei].weight;
+                        if (weight > 0) {
+                            pos_weight[v] -= weight;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     SubgraphResult Run(unsigned max_neg, unsigned max_local_optima, bool do_peeling) {
         // Step 1. Contraction by Peeling
-        InitPruningSet();
         SubgraphResult best = do_peeling ? Peeling() : SubgraphResult{{}, 0.0};
 
         // Step 2. Expansion by Multi-Local Search
+        InitializePositiveWeights();
         for (unsigned it = 0; it < max_local_optima; ++it) {
-            Pruning(best.density);
-            if (pruning_set.empty() || pruning_set.rbegin()->key <= best.density) break;
-            auto result = LocalGreedy(pruning_set.rbegin()->node, max_neg);
+            PruningModeToggle(it, max_local_optima);
+            auto anchor = FindAnchor();
+            if (anchor == Traits::null_vertex() || !valid[anchor]) break;
+            auto result = LocalGreedy(anchor, max_neg);
             if (result.density > best.density) {
                 best = result;
             }
-            Pruning(result);
+            pruning_set_on ? PruningSet(result.nodes, best.density) : PruningVector(result.nodes, best.density);
         }
         return best;
     }

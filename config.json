@@ -78,7 +78,7 @@
             },
             {
                 "path": "/Users/zxj/Desktop/NDS/input/synthetic/WS/",
-                "toggle": true
+                "toggle": false
             },
             {
                 "path": "/Users/zxj/Desktop/NDS/input/synthetic/BA/",
@@ -146,24 +146,25 @@
                 "toggle": true,
                 "exe": "/Users/zxj/Desktop/NDS/src/NEG_DSD/build/NEG_DSD",
                 "params": {
-                    "C_values": "1.0",
+                    "C_values": "0.9,1.0,1.1,1.2",
                     "num_iter": 1
                 }
             },
             {
                 "name": "DCSGreedy",
-                "toggle": false,
+                "toggle": true,
                 "exe": "/Users/zxj/Desktop/NDS/src/DCSGreedy/build/DCSGreedy",
                 "params": {
                     "num_iter": 1
                 }
-            },{
+            },
+            {
                 "name": "CEP",
                 "toggle": true,
                 "exe": "/Users/zxj/Desktop/NDS/src/CEP/build/CEP",
                 "params": {
-                    "max_neg": 100,
-                    "max_local_optima": 10,
+                    "max_neg": 2000,
+                    "max_local_optima": 5,
                     "do_peeling": true,
                     "num_iter": 1
                 }
@@ -172,46 +173,14 @@
     },
     "test": {
         "input": [
-            "/Users/zxj/Desktop/NDS/input/synthetic/ER/ER_n100000_m300000_setting68_inst0.txt" 
+            "/Users/zxj/Desktop/NDS/input/synthetic/SBM/SBM_n10000_blocks4_setting28_inst0.txt" 
         ],
         "weight_reverse": false,
         "output": "/Users/zxj/Desktop/NDS/output/test/",
         "competitors": [
             {
-                "name": "LNDS",
-                "exe": "/Users/zxj/Desktop/NDS/src/LNDS/build/LNDS",
-                "params": {
-                    "max_neg": 100,
-                    "num_iter": 1
-                }
-            },
-            {
-                "name": "LNDS_EP",
-                "exe": "/Users/zxj/Desktop/NDS/src/LNDS-EP/build/LNDS-EP",
-                "params": {
-                    "max_neg": 500,
-                    "num_iter": 1
-                }
-            },
-            {
-                "name": "GNDS",
-                "exe": "/Users/zxj/Desktop/NDS/src/GNDS/build/GNDS",
-                "params": {
-                    "max_neg": 500,
-                    "max_local_optima": 11,
-                    "num_iter": 1
-                }
-            },
-            {
-                "name": "NEG_DSD",
-                "exe": "/Users/zxj/Desktop/NDS/src/NEG-DSD/build/NEG-DSD",
-                "params": {
-                    "C": 1,
-                    "num_iter": 1
-                }
-            },
-            {
                 "name": "DCSGreedy",
+                "toggle": true,
                 "exe": "/Users/zxj/Desktop/NDS/src/DCSGreedy/build/DCSGreedy",
                 "params": {
                     "num_iter": 1
