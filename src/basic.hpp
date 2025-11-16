@@ -43,6 +43,7 @@ protected:
     Graph G;
     vector<bool> valid;
     double total_weight = 0.0;
+    vector<double> loop_weight;
 
     PGraph() = default;
 
@@ -51,7 +52,7 @@ public:
         ReadGraph(input, reverse_weight);
     }
 
-    virtual void ReadGraph(const string& input, bool reverse_weight) {
+    void ReadGraph(const string& input, bool reverse_weight) {
         ifstream infile(input);
         size_t n = 0, m = 0;
         string line;
@@ -62,6 +63,7 @@ public:
             Vertex v = add_vertex(G);
         }
         valid = vector<bool>(n, true);
+        loop_weight = vector<double>(n, 0.0);
         
         while (getline(infile, line)) {
             istringstream iss(line);
@@ -69,7 +71,11 @@ public:
             double weight;
             iss >> u >> v >> weight;
             weight *= (reverse_weight ? -1.0 : 1.0);
-            add_edge(u, v, EdgeProperty{weight}, G);
+            if (u == v) {
+                loop_weight[u] += weight;
+            } else {
+                add_edge(u, v, EdgeProperty{weight}, G);
+            }
             total_weight += weight;
         }
     }
@@ -117,14 +123,10 @@ public:
             double weight = G[*ei].weight;
             if (weight > 0) {
                 pos_deg[u] += weight;
-                if (u != v) {
-                    pos_deg[v] += weight;
-                }
+                pos_deg[v] += weight;
             } else {
                 neg_deg[u] += -weight;
-                if (u != v) {
-                    neg_deg[v] += -weight;
-                }
+                neg_deg[v] += -weight;
             }
         }
     }
@@ -134,8 +136,9 @@ public:
         MinHeap pq;
         vector<MinHeap::handle_type> handles(num_vertices(G));
         for (auto [vi, ve] = vertices(G); vi != ve; ++vi) {
-            auto h = pq.push(MinHeapNode{C * pos_deg[*vi] - neg_deg[*vi], *vi});
-            handles[*vi] = h;
+            auto key = C * pos_deg[*vi] - neg_deg[*vi];
+            key += loop_weight[*vi] > 0 ? C * loop_weight[*vi] : loop_weight[*vi];
+            handles[*vi] = pq.push(MinHeapNode{key, *vi});
         }
         auto current_weight_sum = total_weight;
         auto current_vertex_count = num_vertices(G);
@@ -150,14 +153,14 @@ public:
             pq.pop();
             valid[u] = false;
             remove_order.push_back(u);
+            current_weight_sum -= loop_weight[u];
             current_vertex_count--;
 
             for (auto [ei, ee] = out_edges(u, G); ei != ee; ++ei) {
                 auto v = target(*ei, G);
-                if (valid[v] || v == u) {
+                if (valid[v]) {
                     double weight = G[*ei].weight;
                     current_weight_sum -= weight;
-                    if (u == v) continue;
                     auto new_key = (*handles[v]).key - (weight > 0 ? C * weight : weight);
                     pq.update(handles[v], MinHeapNode{new_key, v});
                 }
@@ -192,16 +195,21 @@ public:
 
     SubgraphResult MaxEdge() {
         double max_weight = -numeric_limits<double>::infinity();
-        Edge max_edge;
+        vector<size_t> max_edge;
         for (auto [ei, ee] = edges(G); ei != ee; ++ei) {
-            if (G[*ei].weight > max_weight) {
-                max_weight = G[*ei].weight;
-                max_edge = *ei;
+            auto current_weight = G[*ei].weight / 2;
+            if (current_weight > max_weight) {
+                max_weight = current_weight;
+                max_edge = {source(*ei, G), target(*ei, G)};
             }
         }
-        auto u = source(max_edge, G);
-        auto v = target(max_edge, G);
-        return ((u == v) ? SubgraphResult{{u}, max_weight} : SubgraphResult{{u, v}, max_weight / 2});
+        for (auto [vi, ve] = vertices(G); vi != ve; ++vi) {
+            if (loop_weight[*vi] > max_weight) {
+                max_weight = loop_weight[*vi];
+                max_edge = {*vi};
+            }
+        }
+        return SubgraphResult{max_edge, max_weight};
     }
 
     SubgraphResult Peeling(bool positive_only = false) {
@@ -209,7 +217,7 @@ public:
         MinHeap pq;
         vector<MinHeap::handle_type> handles(num_vertices(G));
         for (auto [vi, ve] = vertices(G); vi != ve; ++vi) {
-            double degree = 0.0;
+            double degree = (positive_only && loop_weight[*vi] < 0) ? 0.0 : loop_weight[*vi];
             for (auto [ei, ee] = out_edges(*vi, G); ei != ee; ++ei) {
                 double weight = G[*ei].weight;
                 if (!positive_only || weight > 0) {
@@ -226,6 +234,11 @@ public:
                     current_weight_sum += G[*ei].weight;
                 }
             }
+            for (auto [vi, ve] = vertices(G); vi != ve; ++vi) {
+                if (loop_weight[*vi] > 0) {
+                    current_weight_sum += loop_weight[*vi];
+                }
+            }
         }
         auto current_vertex_count = num_vertices(G);
         auto current_density = current_vertex_count > 0 ? current_weight_sum / current_vertex_count : 0.0;
@@ -239,15 +252,16 @@ public:
             pq.pop();
             valid[u] = false;
             remove_order.push_back(u);
+            if (!positive_only || loop_weight[u] > 0) {
+                current_weight_sum -= loop_weight[u];
+            }
             current_vertex_count--;
 
             for (auto [ei, ee] = out_edges(u, G); ei != ee; ++ei) {
                 auto v = target(*ei, G);
                 double weight = G[*ei].weight;
-                if (positive_only && weight < 0) continue;
-                if (valid[v] || v == u) {
+                if ((!positive_only || weight > 0) && valid[v]) {
                     current_weight_sum -= weight;
-                    if (u == v) continue;
                     auto new_key = (*handles[v]).key - weight;
                     pq.update(handles[v], MinHeapNode{new_key, v});
                 }
@@ -263,10 +277,11 @@ public:
         if (positive_only) {
             // compute the real density
             vector<bool> selected(num_vertices(G), false);
+            double total_weight_sum = 0.0;
             for (auto p = remove_order.begin() + best_step; p != remove_order.end(); ++p) {
                 selected[*p] = true;
+                total_weight_sum += loop_weight[*p];
             }
-            double total_weight_sum = 0.0;
             for (auto [ei, ee] = edges(G); ei != ee; ++ei) {
                 size_t u = source(*ei, G);
                 size_t v = target(*ei, G);
@@ -276,7 +291,6 @@ public:
             }
             best_density = total_weight_sum / (remove_order.size() - best_step);
         }
-
         return {{remove_order.begin() + best_step, remove_order.end()}, best_density};
     }
 
@@ -312,6 +326,7 @@ public:
                         total_weight += G[*ei].weight;
                     }
                 }
+                total_weight += loop_weight[u];
             }
             double density = total_weight / component.size();
             if (density > best.density) {
@@ -327,7 +342,9 @@ public:
             return {{}, 0.0};
         }
         auto S1 = Peeling();
+        cout << "Peeling result density: " << S1.density << endl;
         auto S2 = Peeling(true);
+        cout << "Positive-only Peeling result density: " << S2.density << endl;
         if (S1.density > S.density) S = S1;
         if (S2.density > S.density) S = S2;
 
@@ -351,7 +368,6 @@ private:
         In
     };
     vector<Status> status;
-    vector<double> loop_weight;
     vector<size_t> neighbor_in_count;
     vector<double> pos_weight;
     bool pruning_set_on = false;
@@ -364,37 +380,9 @@ private:
 public:
     CEP(const string& input, bool reverse_weight) {
         ReadGraph(input, reverse_weight);
-    }
-
-    void ReadGraph(const string& input, bool reverse_weight) override {
-        ifstream infile(input);
-        size_t n = 0, m = 0;
-        string line;
-        getline(infile, line);
-        istringstream iss_first(line);
-        iss_first >> n >> m;
-        for (size_t i = 0; i < n; ++i) {
-            Vertex v = add_vertex(G);
-        }
-        valid = vector<bool>(n, true);
-        status = vector<Status>(n, Status::Out);
-        loop_weight = vector<double>(n, 0.0);
-        neighbor_in_count = vector<size_t>(n, 0);
-        pos_weight = vector<double>(n, 0.0);
-        
-        while (getline(infile, line)) {
-            istringstream iss(line);
-            size_t u, v;
-            double weight;
-            iss >> u >> v >> weight;
-            weight *= (reverse_weight ? -1.0 : 1.0);
-            if (u == v) {
-                loop_weight[u] += weight;
-            } else {
-                add_edge(u, v, EdgeProperty{weight}, G);
-            }
-            total_weight += weight;
-        }
+        status = vector<Status>(num_vertices(G), Status::Out);
+        neighbor_in_count = vector<size_t>(num_vertices(G), 0);
+        pos_weight = vector<double>(num_vertices(G), 0.0);
     }
 
     SubgraphResult Peeling() {
