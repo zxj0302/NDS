@@ -30,8 +30,7 @@ def run(config, single=True, skip=True):
 
                 # comp_name is the function name
                 func = globals().get(comp_name)
-                result = func(competitor)
-
+                result = func(competitor)  # type: ignore
                 logger.info(f'{comp_name:<9}: time: {result[0]:.6f}s, density: {result[1]:.6f}')
     else:
         reverse = config.get('weight_reverse', False)
@@ -58,76 +57,9 @@ def run(config, single=True, skip=True):
 
                     # comp_name is the function name
                     func = globals().get(comp_name)
-                    result = func(competitor)
-
+                    result = func(competitor)  # type: ignore
                     logger.info(f'{comp_name:<9}: time: {result[0]:.6f}s, density: {result[1]:.6f}')
-
     logger.success('All done!')
-
-
-def GNDS(config):
-    program = config.get('exe')
-    params = config.get('params')
-    input = params.get('input')
-    output = params.get('output')
-    reverse = params.get('reverse')
-    max_neg = params.get('max_neg')
-    max_local_optima = params.get('max_local_optima')
-    num_iter = params.get('num_iter', 1)
-    subprocess.run([program, input, output, "1" if reverse else "0", str(max_neg), str(max_local_optima), str(num_iter)], check=True)
-    # readin the output file
-    result = json.load(open(output))
-    return result['time'], result['density'], result['nodes']
-
-
-def QPBO_MIP(config):
-    program = config.get('exe')
-    params = config.get('params')
-    input = params.get('input')
-    output = params.get('output')
-    reverse = params.get('reverse')
-    dinkelbach_iterations = params.get('dinkelbach_iterations')
-    epsilon = params.get('epsilon')
-    num_iter = params.get('num_iter', 1)
-    subprocess.run([program, input, output, "1" if reverse else "0", str(dinkelbach_iterations), str(epsilon), str(num_iter)], check=True)
-    # readin the output file
-    result = json.load(open(output))
-    return result['time'], result['density'], result['nodes']
-
-
-def GNDS_QPBO_MIP(config):
-    program = config.get('exe')
-    params = config.get('params')
-    input = params.get('input')
-    output = params.get('output')
-    reverse = params.get('reverse')
-    dinkelbach_iterations = params.get('dinkelbach_iterations')
-    epsilon = params.get('epsilon')
-    max_neg = params.get('max_neg')
-    max_local_optima = params.get('max_local_optima')
-    num_iter = params.get('num_iter', 1)
-    subprocess.run([program, input, output, "1" if reverse else "0", str(dinkelbach_iterations), str(epsilon), str(max_neg), str(max_local_optima), str(num_iter)], check=True)
-    # readin the output file
-    result = json.load(open(output))
-    return result['time'], result['density'], result['nodes']
-
-
-def GNDS_QPBO_MIP_UD(config):
-    program = config.get('exe')
-    params = config.get('params')
-    input = params.get('input')
-    output = params.get('output')
-    reverse = params.get('reverse')
-    step_size = params.get('step_size')
-    dinkelbach_iterations = params.get('dinkelbach_iterations')
-    epsilon = params.get('epsilon')
-    max_neg = params.get('max_neg')
-    max_local_optima = params.get('max_local_optima')
-    num_iter = params.get('num_iter', 1)
-    subprocess.run([program, input, output, "1" if reverse else "0", str(step_size), str(dinkelbach_iterations), str(epsilon), str(max_neg), str(max_local_optima), str(num_iter)], check=True)
-    # readin the output file
-    result = json.load(open(output))
-    return result['time'], result['density'], result['nodes']
 
 
 def NEG_DSD(config):
@@ -139,7 +71,6 @@ def NEG_DSD(config):
     C_values = params.get('C_values', "1.0")
     num_iter = params.get('num_iter', 1)
     subprocess.run([program, input, output, "1" if reverse else "0", str(C_values), str(num_iter)], check=True)
-    # readin the output file
     result = json.load(open(output))
     return result['time'], result['density'], result['nodes']
 
@@ -152,7 +83,6 @@ def DCSGreedy(config):
     reverse = params.get('reverse')
     num_iter = params.get('num_iter', 1)
     subprocess.run([program, input, output, "1" if reverse else "0", str(num_iter)], check=True)
-    # readin the output file
     result = json.load(open(output))
     return result['time'], result['density'], result['nodes']
 
@@ -168,6 +98,24 @@ def CEP(config):
     do_peeling = params.get('do_peeling', False)
     num_iter = params.get('num_iter', 1)
     subprocess.run([program, input, output, "1" if reverse else "0", str(max_neg), str(max_local_optima), "1" if do_peeling else "0", str(num_iter)], check=True)
-    # readin the output file
+    result = json.load(open(output))
+    return result['time'], result['density'], result['nodes']
+
+
+def CEP_QPBO(config):
+    program = config.get('exe')
+    params = config.get('params')
+    input = params.get('input')
+    output = params.get('output')
+    reverse = params.get('reverse')
+    max_neg = params.get('max_neg')
+    max_local_optima = params.get('max_local_optima')
+    do_peeling = params.get('do_peeling', False)
+    step_size = params.get('step_size')
+    dinkelbach_iterations = params.get('dinkelbach_iterations')
+    epsilon = params.get('epsilon')
+    mip_time_limit = params.get('mip_time_limit', 300.0)
+    num_iter = params.get('num_iter', 1)
+    subprocess.run([program, input, output, "1" if reverse else "0", str(max_neg), str(max_local_optima), "1" if do_peeling else "0", str(step_size), str(dinkelbach_iterations), str(epsilon), str(mip_time_limit), str(num_iter)], check=True)
     result = json.load(open(output))
     return result['time'], result['density'], result['nodes']

@@ -1,6 +1,10 @@
 TODO:
 
 1. change to listS for edges
+2. try to use traditional methods (for non-genative weights only methods) and MIP
+3. change the hard-coded numbers to params
+4. design output name for each different configuration for the same algorithm
+5. also output the parameters
 
 ## Design
 
@@ -19,4 +23,10 @@ Can use update_lazy() for Fibonacci_heap. Found it can make LocalGreedy a little
 ```
 Comparison of using set or vector to store positive degrees in CEP (According to WS_setting_140):
 If using set, the initialization of the set and pruning a lot of nodes (possibly in the first one/few iterations) can be very time-consuming. However, as items are removed from the set, the size of the set decreases, and the update operations largely decreases. Thus the runtime for each local search iteration may decrease (maybe significantly) as the iterations proceed. The total runtime will keep roughly stable as the number of local search iterations increases. If using vector, the initialization is fast, and no pruning overhead. However, the total time for the Run() increases nearly (but not linear, because as more nodes invalidated, the on-the-fly computation decreases) linearly with the number of local search iterations. Thus I am using hybrid approach now: start with using vector, and switch to set after some iterations. To amortize the overhead of initialization and pruning, changing to set is only toggled when the number of local search iterations are still left a lot. And as the abs(pos_weight) decreases, I was using two Fibonacci_heap to store the positive and the reverse of positive degree separately. This has similar speed with using one set, as Fibonacci_heap can finish the decrease_key operation in O(1) time. However, I changed back to using one set for convenience.
+```
+
+### For CEP_QPBO:
+
+```
+Finding a tight upper bound for the 
 ```

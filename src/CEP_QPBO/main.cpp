@@ -1,9 +1,9 @@
 #include "../basic.hpp"
 
 int main(int argc, char* argv[]) {
-    if (argc < 4 || argc > 11) {
+    if (argc < 4 || argc > 12) {
         cerr << "Usage: " << argv[0] << " <input_filename> <output_filename> <reverse_weight> [max_neg_steps] "
-             << "[max_local_optima] [peeling] [step_size] [dinkelbach_iterations] [epsilon]  [num_its]" << endl;
+             << "[max_local_optima] [peeling] [step_size] [dinkelbach_iterations] [epsilon] [mip_time_limit] [num_its]" << endl;
         return EXIT_FAILURE;
     }
 
@@ -16,7 +16,8 @@ int main(int argc, char* argv[]) {
     double step_size = (argc >= 8) ? stod(argv[7]) : 1.05;
     unsigned dinkelbach_iterations = (argc >= 9) ? stoi(argv[8]) : 10;
     double epsilon = (argc >= 10) ? stod(argv[9]) : 1e-4;
-    unsigned num_its = (argc >= 11) ? stoi(argv[10]) : 1;
+    double mip_time_limit = (argc >= 11) ? stod(argv[10]) : 300.0;
+    unsigned num_its = (argc >= 12) ? stoi(argv[11]) : 1;
 
     CEP_QPBO graph(input, reverse_weight);
     CEP_QPBO::SubgraphResult first_result;
@@ -25,7 +26,7 @@ int main(int argc, char* argv[]) {
     for (unsigned it = 0; it < num_its; ++it) {
         auto graph_copy = graph;
         auto start_time = chrono::high_resolution_clock::now();
-        auto result = graph_copy.Run(max_neg_steps, max_local_optima, do_peeling, step_size, dinkelbach_iterations, epsilon);
+        auto result = graph_copy.Run(max_neg_steps, max_local_optima, do_peeling, step_size, dinkelbach_iterations, epsilon, mip_time_limit);
         auto end_time = chrono::high_resolution_clock::now();
         auto duration = chrono::duration_cast<chrono::nanoseconds>(end_time - start_time);
         double time_seconds = duration.count() / 1e9;
@@ -35,7 +36,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    graph.output(output, total_time / num_its, first_result);
+    graph.output(output, total_time / num_its, first_result, argc, argv);
 
     return 0;
 }

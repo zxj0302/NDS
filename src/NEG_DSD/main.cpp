@@ -35,7 +35,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    graph.output(output, total_time / num_its, first_result);
+    graph.output(output, total_time / num_its, first_result, argc, argv);
 
     return 0;
 }

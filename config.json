@@ -73,53 +73,8 @@
         "output": "./output/synthetic/",
         "competitors": [
             {
-                "name": "GNDS",
-                "toggle": false,
-                "exe": "./src/GNDS/build/GNDS",
-                "params": {
-                    "max_neg": 100,
-                    "max_local_optima": 10,
-                    "num_iter": 10
-                }
-            },
-            {
-                "name": "GNDS_QPBO_MIP_UD",
-                "toggle": false,
-                "exe": "./src/GNDS_QPBO_MIP_UD/build/GNDS_QPBO_MIP_UD",
-                "params": {
-                    "step_size": 1.05,
-                    "dinkelbach_iterations": 10,
-                    "epsilon": 0.0001,
-                    "max_neg": 500,
-                    "max_local_optima": 30,
-                    "num_iter": 1
-                }
-            },
-            {
-                "name": "GNDS_QPBO_MIP",
-                "toggle": false,
-                "exe": "./src/GNDS_QPBO_MIP/build/GNDS_QPBO_MIP",
-                "params": {
-                    "dinkelbach_iterations": 10,
-                    "epsilon": 0.01,
-                    "max_neg": 500,
-                    "max_local_optima": 30,
-                    "num_iter": 1
-                }
-            },
-            {
-                "name": "QPBO_MIP",
-                "toggle": false,
-                "exe": "./src/QPBO_MIP/build/QPBO_MIP",
-                "params": {
-                    "dinkelbach_iterations": 10,
-                    "epsilon": 0.01,
-                    "num_iter": 1
-                }
-            },
-            {
                 "name": "NEG_DSD",
-                "toggle": true,
+                "toggle": false,
                 "exe": "./src/NEG_DSD/build/NEG_DSD",
                 "params": {
                     "C_values": "0.9,1.0,1.1,1.2",
@@ -128,7 +83,7 @@
             },
             {
                 "name": "DCSGreedy",
-                "toggle": true,
+                "toggle": false,
                 "exe": "./src/DCSGreedy/build/DCSGreedy",
                 "params": {
                     "num_iter": 1
@@ -136,12 +91,27 @@
             },
             {
                 "name": "CEP",
-                "toggle": true,
+                "toggle": false,
                 "exe": "./src/CEP/build/CEP",
                 "params": {
                     "max_neg": 200,
                     "max_local_optima": 10,
                     "do_peeling": false,
+                    "num_iter": 1
+                }
+            },
+            {
+                "name": "CEP_QPBO",
+                "toggle": false,
+                "exe": "./src/CEP_QPBO/build/CEP_QPBO",
+                "params": {
+                    "step_size": 1.05,
+                    "dinkelbach_iterations": 10,
+                    "epsilon": 0.0001,
+                    "max_neg": 500,
+                    "max_local_optima": 30,
+                    "do_peeling": false,
+                    "mip_time_limit": 300.0,
                     "num_iter": 1
                 }
             }

@@ -90,7 +90,7 @@ public:
         double density;
     };
 
-    void output(const string& filepath, double avg_time, SubgraphResult& result) {
+    void output(const string& filepath, double avg_time, SubgraphResult& result, int argc, char* argv[]) {
         ofstream out(filepath);
         if (!out) throw std::runtime_error("Cannot open " + filepath);
         std::sort(result.nodes.begin(), result.nodes.end());
@@ -104,7 +104,12 @@ public:
             if (i) out << ", ";
             out << result.nodes[i];
         }
-        out << "]\n}\n";
+        out << "]\n" << "  \"command\": \"";
+        for (auto i = 0; i < argc; ++i) {
+            if (i) out << " ";
+            out << argv[i];
+        }
+        out << "\"\n" << "}\n";
     }
 };
 
@@ -354,7 +359,7 @@ public:
 };
 
 class CEP : public PGraph {
-private: 
+protected: 
     struct MaxHeapNode {
         double key;
         Vertex node;
@@ -724,11 +729,13 @@ private:
 
 public:
     CEP_QPBO(const string& input, bool reverse_weight)
-        : CEP(input, reverse_weight) {}
+        : CEP(input, reverse_weight) {
+            InitializePositiveWeights();
+        }
 
     QPBOResult RunQPBO(double lambda, bool improve = false) {
         size_t n = num_vertices(G);
-        unique_ptr<QPBO<REAL>> qpbo(new QPBO<REAL>(n, num_edges(G)));
+        unique_ptr<QPBO<REAL>> qpbo(new QPBO<REAL>(n, 2 * num_edges(G)));
         qpbo->AddNode(n);
         
         for (auto [vi, ve] = vertices(G); vi != ve; ++vi) {
@@ -740,11 +747,6 @@ public:
         
         qpbo->Solve();
         qpbo->ComputeWeakPersistencies();
-
-        // QPBO<REAL>::ProbeOptions probe_options;
-        // probe_options.probeUnary = true;
-        // probe_options.probePairwise = true;
-        // qpbo.Probe(probe_options);
         
         QPBOResult result;
         result.labels.resize(n);
@@ -765,16 +767,129 @@ public:
         return result;
     }
 
-    SubgraphResult QPBOProcess(double step_size, unsigned dinkelbach_iterations, double epsilon) {
-
+    double FindUpperBound(double init_density, double step_size) {
+        double lambda_ub = init_density * step_size;
+        while (true) {
+            auto result = RunQPBO(lambda_ub, false);
+            if (result.undecided.empty() && result.fixed_in.empty()) {
+                break;
+            }
+            lambda_ub *= step_size;
+        }
+        return min(lambda_ub, *max_element(pos_weight.begin(), pos_weight.end()));
     }
 
-    SubgraphResult Run(unsigned max_neg_steps, unsigned max_local_optima, bool do_peeling, double step_size, unsigned dinkelbach_iterations, double epsilon) {
+    vector<Vertex> RunMIP(QPBOResult& qpbo_result, double lambda, double mip_time_limit) {
+        try {
+            GRBEnv env = GRBEnv(true);
+            env.set(GRB_IntParam_OutputFlag, 0);
+            env.start();
+            GRBModel model = GRBModel(env);
+            
+            auto n = num_vertices(G);
+            std::unordered_map<size_t, GRBVar> undecided_vars;
+            for (auto i : qpbo_result.undecided) {
+                undecided_vars[i] = model.addVar(0.0, 1.0, 0.0, GRB_BINARY);
+            }
+            GRBQuadExpr obj = 0.0;
+            for (auto i = 0; i < n; i++) {
+                double coeff = lambda - loop_weight[i];
+                if (qpbo_result.labels[i] == 1) {
+                    obj += coeff * 1.0;
+                } else if (qpbo_result.labels[i] == -1) {
+                    obj += coeff * undecided_vars[i];
+                }
+            }
+
+            for (auto [ei, ee] = edges(G); ei != ee; ++ei) {
+                auto u = source(*ei, G);
+                auto v = target(*ei, G);
+                auto w = G[*ei].weight;
+                auto label_u = qpbo_result.labels[u];
+                auto label_v = qpbo_result.labels[v];
+                if (label_u == -1 && label_v == -1) {
+                    obj += -w * undecided_vars[u] * undecided_vars[v];
+                } else if (label_u == -1 && label_v != -1) {
+                    obj += -w * label_v * undecided_vars[u];
+                } else if (label_v == -1 && label_u != -1) {
+                    obj += -w * label_u * undecided_vars[v];
+                } else {
+                    obj += -w * label_u * label_v;
+                }
+            }
+            
+            model.setObjective(obj, GRB_MINIMIZE);
+            model.set(GRB_DoubleParam_TimeLimit, mip_time_limit);
+            model.optimize();
+            vector<Vertex> selected = qpbo_result.fixed_in;
+            if (model.get(GRB_IntAttr_SolCount) > 0) {
+                for (auto i : qpbo_result.undecided) {
+                    if (undecided_vars.count(i) && undecided_vars[i].get(GRB_DoubleAttr_X) > 0.5) {
+                        selected.push_back(i);
+                    }
+                }
+            }
+            return selected;
+
+        } catch (GRBException& e) {
+            throw runtime_error("Gurobi exception: " + string(e.getMessage()));
+            return qpbo_result.fixed_in;
+        }
+    }
+
+    double ComputeDensity(const vector<Vertex>& nodes) {
+        double total_weight_sum = 0.0;
+        vector<bool> selected(num_vertices(G), false);
+        for (auto node : nodes) {
+            selected[node] = true;
+            total_weight_sum += loop_weight[node];
+        }
+        for (auto [ei, ee] = edges(G); ei != ee; ++ei) {
+            if (selected[source(*ei, G)] && selected[target(*ei, G)]) {
+                total_weight_sum += G[*ei].weight;
+            }
+        }
+        return total_weight_sum / nodes.size();
+    }
+
+
+    SubgraphResult Dinkelbach(double lower_bound, double upper_bound, unsigned iterations, double epsilon, double mip_time_limit) {
+        vector<Vertex> best_solution;
+        for (auto iter = 0; iter < iterations; iter++) {
+            if ((upper_bound - lower_bound) < epsilon) {
+                break;
+            }
+            double lambda = (lower_bound + upper_bound) / 2.0;
+            QPBOResult qpbo_result = RunQPBO(lambda, false);
+            auto solution = qpbo_result.undecided.empty() ? qpbo_result.fixed_in : RunMIP(qpbo_result, lambda, mip_time_limit);
+            if (solution.empty()) {
+                upper_bound = lambda;
+            } else {
+                double density = ComputeDensity(solution);
+                if (density >= lower_bound) {
+                    lower_bound = density;
+                    best_solution = solution;
+                } else {
+                    throw runtime_error("Dinkelbach: computed density is less than best density");
+                }
+            }
+        }
+        return {best_solution, lower_bound};
+    }
+
+    SubgraphResult Run(unsigned max_neg_steps, unsigned max_local_optima, bool do_peeling, double step_size, unsigned dinkelbach_iterations, double epsilon, double mip_time_limit) {
         // Step 1. Result found by CEP as initial solution
         auto result = CEP::Run(max_neg_steps, max_local_optima, do_peeling);
+        // if qpbo_result.undecided is empty and fixed_in is empty, we can directly return result found by GNDS as Optimal
+        auto pre_qpbo = RunQPBO(result.density, false);
+        if (pre_qpbo.undecided.empty() && pre_qpbo.fixed_in.empty()) {
+            return result;
+        }
 
+        // Step 2. Find an upper bound for QPBO
+        double upper_bound = FindUpperBound(result.density, step_size);
 
-
-        return result;
+        // Step 3. Refine the solution by Dinkelbach
+        return Dinkelbach(result.density, upper_bound, dinkelbach_iterations, epsilon, mip_time_limit);
     }
 };

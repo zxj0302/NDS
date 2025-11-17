@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.26)
-project(GNDS_QPBO_MIP_UD)
+project(CEP_QPBO)
 
 # Add CMake module path
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -58,10 +58,10 @@ endif()
 
 # Compile QPBO as a separate object to avoid template instantiation issues
 add_library(qpbo_lib OBJECT 
-    QPBO/QPBO.cpp
-    QPBO/QPBO_extra.cpp
-    QPBO/QPBO_maxflow.cpp
-    QPBO/QPBO_postprocessing.cpp
+    ../QPBO/QPBO.cpp
+    ../QPBO/QPBO_extra.cpp
+    ../QPBO/QPBO_maxflow.cpp
+    ../QPBO/QPBO_postprocessing.cpp
 )
 target_include_directories(qpbo_lib PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -72,15 +72,16 @@ if(Boost_FOUND)
         ${Boost_INCLUDE_DIRS}
         ${CMAKE_CURRENT_SOURCE_DIR}/..
     )
+endif()
 
 # Add Gurobi include directories and link libraries
 if(GUROBI_FOUND)
-    target_include_directories(GNDS_QPBO_MIP_UD PRIVATE ${GUROBI_INCLUDE_DIRS})
-    target_link_libraries(GNDS_QPBO_MIP_UD PRIVATE ${GUROBI_CXX_LIBRARY} ${GUROBI_LIBRARY})
+    target_include_directories(${PROJECT_NAME} PRIVATE ${GUROBI_INCLUDE_DIRS})
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${GUROBI_CXX_LIBRARY} ${GUROBI_LIBRARY})
 endif()
 
 # Add QPBO include directory
-target_include_directories(GNDS_QPBO_MIP_UD PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Define QPBO as header-only
-target_compile_definitions(GNDS_QPBO_MIP_UD PRIVATE)
+target_compile_definitions(${PROJECT_NAME} PRIVATE)
