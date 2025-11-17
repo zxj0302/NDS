@@ -43,6 +43,21 @@
                     "do_peeling": false,
                     "num_iter": 1
                 }
+            },
+            {
+                "name": "CEP_QPBO",
+                "toggle": true,
+                "exe": "./src/CEP_QPBO/build/CEP_QPBO",
+                "params": {
+                    "step_size": 1.05,
+                    "dinkelbach_iterations": 10,
+                    "epsilon": 0.0001,
+                    "max_neg": 500,
+                    "max_local_optima": 30,
+                    "do_peeling": false,
+                    "mip_time_limit": 300.0,
+                    "num_iter": 1
+                }
             }
         ]
     },

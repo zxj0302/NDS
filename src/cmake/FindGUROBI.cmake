@@ -21,8 +21,9 @@ find_path(GUROBI_INCLUDE_DIRS
 )
 
 find_library(GUROBI_LIBRARY
-    NAMES gurobi gurobi120 gurobi110 gurobi103 gurobi130
+    NAMES gurobi130 gurobi120 gurobi110 gurobi103 gurobi
     HINTS ${GUROBI_DIR}/lib
+    NO_DEFAULT_PATH
 )
 
 find_library(GUROBI_CXX_LIBRARY

@@ -104,7 +104,7 @@ public:
             if (i) out << ", ";
             out << result.nodes[i];
         }
-        out << "]\n" << "  \"command\": \"";
+        out << "],\n" << "  \"command\": \"";
         for (auto i = 0; i < argc; ++i) {
             if (i) out << " ";
             out << argv[i];
