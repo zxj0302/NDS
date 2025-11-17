@@ -2,7 +2,7 @@
 *.vscode
 *__pycache__
 *build
-*cmake*
+# *cmake*
 output*
 tests
 temp*
@@ -26,3 +26,4 @@ src/Graph_Simulator
 input/synthetic
 backup*
 *DS_Store
+test
