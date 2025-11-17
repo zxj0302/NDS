@@ -13,51 +13,16 @@
             "./input/real-world/Partisanship/Partisanship.txt",
             "./input/real-world/Referendum/Referendum.txt"
         ],
-        "weight_reverse": true,
-        "output": ".output/real-world/",
+        "weight_reverse": false,
+        "output": "./output/real-world/",
         "competitors": [
-            {
-                "name": "GNDS_QPBO_MIP_UD",
-                "toggle": true,
-                "exe": "./src/GNDS_QPBO_MIP_UD/build/GNDS_QPBO_MIP_UD",
-                "params": {
-                    "step_size": 1.2,
-                    "dinkelbach_iterations": 10,
-                    "epsilon": 0.01,
-                    "max_neg": 500,
-                    "max_local_optima": 30,
-                    "num_iter": 1
-                }
-            },
-            {
-                "name": "GNDS_QPBO_MIP",
-                "toggle": true,
-                "exe": "./src/GNDS_QPBO_MIP/build/GNDS_QPBO_MIP",
-                "params": {
-                    "dinkelbach_iterations": 10,
-                    "epsilon": 0.01,
-                    "max_neg": 500,
-                    "max_local_optima": 30,
-                    "num_iter": 1
-                }
-            },
-            {
-                "name": "QPBO_MIP",
-                "toggle": true,
-                "exe": "./src/QPBO_MIP/build/QPBO_MIP",
-                "params": {
-                    "dinkelbach_iterations": 10,
-                    "epsilon": 0.01,
-                    "num_iter": 1
-                }
-            },
             {
                 "name": "NEG_DSD",
                 "toggle": true,
-                "exe": "./src/NEG-DSD/build/NEG-DSD",
+                "exe": "./src/NEG_DSD/build/NEG_DSD",
                 "params": {
-                    "C": 1,
-                    "num_iter": 10
+                    "C_values": "1.0",
+                    "num_iter": 1
                 }
             },
             {
@@ -65,7 +30,18 @@
                 "toggle": true,
                 "exe": "./src/DCSGreedy/build/DCSGreedy",
                 "params": {
-                    "num_iter": 10
+                    "num_iter": 1
+                }
+            },
+            {
+                "name": "CEP",
+                "toggle": true,
+                "exe": "./src/CEP/build/CEP",
+                "params": {
+                    "max_neg": 200,
+                    "max_local_optima": 10,
+                    "do_peeling": false,
+                    "num_iter": 1
                 }
             }
         ]
@@ -165,7 +141,7 @@
                 "params": {
                     "max_neg": 200,
                     "max_local_optima": 10,
-                    "do_peeling": true,
+                    "do_peeling": false,
                     "num_iter": 1
                 }
             }
@@ -173,16 +149,36 @@
     },
     "test": {
         "input": [
-            "./input/synthetic/SBM/SBM_n10000_blocks4_setting28_inst0.txt" 
+            "./input/real-world/Referendum/Referendum.txt"
         ],
         "weight_reverse": false,
-        "output": ".output/test/",
+        "output": "./output/test/",
         "competitors": [
+            {
+                "name": "NEG_DSD",
+                "toggle": true,
+                "exe": "./src/NEG_DSD/build/NEG_DSD",
+                "params": {
+                    "C_values": "1.0",
+                    "num_iter": 1
+                }
+            },
             {
                 "name": "DCSGreedy",
                 "toggle": true,
                 "exe": "./src/DCSGreedy/build/DCSGreedy",
                 "params": {
+                    "num_iter": 1
+                }
+            },
+            {
+                "name": "CEP",
+                "toggle": true,
+                "exe": "./src/CEP/build/CEP",
+                "params": {
+                    "max_neg": 200,
+                    "max_local_optima": 10,
+                    "do_peeling": false,
                     "num_iter": 1
                 }
             }

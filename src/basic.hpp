@@ -1,8 +1,12 @@
 #pragma once
 
+#include <gurobi_c++.h>
+#include "QPBO/QPBO.h"
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/graph_traits.hpp>
 #include <boost/heap/fibonacci_heap.hpp>
+#include <unordered_set>
+#include <unordered_map>
 #include <cmath>
 #include <limits>
 #include <vector>
@@ -15,7 +19,6 @@
 #include <iomanip>
 #include <chrono>
 #include <set>
-#include <unordered_set>
 
 using namespace std;
 using namespace boost;
@@ -59,15 +62,15 @@ public:
         getline(infile, line);
         istringstream iss_first(line);
         iss_first >> n >> m;
-        for (size_t i = 0; i < n; ++i) {
-            Vertex v = add_vertex(G);
+        for (auto i = 0; i < n; ++i) {
+            add_vertex(G);
         }
         valid = vector<bool>(n, true);
         loop_weight = vector<double>(n, 0.0);
         
         while (getline(infile, line)) {
             istringstream iss(line);
-            size_t u, v;
+            Vertex u, v;
             double weight;
             iss >> u >> v >> weight;
             weight *= (reverse_weight ? -1.0 : 1.0);
@@ -83,7 +86,7 @@ public:
     virtual ~PGraph() = default;
 
     struct SubgraphResult {
-        vector<size_t> nodes;
+        vector<Vertex> nodes;
         double density;
     };
 
@@ -97,7 +100,7 @@ public:
             << "  \"density\": " << result.density << ",\n"
             << "  \"size\": " << result.nodes.size() << ",\n"
             << "  \"nodes\": [";
-        for (size_t i = 0; i < result.nodes.size(); ++i) {
+        for (auto i = 0; i < result.nodes.size(); ++i) {
             if (i) out << ", ";
             out << result.nodes[i];
         }
@@ -143,7 +146,7 @@ public:
         auto current_weight_sum = total_weight;
         auto current_vertex_count = num_vertices(G);
         auto current_density = current_vertex_count > 0 ? current_weight_sum / current_vertex_count : 0.0;
-        vector<size_t> remove_order;
+        vector<Vertex> remove_order;
         remove_order.reserve(num_vertices(G)); 
         size_t best_step = 0;
         double best_density = current_density;
@@ -195,7 +198,7 @@ public:
 
     SubgraphResult MaxEdge() {
         double max_weight = -numeric_limits<double>::infinity();
-        vector<size_t> max_edge;
+        vector<Vertex> max_edge;
         for (auto [ei, ee] = edges(G); ei != ee; ++ei) {
             auto current_weight = G[*ei].weight / 2;
             if (current_weight > max_weight) {
@@ -242,7 +245,7 @@ public:
         }
         auto current_vertex_count = num_vertices(G);
         auto current_density = current_vertex_count > 0 ? current_weight_sum / current_vertex_count : 0.0;
-        vector<size_t> remove_order;
+        vector<Vertex> remove_order;
         remove_order.reserve(num_vertices(G)); 
         size_t best_step = 0;
         double best_density = current_density;
@@ -283,8 +286,8 @@ public:
                 total_weight_sum += loop_weight[*p];
             }
             for (auto [ei, ee] = edges(G); ei != ee; ++ei) {
-                size_t u = source(*ei, G);
-                size_t v = target(*ei, G);
+                Vertex u = source(*ei, G);
+                Vertex v = target(*ei, G);
                 if (selected[u] && selected[v] && u <= v) {
                     total_weight_sum += G[*ei].weight;
                 }
@@ -294,9 +297,9 @@ public:
         return {{remove_order.begin() + best_step, remove_order.end()}, best_density};
     }
 
-    SubgraphResult MaxConnectedComponent(const vector<size_t>& nodes) {
-        std::unordered_set<size_t> node_set(nodes.begin(), nodes.end());
-        std::unordered_set<size_t> visited;
+    SubgraphResult MaxConnectedComponent(const vector<Vertex>& nodes) {
+        std::unordered_set<Vertex> node_set(nodes.begin(), nodes.end());
+        std::unordered_set<Vertex> visited;
         visited.reserve(nodes.size());
         SubgraphResult best {{}, -numeric_limits<double>::infinity()};
 
@@ -304,13 +307,13 @@ public:
             if (visited.count(start)) continue;
             
             // BFS to find component
-            vector<size_t> component = {start};
+            vector<Vertex> component = {start};
             visited.insert(start);
             
-            for (size_t i = 0; i < component.size(); i++) {
+            for (auto i = 0; i < component.size(); i++) {
                 Vertex u = component[i];
                 for (auto [ei, ee] = out_edges(u, G); ei != ee; ++ei) {
-                    size_t v = target(*ei, G);
+                    Vertex v = target(*ei, G);
                     if (node_set.count(v) && !visited.count(v)) {
                         visited.insert(v);
                         component.push_back(v);
@@ -321,7 +324,7 @@ public:
             double total_weight = 0.0;
             for (auto u : component) {
                 for (auto [ei, ee] = out_edges(u, G); ei != ee; ++ei) {
-                    size_t v = target(*ei, G);
+                    Vertex v = target(*ei, G);
                     if (node_set.count(v) && u <= v) {
                         total_weight += G[*ei].weight;
                     }
@@ -342,9 +345,7 @@ public:
             return {{}, 0.0};
         }
         auto S1 = Peeling();
-        cout << "Peeling result density: " << S1.density << endl;
         auto S2 = Peeling(true);
-        cout << "Positive-only Peeling result density: " << S2.density << endl;
         if (S1.density > S.density) S = S1;
         if (S2.density > S.density) S = S2;
 
@@ -399,7 +400,7 @@ public:
         auto current_weight_sum = total_weight;
         auto current_vertex_count = num_vertices(G);
         auto current_density = current_vertex_count > 0 ? current_weight_sum / current_vertex_count : 0.0;
-        vector<size_t> remove_order;
+        vector<Vertex> remove_order;
         remove_order.reserve(num_vertices(G)); 
         size_t best_step = 0;
         double best_density = current_density;
@@ -595,7 +596,7 @@ public:
         }
 
         // ============== Peeling phase: remove nodes to find maximum density ==============
-        vector<size_t> remove_order;
+        vector<Vertex> remove_order;
         remove_order.reserve(selected.size()); 
         size_t best_step = 0;  
         while (!selected.empty()) {
@@ -621,7 +622,7 @@ public:
         if (best_step != 0) {
             return {{remove_order.begin() + best_step, remove_order.end()}, max_f};
         } else {
-            vector<size_t> best_nodes;
+            vector<Vertex> best_nodes;
             for (auto& item : best) {
                 best_nodes.push_back(item.node);
             }
@@ -629,7 +630,7 @@ public:
         }
     }
 
-    void PruningSet(const vector<size_t>& nodes, double threshold_density) {
+    void PruningSet(const vector<Vertex>& nodes, double threshold_density) {
         for (auto node : nodes) {
             pruning_set.erase(pruning_handles[node]);
             valid[node] = false;
@@ -660,7 +661,7 @@ public:
         }
     }
 
-    void PruningVector(const vector<size_t>& nodes, double threshold_density) {
+    void PruningVector(const vector<Vertex>& nodes, double threshold_density) {
         for (auto node : nodes) {
             valid[node] = false;
             pos_weight[node] = -numeric_limits<double>::infinity();
@@ -674,7 +675,7 @@ public:
                 }
             }
         }
-        for (size_t i = 0; i != pos_weight.size(); ++i) {
+        for (auto i = 0; i != pos_weight.size(); ++i) {
             if (valid[i] && pos_weight[i] < threshold_density) {
                 valid[i] = false;
                 pos_weight[i] = -numeric_limits<double>::infinity();
@@ -708,5 +709,72 @@ public:
             pruning_set_on ? PruningSet(result.nodes, best.density) : PruningVector(result.nodes, best.density);
         }
         return best;
+    }
+};
+
+class CEP_QPBO : public CEP {
+private:
+    struct QPBOResult {
+        vector<int> labels;
+        vector<Vertex> fixed_in;
+        vector<Vertex> fixed_out;
+        vector<Vertex> undecided;
+    };
+    using REAL = double;
+
+public:
+    CEP_QPBO(const string& input, bool reverse_weight)
+        : CEP(input, reverse_weight) {}
+
+    QPBOResult RunQPBO(double lambda, bool improve = false) {
+        size_t n = num_vertices(G);
+        unique_ptr<QPBO<REAL>> qpbo(new QPBO<REAL>(n, num_edges(G)));
+        qpbo->AddNode(n);
+        
+        for (auto [vi, ve] = vertices(G); vi != ve; ++vi) {
+            qpbo->AddUnaryTerm(*vi, 0.0, lambda-loop_weight[*vi]);
+        }
+        for (auto [ei, ee] = edges(G); ei != ee; ++ei) {
+            qpbo->AddPairwiseTerm(source(*ei, G), target(*ei, G), 0, 0, 0, -G[*ei].weight);
+        }
+        
+        qpbo->Solve();
+        qpbo->ComputeWeakPersistencies();
+
+        // QPBO<REAL>::ProbeOptions probe_options;
+        // probe_options.probeUnary = true;
+        // probe_options.probePairwise = true;
+        // qpbo.Probe(probe_options);
+        
+        QPBOResult result;
+        result.labels.resize(n);
+        for (size_t i = 0; i < n; i++) {
+            int label = qpbo->GetLabel(i);
+            if (label == 0) {
+                result.labels[i] = 0;
+                result.fixed_out.push_back(i);
+            } else if (label == 1) {
+                result.labels[i] = 1;
+                result.fixed_in.push_back(i);
+            } else {
+                result.labels[i] = -1;
+                result.undecided.push_back(i);
+            }
+        }
+
+        return result;
+    }
+
+    SubgraphResult QPBOProcess(double step_size, unsigned dinkelbach_iterations, double epsilon) {
+
+    }
+
+    SubgraphResult Run(unsigned max_neg_steps, unsigned max_local_optima, bool do_peeling, double step_size, unsigned dinkelbach_iterations, double epsilon) {
+        // Step 1. Result found by CEP as initial solution
+        auto result = CEP::Run(max_neg_steps, max_local_optima, do_peeling);
+
+
+
+        return result;
     }
 };

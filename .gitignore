@@ -3,7 +3,7 @@
 *__pycache__
 *build
 *cmake*
-output
+output*
 tests
 temp*
 .vscode
