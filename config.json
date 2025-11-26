@@ -90,7 +90,7 @@
                     "max_local_optima": 10,
                     "do_peeling": false,
                     "dinkelbach_iterations": 30,
-                    "epsilon": 0.0001,
+                    "epsilon": -0.00001,
                     "mip_time_limit": 600.0,
                     "use_binary": false,
                     "num_iter": 1
@@ -108,7 +108,7 @@
                     "do_peeling": false,
                     "step_size": 1.05,
                     "dinkelbach_iterations": 30,
-                    "epsilon": 0.0001,
+                    "epsilon": -0.00001,
                     "mip_time_limit": 600.0,
                     "num_iter": 1
                 }
@@ -123,7 +123,7 @@
             },
             {
                 "path": "./input/synthetic/ER/",
-                "toggle": false
+                "toggle": true
             },
             {
                 "path": "./input/synthetic/RGG/",
@@ -178,11 +178,11 @@
                 "params": {
                     "toggle_done": 2,
                     "toggle_left": 20,
-                    "dinkelbach_iterations": 30,
-                    "epsilon": 0.0001,
-                    "max_neg": 500,
+                    "max_neg": 200,
                     "max_local_optima": 10,
                     "do_peeling": false,
+                    "dinkelbach_iterations": 30,
+                    "epsilon": -0.00001,
                     "mip_time_limit": 600.0,
                     "use_binary": false,
                     "num_iter": 1
@@ -195,13 +195,14 @@
                 "params": {
                     "toggle_done": 2,
                     "toggle_left": 20,
-                    "step_size": 1.02,
-                    "dinkelbach_iterations": 30,
-                    "epsilon": 0.0001,
-                    "max_neg": 500,
+                    "max_neg": 200,
                     "max_local_optima": 10,
                     "do_peeling": false,
+                    "step_size": 1.02,
+                    "dinkelbach_iterations": 30,
+                    "epsilon": -0.00001,
                     "mip_time_limit": 600.0,
+                    "use_binary": false,
                     "num_iter": 1
                 }
             }

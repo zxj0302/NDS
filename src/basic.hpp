@@ -797,7 +797,7 @@ public:
     SubgraphResult DinkelbachBinary(const SubgraphResult& cep_result, double upper_bound, unsigned iterations, double epsilon, double mip_time_limit) {
         auto [best_solution, lower_bound] = cep_result;
         for (auto iter = 0; iter < iterations; iter++) {
-            if ((upper_bound - lower_bound) < epsilon) {
+            if ((epsilon > 0 ? (lower_bound / upper_bound) : (lower_bound - upper_bound)) >= epsilon) {
                 break;
             }
             auto lambda = (lower_bound + upper_bound) / 2.0;
@@ -824,7 +824,6 @@ public:
     SubgraphResult Dinkelbach(const SubgraphResult& cep_result, unsigned iterations, double mip_time_limit) {
         auto [best_solution, lower_bound] = cep_result;
         for (auto iter = 0; iter < iterations; iter++) {
-            cout << "Dinkelbach iteration " << iter + 1 << ", current lower bound: " << lower_bound << endl;    
             auto solution = RunMIP(lower_bound, mip_time_limit).first;
             auto density = ComputeDensity(solution);
             if (density > lower_bound) {
@@ -845,7 +844,6 @@ public:
         } else {
             return Dinkelbach(cep_result, dinkelbach_iterations, mip_time_limit);
         }
-        
     }
 };
 
@@ -1056,14 +1054,15 @@ public:
         }
     }
 
-    SubgraphResult Dinkelbach(const SubgraphResult& cep_result, double upper_bound, unsigned iterations, double epsilon, double mip_time_limit) {
+    SubgraphResult DinkelbachBinary(const SubgraphResult& cep_result, double upper_bound, unsigned iterations, double epsilon, double mip_time_limit) {
         auto [best_solution, lower_bound] = cep_result;
         for (auto iter = 0; iter < iterations; iter++) {
-            if (upper_bound - lower_bound < epsilon) {
+            if ((epsilon > 0 ? (lower_bound / upper_bound) : (lower_bound - upper_bound)) >= epsilon) {
                 break;
             }
             double lambda = (lower_bound + upper_bound) / 2.0;
             QPBOResult qpbo_result = RunQPBO(lambda, false);
+            // cout << "QPBO fixed in: " << qpbo_result.fixed_in.size() << ", fixed out: " << qpbo_result.fixed_out.size() << ", undecided: " << qpbo_result.undecided.size() << endl;
             auto [solution, success] = qpbo_result.undecided.empty() ? make_pair(qpbo_result.fixed_in, true) : RunMIP(qpbo_result, lambda, mip_time_limit);
             // FIX: there is possibility that solution given by MIP is empty because of time limit, which cannot reflect correct upper bound
             // FIX: Just assume MIP can give exact solution here for simplicity, should fix it later
@@ -1088,7 +1087,24 @@ public:
         return {best_solution, lower_bound};
     }
 
-    SubgraphResult Run(double max_neg_steps, unsigned max_local_optima, bool do_peeling, double step_size, unsigned dinkelbach_iterations, double epsilon, double mip_time_limit) {
+    SubgraphResult Dinkelbach(const SubgraphResult& cep_result, unsigned iterations, double mip_time_limit) {
+        auto [best_solution, lower_bound] = cep_result;
+        for (auto iter = 0; iter < iterations; iter++) {
+            QPBOResult qpbo_result = RunQPBO(lower_bound, false);
+            auto solution = qpbo_result.undecided.empty() ? qpbo_result.fixed_in : RunMIP(qpbo_result, lower_bound, mip_time_limit).first;
+                double density = ComputeDensity(solution);
+                if (density > lower_bound) {
+                    lower_bound = density;
+                    best_solution = solution;
+                    vertex_upper_bound = solution.size() - 1;
+                } else {
+                    break;
+            }
+        }
+        return {best_solution, lower_bound};
+    }
+
+    SubgraphResult Run(double max_neg_steps, unsigned max_local_optima, bool do_peeling, double step_size, unsigned dinkelbach_iterations, double epsilon, double mip_time_limit, bool use_binary) {
         // Step 1. Result found by CEP as initial solution
         auto result_lb = FindLowerBound(max_neg_steps, max_local_optima, do_peeling);
         // if qpbo_result.undecided is empty and fixed_in is empty, we can directly return result found by CEP as Optimal
@@ -1097,9 +1113,14 @@ public:
             return result_lb;
         }
 
-        // Step 2. Find an upper bound for QPBO
-        auto upper_bound = FindUpperBound(result_lb.density, step_size);
-        // Step 3. Refine the solution by Dinkelbach
-        return Dinkelbach(result_lb, upper_bound, dinkelbach_iterations, epsilon, mip_time_limit);
+        if (use_binary) {
+            // Step 2. Find an upper bound for QPBO
+            auto upper_bound = FindUpperBound(result_lb.density, step_size);
+            // Step 3. Refine the solution by Dinkelbach
+            return DinkelbachBinary(result_lb, upper_bound, dinkelbach_iterations, epsilon, mip_time_limit);
+        } else {
+            return Dinkelbach(result_lb, dinkelbach_iterations, mip_time_limit);
+        }
+        
     }
 };

@@ -1,17 +1,14 @@
 ## TODO:
 
 1. change to listS for edges
-2. try to use traditional methods (for non-genative weights only methods) and MIP
+2. try to use traditional methods (for non-genative weights only methods)
 3. design output name for each different configuration for the same algorithm
 4. optimize the CEP_QPBO, can use Probe(), Improve() and other (like CEP in the middle) to improve
-5. which one is better, P+BP+I, or P+CEP+I?
-6. what if add many peelings in QPBO process?
-7. QPBO里削减图规模，设置array测试顺序，以及Improve时初始化
-8. dynamic lower_bound and upper_bound, use the CEP to find the bounds better
+5. what if add many peelings in QPBO process?
+6. QPBO里削减图规模，设置array测试顺序，以及Improve时初始化
+7. dynamic lower_bound and upper_bound, use the CEP to find the bounds better
 
 ---
-
-
 
 ## Contributions (should contain):
 
@@ -36,11 +33,9 @@
 3. What if initialize the upper_bound in CEP_QPBO randomly, or don't use up-down method to find the upper_bound? Does QPBO really helps? What if Only use MIP?
 4. Do the existing works for non-negative weights graphs really not working?
 5. Runtime of different epsion for exact methods
-
+6. which one is better, P+BP+I, or P+CEP+I?
 
 ---
-
-
 
 ## Logs and Debug
 
@@ -51,8 +46,6 @@
 * [11.26 Wed] Have changed the hard-coded numbers to params, and set percentage things.
 
 ---
-
-
 
 ## Design
 

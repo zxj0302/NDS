@@ -142,7 +142,8 @@ def CEP_QPBO(config):
     dinkelbach_iterations = params.get('dinkelbach_iterations')
     epsilon = params.get('epsilon')
     mip_time_limit = params.get('mip_time_limit', 300.0)
+    use_binary = params.get('use_binary', True)
     num_iter = params.get('num_iter', 1)
-    subprocess.run([program, input, output, "1" if reverse else "0", str(toggle_done), str(toggle_left), str(max_neg), str(max_local_optima), "1" if do_peeling else "0", str(step_size), str(dinkelbach_iterations), str(epsilon), str(mip_time_limit), str(num_iter)], check=True)
+    subprocess.run([program, input, output, "1" if reverse else "0", str(toggle_done), str(toggle_left), str(max_neg), str(max_local_optima), "1" if do_peeling else "0", str(step_size), str(dinkelbach_iterations), str(epsilon), str(mip_time_limit), "1" if use_binary else "0", str(num_iter)], check=True)
     result = json.load(open(output))
     return result['time'], result['density'], result['nodes']
