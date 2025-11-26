@@ -12,8 +12,10 @@ def run(config, single=True, skip=True):
         output_folder = config.get('output')
         reverse = config.get('weight_reverse', False)
         for dataset in natsort.natsorted(datasets):
+            if dataset.get('toggle') is False:
+                continue
+            dataset = dataset.get('path')
             logger.info(f'Running on dataset: {dataset}')
-
             dataset_name = dataset.split('/')[-1].split('.')[0]
             for competitor in config.get('competitors'):
                 if not competitor.get('toggle', False):
@@ -98,6 +100,25 @@ def CEP(config):
     do_peeling = params.get('do_peeling', False)
     num_iter = params.get('num_iter', 1)
     subprocess.run([program, input, output, "1" if reverse else "0", str(max_neg), str(max_local_optima), "1" if do_peeling else "0", str(num_iter)], check=True)
+    result = json.load(open(output))
+    return result['time'], result['density'], result['nodes']
+
+
+def CEP_MIP(config):
+    program = config.get('exe')
+    params = config.get('params')
+    input = params.get('input')
+    output = params.get('output')
+    reverse = params.get('reverse')
+    max_neg = params.get('max_neg')
+    max_local_optima = params.get('max_local_optima')
+    do_peeling = params.get('do_peeling', False)
+    dinkelbach_iterations = params.get('dinkelbach_iterations')
+    epsilon = params.get('epsilon')
+    mip_time_limit = params.get('mip_time_limit', 300.0)
+    use_binary = params.get('use_binary', True)
+    num_iter = params.get('num_iter', 1)
+    subprocess.run([program, input, output, "1" if reverse else "0", str(max_neg), str(max_local_optima), "1" if do_peeling else "0", str(dinkelbach_iterations), str(epsilon), str(mip_time_limit), "1" if use_binary else "0", str(num_iter)], check=True)
     result = json.load(open(output))
     return result['time'], result['density'], result['nodes']
 

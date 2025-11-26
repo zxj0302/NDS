@@ -1,33 +1,66 @@
 {
     "real-world": {
         "input": [
-            "./input/real-world/Abortion/Abortion.txt", 
-            "./input/real-world/Biogrid/Biogrid.txt", 
-            "./input/real-world/Brexit/Brexit.txt", 
-            "./input/real-world/Collins/Collins.txt", 
-            "./input/real-world/Election/Election.txt", 
-            "./input/real-world/Gavin/Gavin.txt", 
-            "./input/real-world/Gun/Gun.txt", 
-            "./input/real-world/Krogan-Core/Krogan-Core.txt", 
-            "./input/real-world/Krogan-Extended/Krogan-Extended.txt",
-            "./input/real-world/Partisanship/Partisanship.txt",
-            "./input/real-world/Referendum/Referendum.txt"
+            {
+                "path": "./input/real-world/Abortion/Abortion.txt",
+                "toggle": true
+            },
+            {
+                "path": "./input/real-world/Biogrid/Biogrid.txt", 
+                "toggle": true
+            },
+            {
+                "path": "./input/real-world/Brexit/Brexit.txt", 
+                "toggle": false
+            },
+            {
+                "path": "./input/real-world/Collins/Collins.txt", 
+                "toggle": true
+            },
+            {
+                "path": "./input/real-world/Election/Election.txt", 
+                "toggle": true
+            },
+            {
+                "path": "./input/real-world/Gavin/Gavin.txt", 
+                "toggle": true
+            },
+            {
+                "path": "./input/real-world/Gun/Gun.txt", 
+                "toggle": true
+            },
+            {
+                "path": "./input/real-world/Krogan-Core/Krogan-Core.txt", 
+                "toggle": true
+            },
+            {
+                "path": "./input/real-world/Krogan-Extended/Krogan-Extended.txt",
+                "toggle": true
+            },
+            {
+                "path": "./input/real-world/Partisanship/Partisanship.txt",
+                "toggle": true
+            },
+            {
+                "path": "./input/real-world/Referendum/Referendum.txt",
+                "toggle": true
+            }
         ],
         "weight_reverse": false,
         "output": "./output/real-world/",
         "competitors": [
             {
                 "name": "NEG_DSD",
-                "toggle": true,
+                "toggle": false,
                 "exe": "./src/NEG_DSD/build/NEG_DSD",
                 "params": {
-                    "C_values": "1.0",
+                    "C_values": "0.9,1.0,1.1,1.2",
                     "num_iter": 1
                 }
             },
             {
                 "name": "DCSGreedy",
-                "toggle": true,
+                "toggle": false,
                 "exe": "./src/DCSGreedy/build/DCSGreedy",
                 "params": {
                     "num_iter": 1
@@ -45,17 +78,32 @@
                 }
             },
             {
+                "name": "CEP_MIP",
+                "toggle": false,
+                "exe": "./src/CEP_MIP/build/CEP_MIP",
+                "params": {
+                    "dinkelbach_iterations": 30,
+                    "epsilon": 0.001,
+                    "max_neg": 200,
+                    "max_local_optima": 10,
+                    "do_peeling": false,
+                    "mip_time_limit": 600.0,
+                    "use_binary": false,
+                    "num_iter": 1
+                }
+            },
+            {
                 "name": "CEP_QPBO",
                 "toggle": true,
                 "exe": "./src/CEP_QPBO/build/CEP_QPBO",
                 "params": {
                     "step_size": 1.05,
-                    "dinkelbach_iterations": 10,
+                    "dinkelbach_iterations": 30,
                     "epsilon": 0.0001,
-                    "max_neg": 500,
-                    "max_local_optima": 30,
+                    "max_neg": 200,
+                    "max_local_optima": 10,
                     "do_peeling": false,
-                    "mip_time_limit": 300.0,
+                    "mip_time_limit": 600.0,
                     "num_iter": 1
                 }
             }
@@ -69,19 +117,19 @@
             },
             {
                 "path": "./input/synthetic/ER/",
-                "toggle": true
+                "toggle": false
             },
             {
                 "path": "./input/synthetic/RGG/",
-                "toggle": true
+                "toggle": false
             },
             {
                 "path": "./input/synthetic/SBM/",
-                "toggle": true
+                "toggle": false
             },
             {
                 "path": "./input/synthetic/WS/",
-                "toggle": true
+                "toggle": false
             }
         ],
         "weight_reverse": false,
@@ -116,17 +164,32 @@
                 }
             },
             {
-                "name": "CEP_QPBO",
+                "name": "CEP_MIP",
                 "toggle": false,
-                "exe": "./src/CEP_QPBO/build/CEP_QPBO",
+                "exe": "./src/CEP_MIP/build/CEP_MIP",
                 "params": {
-                    "step_size": 1.05,
-                    "dinkelbach_iterations": 10,
+                    "dinkelbach_iterations": 30,
                     "epsilon": 0.0001,
                     "max_neg": 500,
-                    "max_local_optima": 30,
+                    "max_local_optima": 10,
                     "do_peeling": false,
-                    "mip_time_limit": 300.0,
+                    "mip_time_limit": 600.0,
+                    "use_binary": false,
+                    "num_iter": 1
+                }
+            },
+            {
+                "name": "CEP_QPBO",
+                "toggle": true,
+                "exe": "./src/CEP_QPBO/build/CEP_QPBO",
+                "params": {
+                    "step_size": 1.02,
+                    "dinkelbach_iterations": 30,
+                    "epsilon": 0.0001,
+                    "max_neg": 500,
+                    "max_local_optima": 10,
+                    "do_peeling": false,
+                    "mip_time_limit": 600.0,
                     "num_iter": 1
                 }
             }
