@@ -380,15 +380,21 @@ protected:
     set<MaxHeapNode> pruning_set;
     vector<set<MaxHeapNode>::iterator> pruning_handles;
 
-    const unsigned toggle_done = 2;
-    const unsigned toggle_left = 20;
+    unsigned toggle_done = 2;
+    unsigned toggle_left = 20;
 
 public:
-    CEP(const string& input, bool reverse_weight) {
+    CEP(const string& input, bool reverse_weight, unsigned toggle_done, unsigned toggle_left) {
         ReadGraph(input, reverse_weight);
         status = vector<Status>(num_vertices(G), Status::Out);
         neighbor_in_count = vector<size_t>(num_vertices(G), 0);
         pos_weight = vector<double>(num_vertices(G), 0.0);
+        this->toggle_done = toggle_done;
+        this->toggle_left = toggle_left;
+    }
+
+    unsigned ConvertMaxNeg(double max_neg) {
+        return static_cast<unsigned>(max_neg * (max_neg < 1.0 ? num_vertices(G) : 1.0));
     }
 
     double ComputeDensity(const vector<Vertex>& nodes) {
@@ -713,17 +719,18 @@ public:
         }
     }
 
-    SubgraphResult Run(unsigned max_neg, unsigned max_local_optima, bool do_peeling) {
+    SubgraphResult Run(double max_neg, unsigned max_local_optima, bool do_peeling) {
         // Step 1. Contraction by Peeling
         SubgraphResult best = do_peeling ? Peeling() : SubgraphResult{{}, 0.0};
 
         // Step 2. Expansion by Multi-Local Search
         InitializePositiveWeights();
+        auto converted_max_neg = ConvertMaxNeg(max_neg);
         for (unsigned it = 0; it < max_local_optima; ++it) {
             PruningModeToggle(it, max_local_optima);
             auto anchor = FindAnchor();
             if (anchor == Traits::null_vertex() || !valid[anchor]) break;
-            auto result = LocalGreedy(anchor, max_neg);
+            auto result = LocalGreedy(anchor, converted_max_neg);
             if (result.density > best.density) {
                 best = result;
             }
@@ -746,8 +753,8 @@ public:
 
 class CEP_MIP : public CEP {
 public:
-    CEP_MIP(const string& input, bool reverse_weight)
-        : CEP(input, reverse_weight) {}
+    CEP_MIP(const string& input, bool reverse_weight, unsigned toggle_done, unsigned toggle_left)
+        : CEP(input, reverse_weight, toggle_done, toggle_left) {}
 
     pair<vector<Vertex>, bool> RunMIP(double lambda, double mip_time_limit) {
         try {
@@ -761,11 +768,6 @@ public:
             for (size_t i = 0; i < n; i++) {
                 x[i] = model.addVar(0.0, 1.0, 0.0, GRB_BINARY);
             }
-            // GRBLinExpr vertex_sum = 0.0;
-            // for (size_t i = 0; i < n; i++) {
-            //     vertex_sum += x[i];
-            // }
-            // model.addConstr(vertex_sum >= 1);
             
             GRBQuadExpr obj = 0.0;
             for (size_t i = 0; i < n; i++) {
@@ -822,6 +824,7 @@ public:
     SubgraphResult Dinkelbach(const SubgraphResult& cep_result, unsigned iterations, double mip_time_limit) {
         auto [best_solution, lower_bound] = cep_result;
         for (auto iter = 0; iter < iterations; iter++) {
+            cout << "Dinkelbach iteration " << iter + 1 << ", current lower bound: " << lower_bound << endl;    
             auto solution = RunMIP(lower_bound, mip_time_limit).first;
             auto density = ComputeDensity(solution);
             if (density > lower_bound) {
@@ -834,7 +837,7 @@ public:
         return {best_solution, lower_bound};
     }
 
-    SubgraphResult Run(unsigned max_neg_steps, unsigned max_local_optima, bool do_peeling, unsigned dinkelbach_iterations, double epsilon, double mip_time_limit, bool use_binary) {
+    SubgraphResult Run(double max_neg_steps, unsigned max_local_optima, bool do_peeling, unsigned dinkelbach_iterations, double epsilon, double mip_time_limit, bool use_binary) {
         auto cep_result = CEP::Run(max_neg_steps, max_local_optima, do_peeling);
         if (use_binary) {
             auto upper_bound = *max_element(pos_weight.begin(), pos_weight.end());
@@ -856,11 +859,11 @@ private:
     };
     using REAL = double;
     size_t vertex_lower_bound, vertex_upper_bound;
-    const bool set_vertex_lb = false;
+    const bool set_vertex_lb = true;
 
 public:
-    CEP_QPBO(const string& input, bool reverse_weight)
-        : CEP(input, reverse_weight) {
+    CEP_QPBO(const string& input, bool reverse_weight, unsigned toggle_done, unsigned toggle_left)
+        : CEP(input, reverse_weight, toggle_done, toggle_left) {
             InitializePositiveWeights();
             vertex_lower_bound = 3; // initialized, but not used in RunMIP (explained there).
             vertex_upper_bound = num_vertices(G);
@@ -944,7 +947,7 @@ public:
         return result;
     }
 
-    SubgraphResult FindLowerBound(unsigned max_neg_steps, unsigned max_local_optima, bool do_peeling) {
+    SubgraphResult FindLowerBound(double max_neg_steps, unsigned max_local_optima, bool do_peeling) {
         auto result = CEP::Run(max_neg_steps, max_local_optima, do_peeling);
         Reset();
         if (set_vertex_lb) {
@@ -1028,10 +1031,11 @@ public:
                 vertex_sum += undecided_vars[i];
             }
             model.addConstr(vertex_sum <= (vertex_upper_bound - qpbo_result.fixed_in.size()));
-            // Note: Don't set it, hope it can result empty fast if the lambda >= largest density
-            if (set_vertex_lb) {
-                model.addConstr(vertex_sum >= max(static_cast<size_t>(0), vertex_lower_bound - qpbo_result.fixed_in.size()));
-            }
+            // Warn: Don't set it, because it will return non-empty result even if the lambda >= largest density
+            // The non-empty result cannot reflect correct upper bound for Dinkelbach, will make the Dinkelbach break.
+            // if (set_vertex_lb) {
+            //     model.addConstr(vertex_sum >= max(static_cast<size_t>(0), vertex_lower_bound - qpbo_result.fixed_in.size()));
+            // }
             
             model.setObjective(obj, GRB_MINIMIZE);
             model.set(GRB_DoubleParam_TimeLimit, mip_time_limit);
@@ -1055,7 +1059,7 @@ public:
     SubgraphResult Dinkelbach(const SubgraphResult& cep_result, double upper_bound, unsigned iterations, double epsilon, double mip_time_limit) {
         auto [best_solution, lower_bound] = cep_result;
         for (auto iter = 0; iter < iterations; iter++) {
-            if (abs(upper_bound - lower_bound) < epsilon) {
+            if (upper_bound - lower_bound < epsilon) {
                 break;
             }
             double lambda = (lower_bound + upper_bound) / 2.0;
@@ -1070,14 +1074,10 @@ public:
                 if (density > lower_bound) {
                     lower_bound = density;
                     best_solution = solution;
-                    vertex_upper_bound = solution.size();
-                    auto new_ub = lambda + solution.size() * (density - lambda) / vertex_lower_bound;
-                    if (new_ub < upper_bound) {
-                        cout << "Refined upper_bound from  " << upper_bound << " to " << new_ub << " based on solution size " << solution.size() << " and density " << density << " and lambda " << lambda << endl;
-                        upper_bound = new_ub;
+                    vertex_upper_bound = solution.size() - 1;
+                    if (set_vertex_lb) {
+                        upper_bound = min(upper_bound, lambda + solution.size() * (density - lambda) / vertex_lower_bound);
                     }
-                    upper_bound = min(upper_bound, lambda + solution.size() * (density - lambda));
-                    cout << "iteration " << iter << ": vertex_upper_bound updated to " << vertex_upper_bound << endl;
                 } else {
                     // throw runtime_error("Dinkelbach: computed density is less than best density");
                     // Cannot find better solution under current lambda within time limit
@@ -1088,7 +1088,7 @@ public:
         return {best_solution, lower_bound};
     }
 
-    SubgraphResult Run(unsigned max_neg_steps, unsigned max_local_optima, bool do_peeling, double step_size, unsigned dinkelbach_iterations, double epsilon, double mip_time_limit) {
+    SubgraphResult Run(double max_neg_steps, unsigned max_local_optima, bool do_peeling, double step_size, unsigned dinkelbach_iterations, double epsilon, double mip_time_limit) {
         // Step 1. Result found by CEP as initial solution
         auto result_lb = FindLowerBound(max_neg_steps, max_local_optima, do_peeling);
         // if qpbo_result.undecided is empty and fixed_in is empty, we can directly return result found by CEP as Optimal

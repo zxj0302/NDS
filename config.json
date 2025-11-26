@@ -11,7 +11,7 @@
             },
             {
                 "path": "./input/real-world/Brexit/Brexit.txt", 
-                "toggle": false
+                "toggle": true
             },
             {
                 "path": "./input/real-world/Collins/Collins.txt", 
@@ -68,9 +68,11 @@
             },
             {
                 "name": "CEP",
-                "toggle": true,
+                "toggle": false,
                 "exe": "./src/CEP/build/CEP",
                 "params": {
+                    "toggle_done": 2,
+                    "toggle_left": 20,
                     "max_neg": 200,
                     "max_local_optima": 10,
                     "do_peeling": false,
@@ -82,11 +84,13 @@
                 "toggle": false,
                 "exe": "./src/CEP_MIP/build/CEP_MIP",
                 "params": {
-                    "dinkelbach_iterations": 30,
-                    "epsilon": 0.001,
+                    "toggle_done": 2,
+                    "toggle_left": 20,
                     "max_neg": 200,
                     "max_local_optima": 10,
                     "do_peeling": false,
+                    "dinkelbach_iterations": 30,
+                    "epsilon": 0.0001,
                     "mip_time_limit": 600.0,
                     "use_binary": false,
                     "num_iter": 1
@@ -97,12 +101,14 @@
                 "toggle": true,
                 "exe": "./src/CEP_QPBO/build/CEP_QPBO",
                 "params": {
-                    "step_size": 1.05,
-                    "dinkelbach_iterations": 30,
-                    "epsilon": 0.0001,
+                    "toggle_done": 2,
+                    "toggle_left": 20,
                     "max_neg": 200,
                     "max_local_optima": 10,
                     "do_peeling": false,
+                    "step_size": 1.05,
+                    "dinkelbach_iterations": 30,
+                    "epsilon": 0.0001,
                     "mip_time_limit": 600.0,
                     "num_iter": 1
                 }
@@ -157,6 +163,8 @@
                 "toggle": false,
                 "exe": "./src/CEP/build/CEP",
                 "params": {
+                    "toggle_done": 2,
+                    "toggle_left": 20,
                     "max_neg": 200,
                     "max_local_optima": 10,
                     "do_peeling": false,
@@ -168,6 +176,8 @@
                 "toggle": false,
                 "exe": "./src/CEP_MIP/build/CEP_MIP",
                 "params": {
+                    "toggle_done": 2,
+                    "toggle_left": 20,
                     "dinkelbach_iterations": 30,
                     "epsilon": 0.0001,
                     "max_neg": 500,
@@ -183,6 +193,8 @@
                 "toggle": true,
                 "exe": "./src/CEP_QPBO/build/CEP_QPBO",
                 "params": {
+                    "toggle_done": 2,
+                    "toggle_left": 20,
                     "step_size": 1.02,
                     "dinkelbach_iterations": 30,
                     "epsilon": 0.0001,

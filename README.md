@@ -2,13 +2,12 @@
 
 1. change to listS for edges
 2. try to use traditional methods (for non-genative weights only methods) and MIP
-3. change the hard-coded numbers to params, and set percentage things
-4. design output name for each different configuration for the same algorithm
-5. optimize the CEP_QPBO, can use Probe(), Improve() and other (like CEP in the middle) to improve
-6. which one is better, P+BP+I, or P+CEP+I?
-7. what if add many peelings in QPBO process?
-8. QPBO里削减图规模，设置array测试顺序，以及Improve时初始化
-9. dynamic lower_bound and upper_bound, use the CEP to find the bounds better
+3. design output name for each different configuration for the same algorithm
+4. optimize the CEP_QPBO, can use Probe(), Improve() and other (like CEP in the middle) to improve
+5. which one is better, P+BP+I, or P+CEP+I?
+6. what if add many peelings in QPBO process?
+7. QPBO里削减图规模，设置array测试顺序，以及Improve时初始化
+8. dynamic lower_bound and upper_bound, use the CEP to find the bounds better
 
 ---
 
@@ -24,6 +23,7 @@
 6. peeling might delete some important nodes wrongly,  and we find some cases that the peeling based methods may fail. However, run CEP that locally optimize the formula will focus on marginal gain, instead of peeling.
 7. Two main contribution: (1) improve of existing heuristic method, and (2) workflow for exact method
 8. explain why cannot use existing positive weighted solution like MaxFlow, and explain why cannot shift weights to positive ones.
+9. Insights behind any tiny design.
 
 ---
 
@@ -47,6 +47,8 @@
 * [11.23 Mon] CEP 扩大neg count居然会减小找到的值！A: 详见Design。这是特性，过多加入（更大的max_neg）会使得peeling时不精确。
 * [11.24 Tue] FindUpperBound can return -inf! A: No reset of the pos_weight and other structures after CEP::Run().
 * [11.24 Tue] QPBO居然会返回非最优值！使用CEP的结果做pre qpbo时居然会返回全部out! A: It was a bug. I set the 'success' to 'false', which should be true if the undecided nodes of QPBO is empty.
+* [11.26 Wed] Have set vertex constrains in MIP, also use the MIP result to refine upper bound.
+* [11.26 Wed] Have changed the hard-coded numbers to params, and set percentage things.
 
 ---
 
@@ -91,8 +93,11 @@ Sometimes the CEP_QPBO does not have significant improvement on the CEP_MIP, thi
 
 ```
 Theorem 1: Assume we use lambda in RunMIP find an 'exact' result s with n nodes and density rho, then all the subgraphs with density larger than rho would have fewer nodes than n_1. This is because we are minimizing lambda * #nodes - weight_sum = maximizing weight_sum - lambda * #nodes = (rho_subgraph - lambda) * #nodes. If there is a subgraph s' has rho' >= rho and n' > n, then the s' should be the exact result instead of s. Note that if the subgraph n is empty, it means all the subgraphs have density smaller than lambda. 
-Apart from the above, we can also see that the upper bound of best density should be <= (rho - lambda) * #nodes, because the subgraph with largest density should have number of nodes at least 1. If its density is larger than (rho - lambda) * #nodes, the MIP should find it instead of s.
+Apart from the above, we can also see that the upper bound of best density should be <= (rho - lambda) * #nodes, because the subgraph with largest density should have number of nodes at least 1. If its density is larger than (rho - lambda) * #nodes, the MIP should find it instead of s. Additionall, if when we set the lower bound, we iterate all 0, 1, and 2 nodes' coombination, i.e. empty set (give density 0), single node (give density max loop weight), and edge (give (loop[u]+loo[v]+w(u, v))/2), we can set the vertex_lower_bound as 3. Thus the best non-found density should be <= (rho - lambda) * #nodes / 3. 
+
+Furthermore, as for a sequence of MIP running result, the lambda set \lambda1, \lambda2... should be increasing, and the result found \rho1, \rho2... should also be increasing. Thus the number of nodes n of densest subgraph should also be < (n1 * (rho1 - l1) / (rho2 - l1)) = Q , for any former MIP result n1 and later result n2 (have density rho2). Note that, Q is larger than n2, othersize in the former MIP iteration the result should be n2. Thus n2 (the node number from the latest MIP) should always be a tighter bound for n. 
 ```
+
 
 ```
 Another thing to note is that, using up-down method to find the upper bound and use binary search later might help the search, because it prunes half search space each time, and has some guaranteed number of iterations to converge to some approximation. However, sometimes it takes longer time to converge too, which is due to the many search for lambda larger than the largest density. In this case, QPBO might have many nodes as un-labeled (actually the ground truth for them should all be 0), and run MIP for them takes time, and return an empty fixed_in. Lower down the upper bound and search again, until end. However, if use bottom-up method and use lower_bound as init lambda, it may converge faster and directly find the solution. The above difference is due to the upper_bound phase, which cannot find a tight upper bound due to QPBO' unlabeled set non-empty. This will cause the upper_bound estimation larger and larger, and shrink it again and again with MIP later.
