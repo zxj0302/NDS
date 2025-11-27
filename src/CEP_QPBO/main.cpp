@@ -1,9 +1,9 @@
 #include "../basic.hpp"
 
 int main(int argc, char* argv[]) {
-    if (argc < 4 || argc > 15) {
+    if (argc < 4 || argc > 16) {
         cerr << "Usage: " << argv[0] << " <input_filename> <output_filename> <reverse_weight> [toggle_done] [toggle_left] [max_neg_steps] "
-             << "[max_local_optima] [peeling] [step_size] [dinkelbach_iterations] [epsilon] [mip_time_limit] [use_binary] [num_its]" << endl;
+             << "[max_local_optima] [peeling] [step_size] [ub_mip_bound] [dinkelbach_iterations] [epsilon] [mip_time_limit] [use_binary] [num_its]" << endl;
         return EXIT_FAILURE;
     }
 
@@ -16,11 +16,12 @@ int main(int argc, char* argv[]) {
     unsigned max_local_optima = (argc >= 8) ? stoi(argv[7]) : 10;
     bool do_peeling = (argc >= 9) ? (string(argv[8]) == "1") : true;
     double step_size = (argc >= 10) ? stod(argv[9]) : 1.05;
-    unsigned dinkelbach_iterations = (argc >= 11) ? stoi(argv[10]) : 10;
-    double epsilon = (argc >= 12) ? stod(argv[11]) : 1e-4;
-    double mip_time_limit = (argc >= 13) ? stod(argv[12]) : 300.0;
-    bool use_binary = (argc >= 14) ? (string(argv[13]) == "1") : true;
-    unsigned num_its = (argc >= 15) ? stoi(argv[14]) : 1;
+    unsigned ub_mip_bound = (argc >= 11) ? stoi(argv[10]) : 10;
+    unsigned dinkelbach_iterations = (argc >= 12) ? stoi(argv[11]) : 10;
+    double epsilon = (argc >= 13) ? stod(argv[12]) : 1e-4;
+    double mip_time_limit = (argc >= 14) ? stod(argv[13]) : 300.0;
+    bool use_binary = (argc >= 15) ? (string(argv[14]) == "1") : true;
+    unsigned num_its = (argc >= 16) ? stoi(argv[15]) : 1;
 
     CEP_QPBO graph(input, reverse_weight, toggle_done, toggle_left);
     CEP_QPBO::SubgraphResult first_result;
@@ -29,7 +30,7 @@ int main(int argc, char* argv[]) {
     for (unsigned it = 0; it < num_its; ++it) {
         auto graph_copy = graph;
         auto start_time = chrono::high_resolution_clock::now();
-        auto result = graph_copy.Run(max_neg_steps, max_local_optima, do_peeling, step_size, dinkelbach_iterations, epsilon, mip_time_limit, use_binary);
+        auto result = graph_copy.Run(max_neg_steps, max_local_optima, do_peeling, step_size, ub_mip_bound, dinkelbach_iterations, epsilon, mip_time_limit, use_binary);
         auto end_time = chrono::high_resolution_clock::now();
         auto duration = chrono::duration_cast<chrono::nanoseconds>(end_time - start_time);
         double time_seconds = duration.count() / 1e9;

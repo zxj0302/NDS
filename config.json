@@ -11,7 +11,7 @@
             },
             {
                 "path": "./input/real-world/Brexit/Brexit.txt", 
-                "toggle": true
+                "toggle": false
             },
             {
                 "path": "./input/real-world/Collins/Collins.txt", 
@@ -81,7 +81,7 @@
             },
             {
                 "name": "CEP_MIP",
-                "toggle": false,
+                "toggle": true,
                 "exe": "./src/CEP_MIP/build/CEP_MIP",
                 "params": {
                     "toggle_done": 2,
@@ -107,6 +107,7 @@
                     "max_local_optima": 10,
                     "do_peeling": false,
                     "step_size": 1.05,
+                    "ub_mip_bound": 100,
                     "dinkelbach_iterations": 30,
                     "epsilon": -0.00001,
                     "mip_time_limit": 600.0,
@@ -173,7 +174,7 @@
             },
             {
                 "name": "CEP_MIP",
-                "toggle": false,
+                "toggle": true,
                 "exe": "./src/CEP_MIP/build/CEP_MIP",
                 "params": {
                     "toggle_done": 2,
@@ -199,6 +200,7 @@
                     "max_local_optima": 10,
                     "do_peeling": false,
                     "step_size": 1.02,
+                    "ub_mip_bound": 100,
                     "dinkelbach_iterations": 30,
                     "epsilon": -0.00001,
                     "mip_time_limit": 600.0,

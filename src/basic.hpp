@@ -982,9 +982,9 @@ public:
         return result;
     }
 
-    double FindUpperBound(double init_density, double step_size) {
+    double FindUpperBoundOld(SubgraphResult& result_lb, double step_size, unsigned ub_mip_bound, unsigned mip_time_limit) {
         auto pos_weight_ub = *max_element(pos_weight.begin(), pos_weight.end());
-        double lambda_ub = init_density * step_size;
+        double lambda_ub = result_lb.density * step_size;
         while (lambda_ub < pos_weight_ub) {
             auto result = RunQPBO(lambda_ub, false);
             if (result.undecided.empty() && result.fixed_in.empty()) {
@@ -995,8 +995,43 @@ public:
         return min(lambda_ub, pos_weight_ub);
     }
 
+    double FindUpperBound(SubgraphResult& result_lb, double step_size, unsigned ub_mip_bound, unsigned mip_time_limit) {
+        auto pos_weight_ub = *max_element(pos_weight.begin(), pos_weight.end());
+        double lambda_ub = result_lb.density * step_size;
+        while (lambda_ub < pos_weight_ub) {
+            auto result = RunQPBO(lambda_ub, false);
+            if (result.undecided.size() <= ub_mip_bound) {
+                auto [solution, success] = result.undecided.empty() ? make_pair(result.fixed_in, true) : RunMIP(result, lambda_ub, mip_time_limit);
+                if (solution.empty() && success) {
+                    // the density of any subgraph must be <= lambda_ub
+                    return lambda_ub;
+                } else if (!solution.empty() && success) {
+                    // the density of solution must be larger than lambda_ub, update lb and lambda_ub
+                    double density = ComputeDensity(solution);
+                    result_lb = {solution, density};
+                    vertex_upper_bound = solution.size() - 1;
+                    if (set_vertex_lb) {
+                        pos_weight_ub = min(pos_weight_ub, lambda_ub + solution.size() * (density - lambda_ub) / vertex_lower_bound);
+                    }
+                    lambda_ub = density;
+                } else if (!solution.empty() && !success) {
+                    // MIP hit time limit, get some solution but cannot guarantee optimality, check density to update lb
+                    double density = ComputeDensity(solution);
+                    if (density > result_lb.density) {
+                        result_lb = {solution, density};
+                        lambda_ub = max(lambda_ub, density);
+                    }
+                } else {
+                    // MIP hit time limit and solution empty, do nothing, try next lambda_ub
+                }
+            }
+            lambda_ub *= step_size;
+        }
+        return pos_weight_ub;
+    }
+
     pair<vector<Vertex>, bool> RunMIP(QPBOResult& qpbo_result, double lambda, double mip_time_limit) {
-        cout << "Running MIP on " << qpbo_result.undecided.size() << " undecided nodes." << endl;
+        // cout << "Running MIP on " << qpbo_result.undecided.size() << " undecided nodes." << endl;
         try {
             GRBEnv env = GRBEnv(true);
             env.set(GRB_IntParam_OutputFlag, 0);
@@ -1086,12 +1121,13 @@ public:
                     lower_bound = density;
                     best_solution = solution;
                     vertex_upper_bound = solution.size() - 1;
-                    if (set_vertex_lb) {
+                    if (set_vertex_lb && success) {
                         upper_bound = min(upper_bound, lambda + solution.size() * (density - lambda) / vertex_lower_bound);
                     }
                 } else {
                     // throw runtime_error("Dinkelbach: computed density is less than best density");
                     // Cannot find better solution under current lambda within time limit
+                    cerr << "DinkelbachBinary: cannot find better solution under current lambda within time limit." << endl;
                     break;
                 }
             }
@@ -1116,25 +1152,23 @@ public:
         return {best_solution, lower_bound};
     }
 
-    SubgraphResult Run(double max_neg_steps, unsigned max_local_optima, bool do_peeling, double step_size, unsigned dinkelbach_iterations, double epsilon, double mip_time_limit, bool use_binary) {
+    SubgraphResult Run(double max_neg_steps, unsigned max_local_optima, bool do_peeling, double step_size, unsigned ub_mip_bound, unsigned dinkelbach_iterations, double epsilon, double mip_time_limit, bool use_binary) {
         // Step 1. Result found by CEP as initial solution
         auto result_lb = FindLowerBound(max_neg_steps, max_local_optima, do_peeling);
         // if qpbo_result.undecided is empty and fixed_in is empty, we can directly return result found by CEP as Optimal
         auto pre_qpbo = RunQPBO(result_lb.density, false);
         if (pre_qpbo.undecided.empty() && pre_qpbo.fixed_in.empty()) {
             return result_lb;
-        }
-        if (pre_qpbo.undecided.empty()) {
+        } else if (pre_qpbo.undecided.empty()) {
             double density = ComputeDensity(pre_qpbo.fixed_in);
             if (density > result_lb.density) {
                 result_lb = {pre_qpbo.fixed_in, density};
             }
         }
         
-
         if (use_binary) {
             // Step 2. Find an upper bound for QPBO
-            auto upper_bound = FindUpperBound(result_lb.density, step_size);
+            auto upper_bound = FindUpperBound(result_lb, step_size, ub_mip_bound, mip_time_limit);
             // Step 3. Refine the solution by Dinkelbach
             return DinkelbachBinary(result_lb, upper_bound, dinkelbach_iterations, epsilon, mip_time_limit);
         } else {
