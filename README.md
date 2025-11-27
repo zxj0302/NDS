@@ -6,7 +6,7 @@
 4. optimize the CEP_QPBO, can use Probe(), Improve() and other (like CEP in the middle) to improve
 5. what if add many peelings in QPBO process?
 6. QPBO里削减图规模，设置array测试顺序，以及Improve时初始化
-7. dynamic lower_bound and upper_bound, use the CEP to find the bounds better
+7. dynamic lower_bound and upper_bound, use the CEP to find the bounds better after MIP or QPBO
 
 ---
 
@@ -91,7 +91,10 @@ Apart from the above, we can also see that the upper bound of best density shoul
 Furthermore, as for a sequence of MIP running result, the lambda set \lambda1, \lambda2... should be increasing, and the result found \rho1, \rho2... should also be increasing. Thus the number of nodes n of densest subgraph should also be < (n1 * (rho1 - l1) / (rho2 - l1)) = Q , for any former MIP result n1 and later result n2 (have density rho2). Note that, Q is larger than n2, othersize in the former MIP iteration the result should be n2. Thus n2 (the node number from the latest MIP) should always be a tighter bound for n. 
 ```
 
-
 ```
 Another thing to note is that, using up-down method to find the upper bound and use binary search later might help the search, because it prunes half search space each time, and has some guaranteed number of iterations to converge to some approximation. However, sometimes it takes longer time to converge too, which is due to the many search for lambda larger than the largest density. In this case, QPBO might have many nodes as un-labeled (actually the ground truth for them should all be 0), and run MIP for them takes time, and return an empty fixed_in. Lower down the upper bound and search again, until end. However, if use bottom-up method and use lower_bound as init lambda, it may converge faster and directly find the solution. The above difference is due to the upper_bound phase, which cannot find a tight upper bound due to QPBO' unlabeled set non-empty. This will cause the upper_bound estimation larger and larger, and shrink it again and again with MIP later.
+```
+
+```
+Compared with purely peeling, CEP (with both expansion and peeling) combine better with QPBO, as QPBO's fixed_in set can be used as start point to expand, and its fixed_out set is already gone.
 ```
