@@ -397,17 +397,29 @@ public:
         return static_cast<unsigned>(max_neg * (max_neg < 1.0 ? num_vertices(G) : 1.0));
     }
 
-    double ComputeDensity(const vector<Vertex>& nodes) {
+    double ComputeDensity(const vector<Vertex>& nodes, bool iterate_edges = false) {
         if (nodes.empty()) return 0.0;
         double total_weight_sum = 0.0;
         vector<bool> selected(num_vertices(G), false);
-        for (auto node : nodes) {
-            selected[node] = true;
-            total_weight_sum += loop_weight[node];
-        }
-        for (auto [ei, ee] = edges(G); ei != ee; ++ei) {
-            if (selected[source(*ei, G)] && selected[target(*ei, G)]) {
-                total_weight_sum += G[*ei].weight;
+        if (iterate_edges) {
+            for (auto node : nodes) {
+                selected[node] = true;
+                total_weight_sum += loop_weight[node];
+            }
+            for (auto [ei, ee] = edges(G); ei != ee; ++ei) {
+                if (selected[source(*ei, G)] && selected[target(*ei, G)]) {
+                    total_weight_sum += G[*ei].weight;
+                }
+            }
+        } else {
+            for (auto node : nodes) {
+                selected[node] = true;
+                total_weight_sum += loop_weight[node];
+                for (auto [ei, ee] = out_edges(node, G); ei != ee; ++ei) {
+                    if (selected[target(*ei, G)]) {
+                        total_weight_sum += G[*ei].weight;
+                    }
+                }
             }
         }
         return total_weight_sum / nodes.size();
@@ -1112,6 +1124,13 @@ public:
         if (pre_qpbo.undecided.empty() && pre_qpbo.fixed_in.empty()) {
             return result_lb;
         }
+        if (pre_qpbo.undecided.empty()) {
+            double density = ComputeDensity(pre_qpbo.fixed_in);
+            if (density > result_lb.density) {
+                result_lb = {pre_qpbo.fixed_in, density};
+            }
+        }
+        
 
         if (use_binary) {
             // Step 2. Find an upper bound for QPBO
@@ -1120,7 +1139,6 @@ public:
             return DinkelbachBinary(result_lb, upper_bound, dinkelbach_iterations, epsilon, mip_time_limit);
         } else {
             return Dinkelbach(result_lb, dinkelbach_iterations, mip_time_limit);
-        }
-        
+        }      
     }
 };

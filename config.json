@@ -202,7 +202,7 @@
                     "dinkelbach_iterations": 30,
                     "epsilon": -0.00001,
                     "mip_time_limit": 600.0,
-                    "use_binary": false,
+                    "use_binary": true,
                     "num_iter": 1
                 }
             }
