@@ -81,7 +81,7 @@
             },
             {
                 "name": "CEP_MIP",
-                "toggle": true,
+                "toggle": false,
                 "exe": "./src/CEP_MIP/build/CEP_MIP",
                 "params": {
                     "toggle_done": 2,
@@ -98,7 +98,7 @@
             },
             {
                 "name": "CEP_QPBO",
-                "toggle": true,
+                "toggle": false,
                 "exe": "./src/CEP_QPBO/build/CEP_QPBO",
                 "params": {
                     "toggle_done": 2,
@@ -111,6 +111,28 @@
                     "dinkelbach_iterations": 30,
                     "epsilon": -0.00001,
                     "mip_time_limit": 600.0,
+                    "num_iter": 1
+                }
+            },
+            {
+                "name": "CEP_QPBO_OPT",
+                "toggle": true,
+                "exe": "./src/CEP_QPBO_OPT/build/CEP_QPBO_OPT",
+                "params": {
+                    "toggle_done": 2,
+                    "toggle_left": 20,
+                    "max_neg": 200,
+                    "max_local_optima": 10,
+                    "do_peeling": false,
+                    "step_size": 1.02,
+                    "ub_mip_bound": 100,
+                    "dinkelbach_iterations": 30,
+                    "epsilon": -0.00001,
+                    "mip_time_limit": 600.0,
+                    "use_binary": true,
+                    "use_probe": false,
+                    "skip_mip_init": true,
+                    "heuristic_after_mip": true,
                     "num_iter": 1
                 }
             }
@@ -174,7 +196,7 @@
             },
             {
                 "name": "CEP_MIP",
-                "toggle": true,
+                "toggle": false,
                 "exe": "./src/CEP_MIP/build/CEP_MIP",
                 "params": {
                     "toggle_done": 2,
@@ -191,7 +213,7 @@
             },
             {
                 "name": "CEP_QPBO",
-                "toggle": true,
+                "toggle": false,
                 "exe": "./src/CEP_QPBO/build/CEP_QPBO",
                 "params": {
                     "toggle_done": 2,
@@ -205,6 +227,28 @@
                     "epsilon": -0.00001,
                     "mip_time_limit": 600.0,
                     "use_binary": true,
+                    "num_iter": 1
+                }
+            },
+            {
+                "name": "CEP_QPBO_OPT",
+                "toggle": true,
+                "exe": "./src/CEP_QPBO_OPT/build/CEP_QPBO_OPT",
+                "params": {
+                    "toggle_done": 2,
+                    "toggle_left": 20,
+                    "max_neg": 200,
+                    "max_local_optima": 10,
+                    "do_peeling": false,
+                    "step_size": 1.02,
+                    "ub_mip_bound": 100,
+                    "dinkelbach_iterations": 30,
+                    "epsilon": -0.00001,
+                    "mip_time_limit": 600.0,
+                    "use_binary": true,
+                    "use_probe": false,
+                    "skip_mip_init": true,
+                    "heuristic_after_mip": true,
                     "num_iter": 1
                 }
             }

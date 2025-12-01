@@ -3,10 +3,9 @@
 1. change to listS for edges
 2. try to use traditional methods (for non-genative weights only methods)
 3. design output name for each different configuration for the same algorithm
-4. optimize the CEP_QPBO, can use Probe(), Improve() and other (like CEP in the middle) to improve
-5. what if add many peelings in QPBO process?
-6. QPBO里削减图规模，设置array测试顺序，以及Improve时初始化
-7. dynamic lower_bound and upper_bound, use the CEP to find the bounds better after MIP or QPBO
+4. organize param order, and combine the SubgraphResult and SubgraphResultEnhanced
+5. When initializing the pos_weights for CEP, do more 聚合邻居的值！
+6. 带默认值的函数给规范一下，传入某些值
 
 ---
 
@@ -23,8 +22,6 @@
 9. Insights behind any tiny design.
 
 ---
-
-
 
 ## Experiments TODO
 
@@ -44,6 +41,9 @@
 * [11.24 Tue] QPBO居然会返回非最优值！使用CEP的结果做pre qpbo时居然会返回全部out! A: It was a bug. I set the 'success' to 'false', which should be true if the undecided nodes of QPBO is empty.
 * [11.26 Wed] Have set vertex constrains in MIP, also use the MIP result to refine upper bound.
 * [11.26 Wed] Have changed the hard-coded numbers to params, and set percentage things.
+* [11.30 Sun] Finished coding of "QPBO里削减图规模，设置array测试顺序，以及Improve时初始化". Prune the graph, and then use the QPBO process. Use Improve with initialization from CEPLambda.
+* [12.01 Mon] Using solution from previous MIP run as next MIP's initial solution guess might be misledding, as the new lambda will be at least the same as the solution's density. If that solution is close to the current solution, then it is ok. Otherwise, it might be more time-consuming.
+* [12.01 Mon] Implemented CEP after MIP, which might improve the result further. It does help.
 
 ---
 
@@ -97,4 +97,8 @@ Another thing to note is that, using up-down method to find the upper bound and 
 
 ```
 Compared with purely peeling, CEP (with both expansion and peeling) combine better with QPBO, as QPBO's fixed_in set can be used as start point to expand, and its fixed_out set is already gone.
+```
+
+```
+Pruning the graph truly helps the QPBO process to run faster.
 ```
