@@ -52,7 +52,7 @@
             {
                 "name": "NEG_DSD",
                 "toggle": false,
-                "exe": "./src/NEG_DSD/build/NEG_DSD",
+                "exe": "./build/neg_dsd",
                 "params": {
                     "C_values": "0.9,1.0,1.1,1.2",
                     "num_iter": 1
@@ -61,7 +61,7 @@
             {
                 "name": "DCSGreedy",
                 "toggle": false,
-                "exe": "./src/DCSGreedy/build/DCSGreedy",
+                "exe": "./build/dcs_greedy",
                 "params": {
                     "num_iter": 1
                 }
@@ -69,7 +69,7 @@
             {
                 "name": "CEP",
                 "toggle": false,
-                "exe": "./src/CEP/build/CEP",
+                "exe": "./build/cep",
                 "params": {
                     "toggle_done": 2,
                     "toggle_left": 20,
@@ -82,7 +82,7 @@
             {
                 "name": "CEP_MIP",
                 "toggle": false,
-                "exe": "./src/CEP_MIP/build/CEP_MIP",
+                "exe": "./build/cep_mip",
                 "params": {
                     "toggle_done": 2,
                     "toggle_left": 20,
@@ -99,7 +99,7 @@
             {
                 "name": "CEP_QPBO",
                 "toggle": false,
-                "exe": "./src/CEP_QPBO/build/CEP_QPBO",
+                "exe": "./build/cep_qpbo",
                 "params": {
                     "toggle_done": 2,
                     "toggle_left": 20,
@@ -117,7 +117,7 @@
             {
                 "name": "CEP_QPBO_OPT",
                 "toggle": true,
-                "exe": "./src/CEP_QPBO_OPT/build/CEP_QPBO_OPT",
+                "exe": "./build/cep_qpbo_opt",
                 "params": {
                     "toggle_done": 2,
                     "toggle_left": 20,
@@ -167,7 +167,7 @@
             {
                 "name": "NEG_DSD",
                 "toggle": false,
-                "exe": "./src/NEG_DSD/build/NEG_DSD",
+                "exe": "./build/neg_dsd",
                 "params": {
                     "C_values": "0.9,1.0,1.1,1.2",
                     "num_iter": 1
@@ -176,7 +176,7 @@
             {
                 "name": "DCSGreedy",
                 "toggle": false,
-                "exe": "./src/DCSGreedy/build/DCSGreedy",
+                "exe": "./build/dcs_greedy",
                 "params": {
                     "num_iter": 1
                 }
@@ -184,7 +184,7 @@
             {
                 "name": "CEP",
                 "toggle": false,
-                "exe": "./src/CEP/build/CEP",
+                "exe": "./build/cep",
                 "params": {
                     "toggle_done": 2,
                     "toggle_left": 20,
@@ -197,7 +197,7 @@
             {
                 "name": "CEP_MIP",
                 "toggle": false,
-                "exe": "./src/CEP_MIP/build/CEP_MIP",
+                "exe": "./build/cep_mip",
                 "params": {
                     "toggle_done": 2,
                     "toggle_left": 20,
@@ -214,7 +214,7 @@
             {
                 "name": "CEP_QPBO",
                 "toggle": false,
-                "exe": "./src/CEP_QPBO/build/CEP_QPBO",
+                "exe": "./build/cep_qpbo",
                 "params": {
                     "toggle_done": 2,
                     "toggle_left": 20,
@@ -233,7 +233,7 @@
             {
                 "name": "CEP_QPBO_OPT",
                 "toggle": true,
-                "exe": "./src/CEP_QPBO_OPT/build/CEP_QPBO_OPT",
+                "exe": "./build/cep_qpbo_opt",
                 "params": {
                     "toggle_done": 2,
                     "toggle_left": 20,
@@ -264,7 +264,7 @@
             {
                 "name": "NEG_DSD",
                 "toggle": true,
-                "exe": "./src/NEG_DSD/build/NEG_DSD",
+                "exe": "./build/neg_dsd",
                 "params": {
                     "C_values": "1.0",
                     "num_iter": 1
@@ -273,7 +273,7 @@
             {
                 "name": "DCSGreedy",
                 "toggle": true,
-                "exe": "./src/DCSGreedy/build/DCSGreedy",
+                "exe": "./build/dcs_greedy",
                 "params": {
                     "num_iter": 1
                 }
@@ -281,7 +281,7 @@
             {
                 "name": "CEP",
                 "toggle": true,
-                "exe": "./src/CEP/build/CEP",
+                "exe": "./build/cep",
                 "params": {
                     "max_neg": 200,
                     "max_local_optima": 10,

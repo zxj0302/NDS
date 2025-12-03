@@ -1,8 +1,7 @@
-from .baselines import *
-from .painter import *
+from .utils.baselines import *
+from .utils.painter import *
 from loguru import logger
 import sys
-import json
 
 def set_logger():
     # Remove default configuration

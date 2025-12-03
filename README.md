@@ -1,15 +1,293 @@
-## TODO:
+# NDS - Negative Densest Subgraph Discovery
 
-1. change to listS for edges
-2. try to use traditional methods (for non-genative weights only methods)
-3. design output name for each different configuration for the same algorithm
-4. organize param order, and combine the SubgraphResult and SubgraphResultEnhanced
-5. When initializing the pos_weights for CEP, do more 聚合邻居的值！
-6. 带默认值的函数给规范一下，传入某些值
+A high-performance C++ implementation of algorithms for discovering densest subgraphs in graphs with negative edge weights. This project provides multiple algorithmic approaches, from fast heuristics to exact optimization methods, combining techniques like local search, QPBO (Quadratic Pseudo-Boolean Optimization), and Mixed Integer Programming (MIP).
+
+## 📋 Table of Contents
+
+- [Overview](#overview)
+- [Algorithms](#algorithms)
+- [Installation](#installation)
+- [Building](#building)
+- [Usage](#usage)
+- [Configuration](#configuration)
+- [Project Structure](#project-structure)
+- [Development Notes](#development-notes)
 
 ---
 
-## Contributions (should contain):
+## Overview
+
+The negative densest subgraph problem aims to find a subgraph that maximizes the ratio of total edge weights to the number of vertices, where edge weights can be negative. This problem has applications in social network analysis, bioinformatics, and community detection.
+
+This project implements several algorithms:
+- **NEG_DSD**: Negative Densest Subgraph Discovery baseline
+- **DCSGreedy**: Greedy approximation algorithm
+- **CEP**: Core Expansion with Peeling (heuristic method)
+- **CEP_MIP**: CEP enhanced with Mixed Integer Programming
+- **CEP_QPBO**: CEP with QPBO-based optimization
+- **CEP_QPBO_OPT**: Optimized version combining CEP, QPBO, and MIP
+
+---
+
+## Algorithms
+
+### 1. NEG_DSD (Baseline)
+Basic algorithm for negative densest subgraph discovery.
+
+### 2. DCSGreedy
+Fast greedy approximation that builds the solution incrementally.
+
+### 3. CEP (Core Expansion with Peeling)
+A heuristic approach that:
+- Starts with a core subgraph
+- Expands by adding negative-weight neighbors
+- Uses peeling to remove low-contribution vertices
+- Employs local search for optimization
+
+### 4. CEP_MIP
+Enhances CEP with Mixed Integer Programming for exact solutions within the search space.
+
+### 5. CEP_QPBO
+Combines CEP with QPBO (Quadratic Pseudo-Boolean Optimization) for improved optimization.
+
+### 6. CEP_QPBO_OPT (Recommended)
+The most sophisticated algorithm combining:
+- CEP for initialization
+- QPBO for graph pruning and partial solutions
+- MIP for exact optimization on reduced problem instances
+- Iterative refinement with Dinkelbach's method
+
+---
+
+## Installation
+
+### Prerequisites
+
+**Required:**
+- **C++17** compatible compiler (GCC 7+, Clang 5+, or Apple Clang 9+)
+- **CMake** 3.26 or higher
+- **Boost** libraries (tested with 1.88.0)
+
+**Optional (for MIP-based algorithms):**
+- **Gurobi Optimizer** 11.0+ (required for CEP_MIP, CEP_QPBO, CEP_QPBO_OPT)
+  - Set `GUROBI_HOME` environment variable or install to default location
+  - Requires valid license
+
+**Python (for utilities and visualization):**
+- Python 3.8+
+- See `requirements.txt` for Python dependencies
+
+### Installing Dependencies
+
+**macOS:**
+```bash
+# Install Boost
+brew install boost
+
+# Install CMake
+brew install cmake
+
+# Install Python dependencies
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+**Linux:**
+```bash
+# Ubuntu/Debian
+sudo apt-get install libboost-all-dev cmake g++
+
+# Install Python dependencies
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+---
+
+## Building
+
+### Quick Build
+
+```bash
+# Build all algorithms in Release mode
+cd src
+./build.sh
+```
+
+### Build Options
+
+```bash
+# Show all options
+./build.sh --help
+
+# Build specific algorithm only
+./build.sh -a cep_qpbo_opt
+
+# Build in Debug mode
+./build.sh -t Debug
+
+# Clean and rebuild
+./build.sh -c
+
+# Build without Gurobi (only non-MIP algorithms)
+./build.sh --no-gurobi
+
+# Use specific number of parallel jobs
+./build.sh -j 8
+```
+
+### Manual CMake Build
+
+```bash
+mkdir -p build
+cd build
+cmake ../src
+make -j$(nproc)
+```
+
+**Executables** are placed in `build/`:
+- `build/neg_dsd`
+- `build/dcs_greedy`
+- `build/cep`
+- `build/cep_mip`
+- `build/cep_qpbo`
+- `build/cep_qpbo_opt`
+
+---
+
+## Usage
+
+### Command Line
+
+Basic usage pattern:
+```bash
+./build/<algorithm> <input_graph> <output_json> [parameters...]
+```
+
+**Example:**
+```bash
+./build/cep_qpbo_opt \
+    ./input/real-world/Referendum/Referendum.txt \
+    ./output/test/result.json \
+    0 2 20 200 10 0 1.02 100 30 -1e-05 600.0 1 0 1
+```
+
+### Using Configuration File
+
+The project includes `config.json` for batch experiments:
+
+```bash
+# Edit config.json to set parameters and toggle algorithms
+# Then run experiments using Python scripts
+python main.ipynb  # or use your experiment runner
+```
+
+### Input Format
+
+Graph files should be in edge list format:
+```
+# Lines starting with # are comments
+vertex1 vertex2 weight
+vertex3 vertex4 weight
+...
+```
+
+- Vertices are 0-indexed integers
+- Weights can be positive or negative floating-point numbers
+- Self-loops are supported
+
+---
+
+## Configuration
+
+### Algorithm Parameters
+
+Common parameters across CEP variants:
+
+- **toggle_done**: Number of iterations before considering convergence (default: 2)
+- **toggle_left**: Minimum iterations remaining before switching data structures (default: 20)
+- **max_neg**: Maximum negative weight neighbors to consider in expansion (default: 200)
+- **max_local_optima**: Maximum local search iterations (default: 10)
+- **do_peeling**: Enable/disable peeling phase (default: false)
+
+MIP-specific parameters:
+
+- **dinkelbach_iterations**: Maximum iterations for Dinkelbach's algorithm (default: 30)
+- **epsilon**: Convergence threshold (default: -1e-05)
+- **mip_time_limit**: Time limit per MIP solve in seconds (default: 600.0)
+- **use_binary**: Use binary search for lambda values (default: true)
+
+QPBO-specific parameters:
+
+- **step_size**: Step size for upper bound search (default: 1.02)
+- **ub_mip_bound**: Upper bound for MIP node constraints (default: 100)
+- **use_probe**: Enable QPBO probing (default: false)
+- **skip_mip_init**: Skip MIP initialization phase (default: true)
+- **heuristic_after_mip**: Run heuristic refinement after MIP (default: true)
+
+---
+
+## Project Structure
+
+```
+NDS/
+├── src/
+│   ├── CMakeLists.txt          # Main build configuration
+│   ├── build.sh                # Build script
+│   ├── core/
+│   │   ├── graph.hpp           # Base graph class
+│   │   └── algorithms/         # Algorithm implementations
+│   │       ├── neg_dsd.hpp
+│   │       ├── dcs_greedy.hpp
+│   │       ├── cep.hpp
+│   │       ├── cep_mip.hpp
+│   │       ├── cep_qpbo.hpp
+│   │       └── cep_qpbo_opt.hpp
+│   ├── executables/            # Main entry points
+│   │   ├── neg_dsd.cpp
+│   │   ├── dcs_greedy.cpp
+│   │   ├── cep.cpp
+│   │   ├── cep_mip.cpp
+│   │   ├── cep_qpbo.cpp
+│   │   └── cep_qpbo_opt.cpp
+│   ├── external/               # Third-party libraries
+│   │   └── QPBO/              # QPBO library
+│   ├── cmake/
+│   │   └── FindGUROBI.cmake   # CMake module for Gurobi
+│   └── utils/                  # Python utilities
+│       ├── baselines.py
+│       ├── painter.py
+│       └── graph_generator/
+├── build/                      # Build output directory
+├── input/                      # Input graphs
+│   ├── real-world/
+│   └── synthetic/
+├── output/                     # Algorithm outputs
+├── config.json                 # Experiment configuration
+├── requirements.txt            # Python dependencies
+└── README.md                   # This file
+```
+
+---
+
+## Development Notes
+
+### Implementation TODO:
+
+1. change to listS for edges
+2. try to use traditional methods (for non-genative weights only methods)
+3. design output name for each different configuration for the same algorithm，调整参数
+4. When initializing the pos_weights for CEP, do more 聚合邻居的值！
+
+---
+
+## Research Contributions
+
+This project explores several novel contributions to the negative densest subgraph problem:
+
+### Key Contributions:
 
 1. convert the form from f(x)/g(x) to f(x)-\lambda g(x)
 2. With initialization from a good value
@@ -23,7 +301,9 @@
 
 ---
 
-## Experiments TODO
+## Experimental Evaluation
+
+### Planned Experiments:
 
 1. Compare the runtime & density across real-word and synthetic graphs **widely**. Should use many different simulator to see how it performs on different kinds of graphs. Can use avg. ranks, p-value, non-dominated ratio, avg. time to demonstrate.
 2. Analyze the parameter settings' influence on the CEP and other works. CEP with/without Peeling.
@@ -34,7 +314,7 @@
 
 ---
 
-## Logs and Debug
+## Implementation Insights & Debug Log
 
 * [11.23 Mon] CEP 扩大neg count居然会减小找到的值！A: 详见Design。这是特性，过多加入（更大的max_neg）会使得peeling时不精确。
 * [11.24 Tue] FindUpperBound can return -inf! A: No reset of the pos_weight and other structures after CEP::Run().
@@ -44,10 +324,11 @@
 * [11.30 Sun] Finished coding of "QPBO里削减图规模，设置array测试顺序，以及Improve时初始化". Prune the graph, and then use the QPBO process. Use Improve with initialization from CEPLambda.
 * [12.01 Mon] Using solution from previous MIP run as next MIP's initial solution guess might be misledding, as the new lambda will be at least the same as the solution's density. If that solution is close to the current solution, then it is ok. Otherwise, it might be more time-consuming.
 * [12.01 Mon] Implemented CEP after MIP, which might improve the result further. It does help.
+* [12.01 Mon] Re-organize the code, like the order of params, and resue some code.
 
 ---
 
-## Design
+## Algorithm Design Details
 
 ### For all classes:
 
@@ -102,3 +383,39 @@ Compared with purely peeling, CEP (with both expansion and peeling) combine bett
 ```
 Pruning the graph truly helps the QPBO process to run faster.
 ```
+
+---
+
+## Performance Considerations
+
+### Data Structure Trade-offs
+
+The implementation uses different data structures based on workload:
+- **std::priority_queue with lazy updates**: Often faster than Fibonacci heap due to lower overhead
+- **Fibonacci heap**: Better for frequent decrease-key operations
+- **std::set vs on-the-fly computation**: Hybrid approach switches based on iteration count
+
+### Optimization Tips
+
+1. **For large graphs**: Use CEP_QPBO_OPT with appropriate `max_neg` limit
+2. **For quick results**: Use CEP or DCSGreedy
+3. **For exact solutions**: Use CEP_MIP or CEP_QPBO_OPT with sufficient time limits
+4. **Memory constraints**: Reduce `max_neg` and `ub_mip_bound` parameters
+
+---
+
+## License
+
+[Add your license information here]
+
+---
+
+## Citation
+
+[Add citation information if this is for a research paper]
+
+---
+
+## Contact
+
+[Add contact information]

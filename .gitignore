@@ -2,28 +2,14 @@
 *.vscode
 *__pycache__
 *build
-# *cmake*
 output*
-tests
 temp*
-.vscode
 .ipynb_checkpoints
 .virtual_documents
-# TODO*
-.DS_Store
-# others
-# *.txt
-# *.json
-# *.zip
 .venv
 *.exe
-*backups
-src/pads_cpp/datasets
-src/Negative-Densest-Subgraph-Discovery
-temp*
 logs
-src/Graph_Simulator
 input/synthetic
-backup*
+backups
 *DS_Store
-test
+test*

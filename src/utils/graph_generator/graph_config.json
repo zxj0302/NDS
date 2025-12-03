@@ -1,0 +1,6886 @@
+{
+  "ER": [
+    {
+      "n": 10000,
+      "m": 11000,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 10000,
+      "m": 11000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 10000,
+      "m": 11000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 10000,
+      "m": 11000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 10000,
+      "m": 11000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 10000,
+      "m": 15000,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 10000,
+      "m": 15000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 10000,
+      "m": 15000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 10000,
+      "m": 15000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 10000,
+      "m": 15000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 10000,
+      "m": 20000,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 10000,
+      "m": 20000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 10000,
+      "m": 20000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 10000,
+      "m": 20000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 10000,
+      "m": 20000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 10000,
+      "m": 30000,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 10000,
+      "m": 30000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 10000,
+      "m": 30000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 10000,
+      "m": 30000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 10000,
+      "m": 30000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 10000,
+      "m": 50000,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 10000,
+      "m": 50000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 10000,
+      "m": 50000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 10000,
+      "m": 50000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 10000,
+      "m": 50000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 50000,
+      "m": 55000,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 50000,
+      "m": 55000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 50000,
+      "m": 55000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 50000,
+      "m": 55000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 50000,
+      "m": 55000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 50000,
+      "m": 75000,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 50000,
+      "m": 75000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 50000,
+      "m": 75000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 50000,
+      "m": 75000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 50000,
+      "m": 75000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 50000,
+      "m": 100000,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 50000,
+      "m": 100000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 50000,
+      "m": 100000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 50000,
+      "m": 100000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 50000,
+      "m": 100000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 50000,
+      "m": 150000,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 50000,
+      "m": 150000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 50000,
+      "m": 150000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 50000,
+      "m": 150000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 50000,
+      "m": 150000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 50000,
+      "m": 250000,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 50000,
+      "m": 250000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 50000,
+      "m": 250000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 50000,
+      "m": 250000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 50000,
+      "m": 250000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 100000,
+      "m": 110000,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 100000,
+      "m": 110000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 100000,
+      "m": 110000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 100000,
+      "m": 110000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 100000,
+      "m": 110000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 100000,
+      "m": 150000,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 100000,
+      "m": 150000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 100000,
+      "m": 150000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 100000,
+      "m": 150000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 100000,
+      "m": 150000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 100000,
+      "m": 200000,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 100000,
+      "m": 200000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 100000,
+      "m": 200000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 100000,
+      "m": 200000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 100000,
+      "m": 200000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 100000,
+      "m": 300000,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 100000,
+      "m": 300000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 100000,
+      "m": 300000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 100000,
+      "m": 300000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 100000,
+      "m": 300000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 100000,
+      "m": 500000,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 100000,
+      "m": 500000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 100000,
+      "m": 500000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 100000,
+      "m": 500000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 100000,
+      "m": 500000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 500000,
+      "m": 550000,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 500000,
+      "m": 550000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 500000,
+      "m": 550000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 500000,
+      "m": 550000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 500000,
+      "m": 550000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 500000,
+      "m": 750000,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 500000,
+      "m": 750000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 500000,
+      "m": 750000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 500000,
+      "m": 750000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 500000,
+      "m": 750000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 500000,
+      "m": 1000000,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 500000,
+      "m": 1000000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 500000,
+      "m": 1000000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 500000,
+      "m": 1000000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 500000,
+      "m": 1000000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 500000,
+      "m": 1500000,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 500000,
+      "m": 1500000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 500000,
+      "m": 1500000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 500000,
+      "m": 1500000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 500000,
+      "m": 1500000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 500000,
+      "m": 2500000,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 500000,
+      "m": 2500000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 500000,
+      "m": 2500000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 500000,
+      "m": 2500000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 500000,
+      "m": 2500000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 1000000,
+      "m": 1100000,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 1000000,
+      "m": 1100000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 1000000,
+      "m": 1100000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 1000000,
+      "m": 1100000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 1000000,
+      "m": 1100000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 1000000,
+      "m": 1500000,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 1000000,
+      "m": 1500000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 1000000,
+      "m": 1500000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 1000000,
+      "m": 1500000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 1000000,
+      "m": 1500000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 1000000,
+      "m": 2000000,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 1000000,
+      "m": 2000000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 1000000,
+      "m": 2000000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 1000000,
+      "m": 2000000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 1000000,
+      "m": 2000000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 1000000,
+      "m": 3000000,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 1000000,
+      "m": 3000000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 1000000,
+      "m": 3000000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 1000000,
+      "m": 3000000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 1000000,
+      "m": 3000000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 1000000,
+      "m": 5000000,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 1000000,
+      "m": 5000000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 1000000,
+      "m": 5000000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 1000000,
+      "m": 5000000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 1000000,
+      "m": 5000000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 5000000,
+      "m": 5500000,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 5000000,
+      "m": 5500000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 5000000,
+      "m": 5500000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 5000000,
+      "m": 5500000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 5000000,
+      "m": 5500000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 5000000,
+      "m": 7500000,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 5000000,
+      "m": 7500000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 5000000,
+      "m": 7500000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 5000000,
+      "m": 7500000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 5000000,
+      "m": 7500000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 5000000,
+      "m": 10000000,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 5000000,
+      "m": 10000000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 5000000,
+      "m": 10000000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 5000000,
+      "m": 10000000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 5000000,
+      "m": 10000000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 5000000,
+      "m": 15000000,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 5000000,
+      "m": 15000000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 5000000,
+      "m": 15000000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 5000000,
+      "m": 15000000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 5000000,
+      "m": 15000000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 5000000,
+      "m": 25000000,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 5000000,
+      "m": 25000000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 5000000,
+      "m": 25000000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 5000000,
+      "m": 25000000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 5000000,
+      "m": 25000000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 10000000,
+      "m": 11000000,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 10000000,
+      "m": 11000000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 10000000,
+      "m": 11000000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 10000000,
+      "m": 11000000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 10000000,
+      "m": 11000000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 10000000,
+      "m": 15000000,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 10000000,
+      "m": 15000000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 10000000,
+      "m": 15000000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 10000000,
+      "m": 15000000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 10000000,
+      "m": 15000000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 10000000,
+      "m": 20000000,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 10000000,
+      "m": 20000000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 10000000,
+      "m": 20000000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 10000000,
+      "m": 20000000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 10000000,
+      "m": 20000000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 10000000,
+      "m": 30000000,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 10000000,
+      "m": 30000000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 10000000,
+      "m": 30000000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 10000000,
+      "m": 30000000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 10000000,
+      "m": 30000000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 10000000,
+      "m": 50000000,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 10000000,
+      "m": 50000000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 10000000,
+      "m": 50000000,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 10000000,
+      "m": 50000000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 10000000,
+      "m": 50000000,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    }
+  ],
+  "BA": [
+    {
+      "n": 10000,
+      "m": 2,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 10000,
+      "m": 2,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 10000,
+      "m": 2,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 10000,
+      "m": 2,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 10000,
+      "m": 2,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 10000,
+      "m": 3,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 10000,
+      "m": 3,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 10000,
+      "m": 3,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 10000,
+      "m": 3,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 10000,
+      "m": 3,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 10000,
+      "m": 4,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 10000,
+      "m": 4,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 10000,
+      "m": 4,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 10000,
+      "m": 4,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 10000,
+      "m": 4,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 10000,
+      "m": 5,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 10000,
+      "m": 5,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 10000,
+      "m": 5,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 10000,
+      "m": 5,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 10000,
+      "m": 5,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 50000,
+      "m": 2,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 50000,
+      "m": 2,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 50000,
+      "m": 2,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 50000,
+      "m": 2,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 50000,
+      "m": 2,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 50000,
+      "m": 3,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 50000,
+      "m": 3,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 50000,
+      "m": 3,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 50000,
+      "m": 3,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 50000,
+      "m": 3,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 50000,
+      "m": 4,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 50000,
+      "m": 4,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 50000,
+      "m": 4,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 50000,
+      "m": 4,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 50000,
+      "m": 4,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 50000,
+      "m": 5,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 50000,
+      "m": 5,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 50000,
+      "m": 5,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 50000,
+      "m": 5,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 50000,
+      "m": 5,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 100000,
+      "m": 2,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 100000,
+      "m": 2,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 100000,
+      "m": 2,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 100000,
+      "m": 2,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 100000,
+      "m": 2,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 100000,
+      "m": 3,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 100000,
+      "m": 3,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 100000,
+      "m": 3,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 100000,
+      "m": 3,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 100000,
+      "m": 3,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 100000,
+      "m": 4,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 100000,
+      "m": 4,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 100000,
+      "m": 4,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 100000,
+      "m": 4,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 100000,
+      "m": 4,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 100000,
+      "m": 5,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 100000,
+      "m": 5,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 100000,
+      "m": 5,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 100000,
+      "m": 5,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 100000,
+      "m": 5,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 500000,
+      "m": 2,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 500000,
+      "m": 2,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 500000,
+      "m": 2,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 500000,
+      "m": 2,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 500000,
+      "m": 2,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 500000,
+      "m": 3,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 500000,
+      "m": 3,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 500000,
+      "m": 3,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 500000,
+      "m": 3,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 500000,
+      "m": 3,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 500000,
+      "m": 4,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 500000,
+      "m": 4,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 500000,
+      "m": 4,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 500000,
+      "m": 4,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 500000,
+      "m": 4,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 500000,
+      "m": 5,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 500000,
+      "m": 5,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 500000,
+      "m": 5,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 500000,
+      "m": 5,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 500000,
+      "m": 5,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    }
+  ],
+  "WS": [
+    {
+      "n": 10000,
+      "k": 4,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 10000,
+      "k": 4,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 10000,
+      "k": 4,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 10000,
+      "k": 4,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 10000,
+      "k": 4,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 10000,
+      "k": 4,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 10000,
+      "k": 4,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 10000,
+      "k": 4,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 10000,
+      "k": 4,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 10000,
+      "k": 4,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 10000,
+      "k": 4,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 10000,
+      "k": 4,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 10000,
+      "k": 4,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 10000,
+      "k": 4,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 10000,
+      "k": 4,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 10000,
+      "k": 6,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 10000,
+      "k": 6,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 10000,
+      "k": 6,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 10000,
+      "k": 6,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 10000,
+      "k": 6,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 10000,
+      "k": 6,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 10000,
+      "k": 6,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 10000,
+      "k": 6,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 10000,
+      "k": 6,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 10000,
+      "k": 6,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 10000,
+      "k": 6,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 10000,
+      "k": 6,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 10000,
+      "k": 6,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 10000,
+      "k": 6,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 10000,
+      "k": 6,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 10000,
+      "k": 10,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 10000,
+      "k": 10,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 10000,
+      "k": 10,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 10000,
+      "k": 10,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 10000,
+      "k": 10,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 10000,
+      "k": 10,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 10000,
+      "k": 10,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 10000,
+      "k": 10,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 10000,
+      "k": 10,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 10000,
+      "k": 10,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 10000,
+      "k": 10,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 10000,
+      "k": 10,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 10000,
+      "k": 10,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 10000,
+      "k": 10,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 10000,
+      "k": 10,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 50000,
+      "k": 4,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 50000,
+      "k": 4,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 50000,
+      "k": 4,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 50000,
+      "k": 4,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 50000,
+      "k": 4,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 50000,
+      "k": 4,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 50000,
+      "k": 4,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 50000,
+      "k": 4,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 50000,
+      "k": 4,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 50000,
+      "k": 4,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 50000,
+      "k": 4,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 50000,
+      "k": 4,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 50000,
+      "k": 4,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 50000,
+      "k": 4,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 50000,
+      "k": 4,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 50000,
+      "k": 6,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 50000,
+      "k": 6,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 50000,
+      "k": 6,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 50000,
+      "k": 6,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 50000,
+      "k": 6,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 50000,
+      "k": 6,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 50000,
+      "k": 6,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 50000,
+      "k": 6,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 50000,
+      "k": 6,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 50000,
+      "k": 6,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 50000,
+      "k": 6,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 50000,
+      "k": 6,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 50000,
+      "k": 6,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 50000,
+      "k": 6,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 50000,
+      "k": 6,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 50000,
+      "k": 10,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 50000,
+      "k": 10,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 50000,
+      "k": 10,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 50000,
+      "k": 10,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 50000,
+      "k": 10,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 50000,
+      "k": 10,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 50000,
+      "k": 10,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 50000,
+      "k": 10,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 50000,
+      "k": 10,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 50000,
+      "k": 10,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 50000,
+      "k": 10,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 50000,
+      "k": 10,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 50000,
+      "k": 10,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 50000,
+      "k": 10,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 50000,
+      "k": 10,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 100000,
+      "k": 4,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 100000,
+      "k": 4,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 100000,
+      "k": 4,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 100000,
+      "k": 4,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 100000,
+      "k": 4,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 100000,
+      "k": 4,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 100000,
+      "k": 4,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 100000,
+      "k": 4,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 100000,
+      "k": 4,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 100000,
+      "k": 4,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 100000,
+      "k": 4,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 100000,
+      "k": 4,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 100000,
+      "k": 4,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 100000,
+      "k": 4,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 100000,
+      "k": 4,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 100000,
+      "k": 6,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 100000,
+      "k": 6,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 100000,
+      "k": 6,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 100000,
+      "k": 6,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 100000,
+      "k": 6,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 100000,
+      "k": 6,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 100000,
+      "k": 6,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 100000,
+      "k": 6,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 100000,
+      "k": 6,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 100000,
+      "k": 6,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 100000,
+      "k": 6,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 100000,
+      "k": 6,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 100000,
+      "k": 6,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 100000,
+      "k": 6,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 100000,
+      "k": 6,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 100000,
+      "k": 10,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 100000,
+      "k": 10,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 100000,
+      "k": 10,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 100000,
+      "k": 10,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 100000,
+      "k": 10,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 100000,
+      "k": 10,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 100000,
+      "k": 10,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 100000,
+      "k": 10,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 100000,
+      "k": 10,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 100000,
+      "k": 10,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 100000,
+      "k": 10,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 100000,
+      "k": 10,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 100000,
+      "k": 10,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 100000,
+      "k": 10,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 100000,
+      "k": 10,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 500000,
+      "k": 4,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 500000,
+      "k": 4,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 500000,
+      "k": 4,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 500000,
+      "k": 4,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 500000,
+      "k": 4,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 500000,
+      "k": 4,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 500000,
+      "k": 4,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 500000,
+      "k": 4,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 500000,
+      "k": 4,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 500000,
+      "k": 4,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 500000,
+      "k": 4,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 500000,
+      "k": 4,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 500000,
+      "k": 4,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 500000,
+      "k": 4,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 500000,
+      "k": 4,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 500000,
+      "k": 6,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 500000,
+      "k": 6,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 500000,
+      "k": 6,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 500000,
+      "k": 6,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 500000,
+      "k": 6,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 500000,
+      "k": 6,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 500000,
+      "k": 6,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 500000,
+      "k": 6,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 500000,
+      "k": 6,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 500000,
+      "k": 6,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 500000,
+      "k": 6,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 500000,
+      "k": 6,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 500000,
+      "k": 6,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 500000,
+      "k": 6,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 500000,
+      "k": 6,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 500000,
+      "k": 10,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 500000,
+      "k": 10,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 500000,
+      "k": 10,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 500000,
+      "k": 10,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 500000,
+      "k": 10,
+      "p": 0.1,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 500000,
+      "k": 10,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 500000,
+      "k": 10,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 500000,
+      "k": 10,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 500000,
+      "k": 10,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 500000,
+      "k": 10,
+      "p": 0.3,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 500000,
+      "k": 10,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 500000,
+      "k": 10,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 500000,
+      "k": 10,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 500000,
+      "k": 10,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 500000,
+      "k": 10,
+      "p": 0.5,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    }
+  ],
+  "RGG": [
+    {
+      "n": 10000,
+      "radius": 0.01,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 10000,
+      "radius": 0.01,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 10000,
+      "radius": 0.01,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 10000,
+      "radius": 0.01,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 10000,
+      "radius": 0.01,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 10000,
+      "radius": 0.05,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 10000,
+      "radius": 0.05,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 10000,
+      "radius": 0.05,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 10000,
+      "radius": 0.05,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 10000,
+      "radius": 0.05,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 50000,
+      "radius": 0.01,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 50000,
+      "radius": 0.01,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 50000,
+      "radius": 0.01,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 50000,
+      "radius": 0.01,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 50000,
+      "radius": 0.01,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 50000,
+      "radius": 0.05,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 50000,
+      "radius": 0.05,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 50000,
+      "radius": 0.05,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 50000,
+      "radius": 0.05,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 50000,
+      "radius": 0.05,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 100000,
+      "radius": 0.01,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 100000,
+      "radius": 0.01,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 100000,
+      "radius": 0.01,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 100000,
+      "radius": 0.01,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 100000,
+      "radius": 0.01,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "n": 100000,
+      "radius": 0.05,
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "n": 100000,
+      "radius": 0.05,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "n": 100000,
+      "radius": 0.05,
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "n": 100000,
+      "radius": 0.05,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "n": 100000,
+      "radius": 0.05,
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    }
+  ],
+  "SBM": [
+    {
+      "sizes": [
+        5000,
+        5000
+      ],
+      "p_matrix": [
+        [
+          0.001,
+          0.0002
+        ],
+        [
+          0.0002,
+          0.001
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "sizes": [
+        5000,
+        5000
+      ],
+      "p_matrix": [
+        [
+          0.001,
+          0.0002
+        ],
+        [
+          0.0002,
+          0.001
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "sizes": [
+        5000,
+        5000
+      ],
+      "p_matrix": [
+        [
+          0.001,
+          0.0002
+        ],
+        [
+          0.0002,
+          0.001
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "sizes": [
+        5000,
+        5000
+      ],
+      "p_matrix": [
+        [
+          0.001,
+          0.0002
+        ],
+        [
+          0.0002,
+          0.001
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "sizes": [
+        5000,
+        5000
+      ],
+      "p_matrix": [
+        [
+          0.001,
+          0.0002
+        ],
+        [
+          0.0002,
+          0.001
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "sizes": [
+        5000,
+        5000
+      ],
+      "p_matrix": [
+        [
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.001
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "sizes": [
+        5000,
+        5000
+      ],
+      "p_matrix": [
+        [
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.001
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "sizes": [
+        5000,
+        5000
+      ],
+      "p_matrix": [
+        [
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.001
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "sizes": [
+        5000,
+        5000
+      ],
+      "p_matrix": [
+        [
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.001
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "sizes": [
+        5000,
+        5000
+      ],
+      "p_matrix": [
+        [
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.001
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "sizes": [
+        5000,
+        5000
+      ],
+      "p_matrix": [
+        [
+          0.005,
+          0.0002
+        ],
+        [
+          0.0002,
+          0.005
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "sizes": [
+        5000,
+        5000
+      ],
+      "p_matrix": [
+        [
+          0.005,
+          0.0002
+        ],
+        [
+          0.0002,
+          0.005
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "sizes": [
+        5000,
+        5000
+      ],
+      "p_matrix": [
+        [
+          0.005,
+          0.0002
+        ],
+        [
+          0.0002,
+          0.005
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "sizes": [
+        5000,
+        5000
+      ],
+      "p_matrix": [
+        [
+          0.005,
+          0.0002
+        ],
+        [
+          0.0002,
+          0.005
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "sizes": [
+        5000,
+        5000
+      ],
+      "p_matrix": [
+        [
+          0.005,
+          0.0002
+        ],
+        [
+          0.0002,
+          0.005
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "sizes": [
+        5000,
+        5000
+      ],
+      "p_matrix": [
+        [
+          0.005,
+          0.001
+        ],
+        [
+          0.001,
+          0.005
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "sizes": [
+        5000,
+        5000
+      ],
+      "p_matrix": [
+        [
+          0.005,
+          0.001
+        ],
+        [
+          0.001,
+          0.005
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "sizes": [
+        5000,
+        5000
+      ],
+      "p_matrix": [
+        [
+          0.005,
+          0.001
+        ],
+        [
+          0.001,
+          0.005
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "sizes": [
+        5000,
+        5000
+      ],
+      "p_matrix": [
+        [
+          0.005,
+          0.001
+        ],
+        [
+          0.001,
+          0.005
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "sizes": [
+        5000,
+        5000
+      ],
+      "p_matrix": [
+        [
+          0.005,
+          0.001
+        ],
+        [
+          0.001,
+          0.005
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "sizes": [
+        2500,
+        2500,
+        2500,
+        2500
+      ],
+      "p_matrix": [
+        [
+          0.01,
+          0.001,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.01,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.01,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.001,
+          0.01
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "sizes": [
+        2500,
+        2500,
+        2500,
+        2500
+      ],
+      "p_matrix": [
+        [
+          0.01,
+          0.001,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.01,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.01,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.001,
+          0.01
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "sizes": [
+        2500,
+        2500,
+        2500,
+        2500
+      ],
+      "p_matrix": [
+        [
+          0.01,
+          0.001,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.01,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.01,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.001,
+          0.01
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "sizes": [
+        2500,
+        2500,
+        2500,
+        2500
+      ],
+      "p_matrix": [
+        [
+          0.01,
+          0.001,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.01,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.01,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.001,
+          0.01
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "sizes": [
+        2500,
+        2500,
+        2500,
+        2500
+      ],
+      "p_matrix": [
+        [
+          0.01,
+          0.001,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.01,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.01,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.001,
+          0.01
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "sizes": [
+        2500,
+        2500,
+        2500,
+        2500
+      ],
+      "p_matrix": [
+        [
+          0.01,
+          0.005,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.01,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.01,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.005,
+          0.01
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "sizes": [
+        2500,
+        2500,
+        2500,
+        2500
+      ],
+      "p_matrix": [
+        [
+          0.01,
+          0.005,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.01,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.01,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.005,
+          0.01
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "sizes": [
+        2500,
+        2500,
+        2500,
+        2500
+      ],
+      "p_matrix": [
+        [
+          0.01,
+          0.005,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.01,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.01,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.005,
+          0.01
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "sizes": [
+        2500,
+        2500,
+        2500,
+        2500
+      ],
+      "p_matrix": [
+        [
+          0.01,
+          0.005,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.01,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.01,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.005,
+          0.01
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "sizes": [
+        2500,
+        2500,
+        2500,
+        2500
+      ],
+      "p_matrix": [
+        [
+          0.01,
+          0.005,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.01,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.01,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.005,
+          0.01
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "sizes": [
+        2500,
+        2500,
+        2500,
+        2500
+      ],
+      "p_matrix": [
+        [
+          0.05,
+          0.001,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.05,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.05,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.001,
+          0.05
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "sizes": [
+        2500,
+        2500,
+        2500,
+        2500
+      ],
+      "p_matrix": [
+        [
+          0.05,
+          0.001,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.05,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.05,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.001,
+          0.05
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "sizes": [
+        2500,
+        2500,
+        2500,
+        2500
+      ],
+      "p_matrix": [
+        [
+          0.05,
+          0.001,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.05,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.05,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.001,
+          0.05
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "sizes": [
+        2500,
+        2500,
+        2500,
+        2500
+      ],
+      "p_matrix": [
+        [
+          0.05,
+          0.001,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.05,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.05,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.001,
+          0.05
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "sizes": [
+        2500,
+        2500,
+        2500,
+        2500
+      ],
+      "p_matrix": [
+        [
+          0.05,
+          0.001,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.05,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.05,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.001,
+          0.05
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "sizes": [
+        2500,
+        2500,
+        2500,
+        2500
+      ],
+      "p_matrix": [
+        [
+          0.05,
+          0.005,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.05,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.05,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.005,
+          0.05
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "sizes": [
+        2500,
+        2500,
+        2500,
+        2500
+      ],
+      "p_matrix": [
+        [
+          0.05,
+          0.005,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.05,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.05,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.005,
+          0.05
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "sizes": [
+        2500,
+        2500,
+        2500,
+        2500
+      ],
+      "p_matrix": [
+        [
+          0.05,
+          0.005,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.05,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.05,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.005,
+          0.05
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "sizes": [
+        2500,
+        2500,
+        2500,
+        2500
+      ],
+      "p_matrix": [
+        [
+          0.05,
+          0.005,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.05,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.05,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.005,
+          0.05
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "sizes": [
+        2500,
+        2500,
+        2500,
+        2500
+      ],
+      "p_matrix": [
+        [
+          0.05,
+          0.005,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.05,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.05,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.005,
+          0.05
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "sizes": [
+        25000,
+        25000
+      ],
+      "p_matrix": [
+        [
+          0.001,
+          0.0002
+        ],
+        [
+          0.0002,
+          0.001
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "sizes": [
+        25000,
+        25000
+      ],
+      "p_matrix": [
+        [
+          0.001,
+          0.0002
+        ],
+        [
+          0.0002,
+          0.001
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "sizes": [
+        25000,
+        25000
+      ],
+      "p_matrix": [
+        [
+          0.001,
+          0.0002
+        ],
+        [
+          0.0002,
+          0.001
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "sizes": [
+        25000,
+        25000
+      ],
+      "p_matrix": [
+        [
+          0.001,
+          0.0002
+        ],
+        [
+          0.0002,
+          0.001
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "sizes": [
+        25000,
+        25000
+      ],
+      "p_matrix": [
+        [
+          0.001,
+          0.0002
+        ],
+        [
+          0.0002,
+          0.001
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "sizes": [
+        25000,
+        25000
+      ],
+      "p_matrix": [
+        [
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.001
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "sizes": [
+        25000,
+        25000
+      ],
+      "p_matrix": [
+        [
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.001
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "sizes": [
+        25000,
+        25000
+      ],
+      "p_matrix": [
+        [
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.001
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "sizes": [
+        25000,
+        25000
+      ],
+      "p_matrix": [
+        [
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.001
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "sizes": [
+        25000,
+        25000
+      ],
+      "p_matrix": [
+        [
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.001
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "sizes": [
+        25000,
+        25000
+      ],
+      "p_matrix": [
+        [
+          0.005,
+          0.0002
+        ],
+        [
+          0.0002,
+          0.005
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "sizes": [
+        25000,
+        25000
+      ],
+      "p_matrix": [
+        [
+          0.005,
+          0.0002
+        ],
+        [
+          0.0002,
+          0.005
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "sizes": [
+        25000,
+        25000
+      ],
+      "p_matrix": [
+        [
+          0.005,
+          0.0002
+        ],
+        [
+          0.0002,
+          0.005
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "sizes": [
+        25000,
+        25000
+      ],
+      "p_matrix": [
+        [
+          0.005,
+          0.0002
+        ],
+        [
+          0.0002,
+          0.005
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "sizes": [
+        25000,
+        25000
+      ],
+      "p_matrix": [
+        [
+          0.005,
+          0.0002
+        ],
+        [
+          0.0002,
+          0.005
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "sizes": [
+        25000,
+        25000
+      ],
+      "p_matrix": [
+        [
+          0.005,
+          0.001
+        ],
+        [
+          0.001,
+          0.005
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "sizes": [
+        25000,
+        25000
+      ],
+      "p_matrix": [
+        [
+          0.005,
+          0.001
+        ],
+        [
+          0.001,
+          0.005
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "sizes": [
+        25000,
+        25000
+      ],
+      "p_matrix": [
+        [
+          0.005,
+          0.001
+        ],
+        [
+          0.001,
+          0.005
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "sizes": [
+        25000,
+        25000
+      ],
+      "p_matrix": [
+        [
+          0.005,
+          0.001
+        ],
+        [
+          0.001,
+          0.005
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "sizes": [
+        25000,
+        25000
+      ],
+      "p_matrix": [
+        [
+          0.005,
+          0.001
+        ],
+        [
+          0.001,
+          0.005
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "sizes": [
+        12500,
+        12500,
+        12500,
+        12500
+      ],
+      "p_matrix": [
+        [
+          0.01,
+          0.001,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.01,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.01,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.001,
+          0.01
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "sizes": [
+        12500,
+        12500,
+        12500,
+        12500
+      ],
+      "p_matrix": [
+        [
+          0.01,
+          0.001,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.01,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.01,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.001,
+          0.01
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "sizes": [
+        12500,
+        12500,
+        12500,
+        12500
+      ],
+      "p_matrix": [
+        [
+          0.01,
+          0.001,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.01,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.01,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.001,
+          0.01
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "sizes": [
+        12500,
+        12500,
+        12500,
+        12500
+      ],
+      "p_matrix": [
+        [
+          0.01,
+          0.001,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.01,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.01,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.001,
+          0.01
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "sizes": [
+        12500,
+        12500,
+        12500,
+        12500
+      ],
+      "p_matrix": [
+        [
+          0.01,
+          0.001,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.01,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.01,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.001,
+          0.01
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "sizes": [
+        12500,
+        12500,
+        12500,
+        12500
+      ],
+      "p_matrix": [
+        [
+          0.01,
+          0.005,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.01,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.01,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.005,
+          0.01
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "sizes": [
+        12500,
+        12500,
+        12500,
+        12500
+      ],
+      "p_matrix": [
+        [
+          0.01,
+          0.005,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.01,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.01,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.005,
+          0.01
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "sizes": [
+        12500,
+        12500,
+        12500,
+        12500
+      ],
+      "p_matrix": [
+        [
+          0.01,
+          0.005,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.01,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.01,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.005,
+          0.01
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "sizes": [
+        12500,
+        12500,
+        12500,
+        12500
+      ],
+      "p_matrix": [
+        [
+          0.01,
+          0.005,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.01,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.01,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.005,
+          0.01
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "sizes": [
+        12500,
+        12500,
+        12500,
+        12500
+      ],
+      "p_matrix": [
+        [
+          0.01,
+          0.005,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.01,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.01,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.005,
+          0.01
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "sizes": [
+        12500,
+        12500,
+        12500,
+        12500
+      ],
+      "p_matrix": [
+        [
+          0.05,
+          0.001,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.05,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.05,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.001,
+          0.05
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "sizes": [
+        12500,
+        12500,
+        12500,
+        12500
+      ],
+      "p_matrix": [
+        [
+          0.05,
+          0.001,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.05,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.05,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.001,
+          0.05
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "sizes": [
+        12500,
+        12500,
+        12500,
+        12500
+      ],
+      "p_matrix": [
+        [
+          0.05,
+          0.001,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.05,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.05,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.001,
+          0.05
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "sizes": [
+        12500,
+        12500,
+        12500,
+        12500
+      ],
+      "p_matrix": [
+        [
+          0.05,
+          0.001,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.05,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.05,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.001,
+          0.05
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "sizes": [
+        12500,
+        12500,
+        12500,
+        12500
+      ],
+      "p_matrix": [
+        [
+          0.05,
+          0.001,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.05,
+          0.001,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.05,
+          0.001
+        ],
+        [
+          0.001,
+          0.001,
+          0.001,
+          0.05
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    },
+    {
+      "sizes": [
+        12500,
+        12500,
+        12500,
+        12500
+      ],
+      "p_matrix": [
+        [
+          0.05,
+          0.005,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.05,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.05,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.005,
+          0.05
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "uniform"
+    },
+    {
+      "sizes": [
+        12500,
+        12500,
+        12500,
+        12500
+      ],
+      "p_matrix": [
+        [
+          0.05,
+          0.005,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.05,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.05,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.005,
+          0.05
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.3
+      }
+    },
+    {
+      "sizes": [
+        12500,
+        12500,
+        12500,
+        12500
+      ],
+      "p_matrix": [
+        [
+          0.05,
+          0.005,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.05,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.05,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.005,
+          0.05
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "gaussian",
+      "weight_params": {
+        "mean": 0.0,
+        "std": 0.5
+      }
+    },
+    {
+      "sizes": [
+        12500,
+        12500,
+        12500,
+        12500
+      ],
+      "p_matrix": [
+        [
+          0.05,
+          0.005,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.05,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.05,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.005,
+          0.05
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 2.0,
+        "beta": 5.0
+      }
+    },
+    {
+      "sizes": [
+        12500,
+        12500,
+        12500,
+        12500
+      ],
+      "p_matrix": [
+        [
+          0.05,
+          0.005,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.05,
+          0.005,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.05,
+          0.005
+        ],
+        [
+          0.005,
+          0.005,
+          0.005,
+          0.05
+        ]
+      ],
+      "num_instances": 1,
+      "weight_distribution": "beta",
+      "weight_params": {
+        "alpha": 5.0,
+        "beta": 2.0
+      }
+    }
+  ]
+}

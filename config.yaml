@@ -1,0 +1,226 @@
+real-world:
+  input:
+    - path: ./input/real-world/Abortion/Abortion.txt
+      toggle: true
+    - path: ./input/real-world/Biogrid/Biogrid.txt
+      toggle: true
+    - path: ./input/real-world/Brexit/Brexit.txt
+      toggle: false
+    - path: ./input/real-world/Collins/Collins.txt
+      toggle: true
+    - path: ./input/real-world/Election/Election.txt
+      toggle: true
+    - path: ./input/real-world/Gavin/Gavin.txt
+      toggle: true
+    - path: ./input/real-world/Gun/Gun.txt
+      toggle: true
+    - path: ./input/real-world/Krogan-Core/Krogan-Core.txt
+      toggle: true
+    - path: ./input/real-world/Krogan-Extended/Krogan-Extended.txt
+      toggle: true
+    - path: ./input/real-world/Partisanship/Partisanship.txt
+      toggle: true
+    - path: ./input/real-world/Referendum/Referendum.txt
+      toggle: true
+  
+  weight_reverse: false
+  output: ./output/real-world/
+  
+  competitors:
+    - name: NEG_DSD
+      toggle: false
+      exe: ./build/neg_dsd
+      params:
+        C_values: [0.9, 1.0, 1.1, 1.2]
+        num_iter: 1
+    
+    - name: DCSGreedy
+      toggle: false
+      exe: ./build/dcs_greedy
+      params:
+        num_iter: 1
+    
+    - name: CEP
+      toggle: false
+      exe: ./build/cep
+      params:
+        toggle_done: 2
+        toggle_left: 20
+        max_neg: 200
+        max_local_optima: 10
+        do_peeling: false
+        num_iter: 1
+    
+    - name: CEP_MIP
+      toggle: false
+      exe: ./build/cep_mip
+      params:
+        toggle_done: 2
+        toggle_left: 20
+        max_neg: 200
+        max_local_optima: 10
+        do_peeling: false
+        dinkelbach_iterations: 30
+        epsilon: -0.00001
+        mip_time_limit: 600.0
+        use_binary: false
+        num_iter: 1
+    
+    - name: CEP_QPBO
+      toggle: false
+      exe: ./build/cep_qpbo
+      params:
+        toggle_done: 2
+        toggle_left: 20
+        max_neg: 200
+        max_local_optima: 10
+        do_peeling: false
+        step_size: 1.05
+        ub_mip_bound: 100
+        dinkelbach_iterations: 30
+        epsilon: -0.00001
+        mip_time_limit: 600.0
+        num_iter: 1
+    
+    - name: CEP_QPBO_OPT
+      toggle: true
+      exe: ./build/cep_qpbo_opt
+      params:
+        toggle_done: 2
+        toggle_left: 20
+        max_neg: 200
+        max_local_optima: 10
+        do_peeling: false
+        step_size: 1.02
+        ub_mip_bound: 100
+        dinkelbach_iterations: 30
+        epsilon: -0.00001
+        mip_time_limit: 600.0
+        use_binary: true
+        use_probe: false
+        skip_mip_init: true
+        heuristic_after_mip: true
+        num_iter: 1
+
+synthetic:
+  input_folder:
+    - path: ./input/synthetic/BA/
+      toggle: true
+    - path: ./input/synthetic/ER/
+      toggle: true
+    - path: ./input/synthetic/RGG/
+      toggle: false
+    - path: ./input/synthetic/SBM/
+      toggle: false
+    - path: ./input/synthetic/WS/
+      toggle: false
+  
+  weight_reverse: false
+  output: ./output/synthetic/
+  
+  competitors:
+    - name: NEG_DSD
+      toggle: false
+      exe: ./build/neg_dsd
+      params:
+        C_values: [0.9, 1.0, 1.1, 1.2]
+        num_iter: 1
+    
+    - name: DCSGreedy
+      toggle: false
+      exe: ./build/dcs_greedy
+      params:
+        num_iter: 1
+    
+    - name: CEP
+      toggle: false
+      exe: ./build/cep
+      params:
+        toggle_done: 2
+        toggle_left: 20
+        max_neg: 200
+        max_local_optima: 10
+        do_peeling: false
+        num_iter: 1
+    
+    - name: CEP_MIP
+      toggle: false
+      exe: ./build/cep_mip
+      params:
+        toggle_done: 2
+        toggle_left: 20
+        max_neg: 200
+        max_local_optima: 10
+        do_peeling: false
+        dinkelbach_iterations: 30
+        epsilon: -0.00001
+        mip_time_limit: 600.0
+        use_binary: false
+        num_iter: 1
+    
+    - name: CEP_QPBO
+      toggle: false
+      exe: ./build/cep_qpbo
+      params:
+        toggle_done: 2
+        toggle_left: 20
+        max_neg: 200
+        max_local_optima: 10
+        do_peeling: false
+        step_size: 1.02
+        ub_mip_bound: 100
+        dinkelbach_iterations: 30
+        epsilon: -0.00001
+        mip_time_limit: 600.0
+        use_binary: true
+        num_iter: 1
+    
+    - name: CEP_QPBO_OPT
+      toggle: true
+      exe: ./build/cep_qpbo_opt
+      params:
+        toggle_done: 2
+        toggle_left: 20
+        max_neg: 200
+        max_local_optima: 10
+        do_peeling: false
+        step_size: 1.02
+        ub_mip_bound: 100
+        dinkelbach_iterations: 30
+        epsilon: -0.00001
+        mip_time_limit: 600.0
+        use_binary: true
+        use_probe: false
+        skip_mip_init: true
+        heuristic_after_mip: true
+        num_iter: 1
+
+test:
+  input:
+    - ./input/real-world/Referendum/Referendum.txt
+  
+  weight_reverse: false
+  output: ./output/test/
+  
+  competitors:
+    - name: NEG_DSD
+      toggle: true
+      exe: ./build/neg_dsd
+      params:
+        C_values: [1.0]
+        num_iter: 1
+    
+    - name: DCSGreedy
+      toggle: true
+      exe: ./build/dcs_greedy
+      params:
+        num_iter: 1
+    
+    - name: CEP
+      toggle: true
+      exe: ./build/cep
+      params:
+        max_neg: 200
+        max_local_optima: 10
+        do_peeling: false
+        num_iter: 1
