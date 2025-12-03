@@ -2,22 +2,16 @@
 
 class NEG_DSD : public PGraph {
 public:
-    struct Config {
+    struct NEG_DSD_Config : public PGraph_Config {
         vector<double> C_values = {1.0};
-        string input;
-        string output;
-        bool reverse_weight = false;
-        unsigned num_iter = 1;
         
-        void load_from_json(const string& filename) {
-            std::ifstream file(filename);
-            std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-            auto json = boost::json::parse(content).as_object();
+        void load_from_json(const string& filename) override {
+            PGraph_Config::load_from_json(filename);
             
-            if (json.contains("input")) input = json.at("input").as_string().c_str();
-            if (json.contains("output")) output = json.at("output").as_string().c_str();
-            if (json.contains("reverse_weight")) reverse_weight = json.at("reverse_weight").as_bool();
-            if (json.contains("num_iter")) num_iter = json.at("num_iter").to_number<unsigned>();
+            ifstream file(filename);
+            string content((istreambuf_iterator<char>(file)), istreambuf_iterator<char>());
+            auto json = json::parse(content).as_object();
+            
             if (json.contains("C_values")) {
                 C_values.clear();
                 for (auto& v : json.at("C_values").as_array()) {
@@ -25,19 +19,23 @@ public:
                 }
             }
         }
+
+        void add_to_json(json::object& cfg) const override {
+            PGraph_Config::add_to_json(cfg);
+            json::array c_values_array;
+            for (const auto& c : C_values) {
+                c_values_array.push_back(c);
+            }
+            cfg["C_values"] = c_values_array;
+        }
     };
     
-    Config config;
-
 private:
     vector<double> pos_deg;
     vector<double> neg_deg;
 
 public:
-    NEG_DSD(const string& config_file) {
-        config.load_from_json(config_file);
-        ReadGraph(config.input, config.reverse_weight);
-    }
+    NEG_DSD(const NEG_DSD_Config& cfg) : PGraph(cfg) {}
 
     void InitializeDegrees() {
         pos_deg.assign(num_vertices(G), 0.0);
@@ -100,23 +98,15 @@ public:
         return {{remove_order.begin() + best_step, remove_order.end()}, best_density};
     }
 
-    SubgraphResult Run() {
+    SubgraphResult Run(const NEG_DSD_Config& cfg) {
         InitializeDegrees();
         SubgraphResult best {{}, -numeric_limits<double>::infinity()};
-        for (auto C : config.C_values) {
+        for (auto C : cfg.C_values) {
             auto result = Peeling(C);
             if (result.density > best.density) {
                 best = result;
             }
         }
         return best;
-    }
-    
-    void add_config_params(boost::json::object& config_obj) override {
-        boost::json::array c_values_array;
-        for (const auto& c : config.C_values) {
-            c_values_array.push_back(c);
-        }
-        config_obj["C_values"] = c_values_array;
     }
 };

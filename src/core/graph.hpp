@@ -1,29 +1,55 @@
 #pragma once
 
-// Note: Gurobi and QPBO headers are included in specific algorithm files that need them
 #include <boost/graph/adjacency_list.hpp>
-#include <boost/graph/graph_traits.hpp>
 #include <boost/heap/fibonacci_heap.hpp>
+#include <boost/graph/graph_traits.hpp>
 #include <boost/json.hpp>
 #include <unordered_set>
 #include <unordered_map>
-#include <cmath>
-#include <limits>
-#include <vector>
+#include <functional>
 #include <algorithm>
 #include <stdexcept>
 #include <iostream>
-#include <string>
 #include <fstream>
 #include <sstream>
 #include <iomanip>
+#include <limits>
+#include <vector>
+#include <string>
 #include <chrono>
+#include <cmath>
 #include <set>
 
 using namespace std;
 using namespace boost;
 
 class PGraph {
+public:
+    struct PGraph_Config {
+        string input;
+        string output;
+        bool reverse_weight = false;
+        unsigned num_iter = 1;
+        
+        virtual void load_from_json(const string& filename) {
+            ifstream file(filename);
+            string content((istreambuf_iterator<char>(file)), istreambuf_iterator<char>());
+            auto json = json::parse(content).as_object();
+            
+            if (json.contains("input")) input = json.at("input").as_string().c_str();
+            if (json.contains("output")) output = json.at("output").as_string().c_str();
+            if (json.contains("reverse_weight")) reverse_weight = json.at("reverse_weight").as_bool();
+            if (json.contains("num_iter")) num_iter = json.at("num_iter").to_number<unsigned>();
+        }
+
+        virtual void add_to_json(json::object& cfg) const {
+            cfg["input"] = input;
+            cfg["output"] = output;
+            cfg["reverse_weight"] = reverse_weight;
+            cfg["num_iter"] = num_iter;
+        }
+    };
+
 protected:
     struct EdgeProperty {
         double weight = 0.0;
@@ -51,12 +77,12 @@ protected:
     PGraph() = default;
 
 public:
-    PGraph(const string& input, bool reverse_weight) {
-        ReadGraph(input, reverse_weight);
+    PGraph(const PGraph_Config& cfg) {
+        ReadGraph(cfg);
     }
 
-    void ReadGraph(const string& input, bool reverse_weight) {
-        ifstream infile(input);
+    void ReadGraph(const PGraph_Config& cfg) {
+        ifstream infile(cfg.input);
         size_t n = 0, m = 0;
         string line;
         getline(infile, line);
@@ -73,7 +99,7 @@ public:
             Vertex u, v;
             double weight;
             iss >> u >> v >> weight;
-            weight *= (reverse_weight ? -1.0 : 1.0);
+            weight *= (cfg.reverse_weight ? -1.0 : 1.0);
             if (u == v) {
                 loop_weight[u] += weight;
             } else {
@@ -91,49 +117,70 @@ public:
     };
 
     template<typename ConfigType>
-    void output(const string& filepath, double avg_time, SubgraphResult& result, const ConfigType& cfg, int argc, char* argv[]) {
-        std::sort(result.nodes.begin(), result.nodes.end());
-        
-        // Build JSON object using Boost.JSON
-        boost::json::object json_output;
+    void output(const ConfigType& cfg, double avg_time, SubgraphResult& result) {
+        json::object json_output;
         json_output["time"] = avg_time;
         json_output["density"] = result.density;
         json_output["size"] = result.nodes.size();
-        
-        // Convert nodes vector to JSON array
-        boost::json::array nodes_array;
+        sort(result.nodes.begin(), result.nodes.end());
+        json::array nodes_array;
         for (const auto& node : result.nodes) {
             nodes_array.push_back(node);
         }
         json_output["nodes"] = nodes_array;
         
         // Build config object
-        boost::json::object config_obj;
-        config_obj["input"] = cfg.input;
-        config_obj["output"] = cfg.output;
-        config_obj["reverse_weight"] = cfg.reverse_weight;
-        config_obj["num_iter"] = cfg.num_iter;
-        
-        // Add algorithm-specific parameters
-        add_config_params(config_obj);
-        json_output["config"] = config_obj;
-        
-        // Build command string
-        string command;
-        for (int i = 0; i < argc; ++i) {
-            if (i) command += " ";
-            command += argv[i];
-        }
-        json_output["command"] = command;
+        json::object config;
+        cfg.add_to_json(config);
+        json_output["config"] = config;
         
         // Write to file with pretty-printed formatting
-        ofstream out(filepath);
-        if (!out) throw std::runtime_error("Cannot open " + filepath);
-        out << boost::json::serialize(json_output) << "\n";
-    }
-    
-    // Virtual method to be overridden by derived classes
-    virtual void add_config_params(boost::json::object& config_obj) {
-        // Default: no additional params
+        ofstream out(cfg.output);
+        if (!out) throw runtime_error("Cannot open " + cfg.output);
+        
+        // Recursive function to format JSON with proper indentation and fixed-point numbers
+        function<string(const json::value&, int)> format_json;
+        format_json = [&](const json::value& val, int indent_level) -> string {
+            ostringstream result;
+            string indent_str(indent_level * 2, ' ');
+            
+            if (val.is_object()) {
+                result << "{\n";
+                auto& obj = val.as_object();
+                bool first = true;
+                for (auto& [key, value] : obj) {
+                    if (!first) result << ",\n";
+                    first = false;
+                    result << string((indent_level + 1) * 2, ' ') << "\"" << key << "\": ";
+                    result << format_json(value, indent_level + 1);
+                }
+                result << "\n" << indent_str << "}";
+            } else if (val.is_array()) {
+                result << "[";
+                auto& arr = val.as_array();
+                bool first = true;
+                for (auto& elem : arr) {
+                    if (!first) result << ", ";
+                    first = false;
+                    result << format_json(elem, indent_level);
+                }
+                result << "]";
+            } else if (val.is_double()) {
+                result << val.as_double();
+            } else if (val.is_int64()) {
+                result << val.as_int64();
+            } else if (val.is_uint64()) {
+                result << val.as_uint64();
+            } else if (val.is_bool()) {
+                result << (val.as_bool() ? "true" : "false");
+            } else if (val.is_string()) {
+                result << "\"" << val.as_string().c_str() << "\"";
+            } else {
+                result << "null";
+            }
+            return result.str();
+        };
+        
+        out << format_json(json_output, 0) << "\n";
     }
 };

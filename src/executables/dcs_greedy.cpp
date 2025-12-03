@@ -6,13 +6,14 @@ int main(int argc, char* argv[]) {
         return EXIT_FAILURE;
     }
 
-    string config_file = argv[1];
-    DCSGreedy graph(config_file);
+    auto cfg = DCSGreedy::DCSGreedy_Config();
+    cfg.load_from_json(argv[1]);
+    DCSGreedy graph(cfg);
     
-    PGraph::SubgraphResult best_result;
+    PGraph::SubgraphResult first_result;
     double total_time = 0.0;
     
-    for (unsigned iter = 0; iter < graph.config.num_iter; ++iter) {
+    for (unsigned iter = 0; iter < cfg.num_iter; ++iter) {
         auto start_time = chrono::high_resolution_clock::now();
         auto result = graph.Run();
         auto end_time = chrono::high_resolution_clock::now();
@@ -20,12 +21,12 @@ int main(int argc, char* argv[]) {
         double time_seconds = duration.count() / 1e9;
         total_time += time_seconds;
         
-        if (iter == 0 || result.density > best_result.density) {
-            best_result = result;
+        if (iter == 0) {
+            first_result = result;
         }
     }
 
-    graph.output(graph.config.output, total_time / graph.config.num_iter, best_result, graph.config, argc, argv);
+    graph.output(cfg, total_time / cfg.num_iter, first_result);
 
     return 0;
 }

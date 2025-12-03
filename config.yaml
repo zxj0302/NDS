@@ -23,25 +23,25 @@ real-world:
     - path: ./input/real-world/Referendum/Referendum.txt
       toggle: true
   
-  weight_reverse: false
+  weight_reverse: true
   output: ./output/real-world/
   
   competitors:
     - name: NEG_DSD
-      toggle: false
+      toggle: true
       exe: ./build/neg_dsd
       params:
         C_values: [0.9, 1.0, 1.1, 1.2]
         num_iter: 1
     
     - name: DCSGreedy
-      toggle: false
+      toggle: true
       exe: ./build/dcs_greedy
       params:
         num_iter: 1
     
     - name: CEP
-      toggle: false
+      toggle: true
       exe: ./build/cep
       params:
         toggle_done: 2
@@ -52,7 +52,7 @@ real-world:
         num_iter: 1
     
     - name: CEP_MIP
-      toggle: false
+      toggle: true
       exe: ./build/cep_mip
       params:
         toggle_done: 2
@@ -67,7 +67,7 @@ real-world:
         num_iter: 1
     
     - name: CEP_QPBO
-      toggle: false
+      toggle: true
       exe: ./build/cep_qpbo
       params:
         toggle_done: 2
@@ -75,7 +75,7 @@ real-world:
         max_neg: 200
         max_local_optima: 10
         do_peeling: false
-        step_size: 1.05
+        step_size: 1.02
         ub_mip_bound: 100
         dinkelbach_iterations: 30
         epsilon: -0.00001
@@ -105,7 +105,7 @@ real-world:
 synthetic:
   input_folder:
     - path: ./input/synthetic/BA/
-      toggle: true
+      toggle: false
     - path: ./input/synthetic/ER/
       toggle: true
     - path: ./input/synthetic/RGG/
@@ -120,20 +120,20 @@ synthetic:
   
   competitors:
     - name: NEG_DSD
-      toggle: false
+      toggle: true
       exe: ./build/neg_dsd
       params:
         C_values: [0.9, 1.0, 1.1, 1.2]
         num_iter: 1
     
     - name: DCSGreedy
-      toggle: false
+      toggle: true
       exe: ./build/dcs_greedy
       params:
         num_iter: 1
     
     - name: CEP
-      toggle: false
+      toggle: true
       exe: ./build/cep
       params:
         toggle_done: 2
@@ -144,7 +144,7 @@ synthetic:
         num_iter: 1
     
     - name: CEP_MIP
-      toggle: false
+      toggle: true
       exe: ./build/cep_mip
       params:
         toggle_done: 2
@@ -159,7 +159,7 @@ synthetic:
         num_iter: 1
     
     - name: CEP_QPBO
-      toggle: false
+      toggle: true
       exe: ./build/cep_qpbo
       params:
         toggle_done: 2

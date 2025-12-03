@@ -1,6 +1,7 @@
 from .utils.baselines import *
 from .utils.painter import *
 from loguru import logger
+import yaml
 import sys
 
 def set_logger():

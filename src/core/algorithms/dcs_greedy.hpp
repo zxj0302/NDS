@@ -2,30 +2,17 @@
 
 class DCSGreedy : public PGraph {
 public:
-    struct Config {
-        string input;
-        string output;
-        bool reverse_weight = false;
-        unsigned num_iter = 1;
-        
-        void load_from_json(const string& filename) {
-            std::ifstream file(filename);
-            std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-            auto json = boost::json::parse(content).as_object();
-            
-            if (json.contains("input")) input = json.at("input").as_string().c_str();
-            if (json.contains("output")) output = json.at("output").as_string().c_str();
-            if (json.contains("reverse_weight")) reverse_weight = json.at("reverse_weight").as_bool();
-            if (json.contains("num_iter")) num_iter = json.at("num_iter").to_number<unsigned>();
+    struct DCSGreedy_Config : public PGraph_Config {
+        void load_from_json(const string& filename) override {
+            PGraph_Config::load_from_json(filename);
+        }
+
+        void add_to_json(json::object& cfg) const override {
+            PGraph_Config::add_to_json(cfg);
         }
     };
     
-    Config config;
-
-    DCSGreedy(const string& config_file) {
-        config.load_from_json(config_file);
-        ReadGraph(config.input, config.reverse_weight);
-    }
+    DCSGreedy(const DCSGreedy_Config& cfg) : PGraph(cfg) {}
 
     SubgraphResult MaxEdge() {
         double max_weight = -numeric_limits<double>::infinity();
@@ -181,9 +168,5 @@ public:
         if (S2.density > S.density) S = S2;
 
         return MaxConnectedComponent(S.nodes);
-    }
-    
-    void add_config_params(boost::json::object& config_obj) override {
-        // DCSGreedy has no additional parameters beyond base config
     }
 };

@@ -4,7 +4,6 @@ import subprocess
 import json
 from tqdm import tqdm
 import natsort
-import yaml
 
 
 def write_config_json(params, config_dir="./temp"):

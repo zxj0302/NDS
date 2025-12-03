@@ -4,27 +4,41 @@
 
 class CEP_QPBO : public CEP {
 public:
-    struct Config : public CEP::Config {
+    struct CEP_QPBO_Config : public CEP_Config {
+        bool use_binary = true;
         double step_size = 1.05;
-        unsigned ub_mip_bound = 100;
+        bool use_probe = false;
+        unsigned findub_mip_bound = 100;
         unsigned dinkelbach_iterations = 30;
         double epsilon = -0.00001;
         double mip_time_limit = 300.0;
-        bool use_binary = true;
         
-        void load_from_json(const string& filename) {
-            CEP::Config::load_from_json(filename);
+        
+        void load_from_json(const string& filename) override {
+            CEP_Config::load_from_json(filename);
             
-            std::ifstream file(filename);
-            std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-            auto json = boost::json::parse(content).as_object();
+            ifstream file(filename);
+            string content((istreambuf_iterator<char>(file)), istreambuf_iterator<char>());
+            auto json = json::parse(content).as_object();
             
+            if (json.contains("use_binary")) use_binary = json.at("use_binary").as_bool();
             if (json.contains("step_size")) step_size = json.at("step_size").to_number<double>();
-            if (json.contains("ub_mip_bound")) ub_mip_bound = json.at("ub_mip_bound").to_number<unsigned>();
+            if (json.contains("use_probe")) use_probe = json.at("use_probe").as_bool();
+            if (json.contains("findub_mip_bound")) findub_mip_bound = json.at("findub_mip_bound").to_number<unsigned>();
             if (json.contains("dinkelbach_iterations")) dinkelbach_iterations = json.at("dinkelbach_iterations").to_number<unsigned>();
             if (json.contains("epsilon")) epsilon = json.at("epsilon").to_number<double>();
             if (json.contains("mip_time_limit")) mip_time_limit = json.at("mip_time_limit").to_number<double>();
-            if (json.contains("use_binary")) use_binary = json.at("use_binary").as_bool();
+        }
+        
+        void add_to_json(json::object& cfg) const override {
+            CEP_Config::add_to_json(cfg);
+            cfg["use_binary"] = use_binary;
+            cfg["step_size"] = step_size;
+            cfg["use_probe"] = use_probe;
+            cfg["findub_mip_bound"] = findub_mip_bound;
+            cfg["dinkelbach_iterations"] = dinkelbach_iterations;
+            cfg["epsilon"] = epsilon;
+            cfg["mip_time_limit"] = mip_time_limit;
         }
     };
 
@@ -40,14 +54,12 @@ private:
     const bool set_vertex_lb = true;
 
 public:
-    CEP_QPBO(const string& config_file) : CEP(config_file) {
-        static_cast<Config&>(config).load_from_json(config_file);
-        InitializePositiveWeights();
-        vertex_lower_bound = 3; // initialized, but not used in RunMIP (explained there).
-            vertex_upper_bound = num_vertices(G);
-        }
+    CEP_QPBO(const CEP_QPBO_Config& cfg) : CEP(cfg) {
+        vertex_lower_bound = 3;
+        vertex_upper_bound = num_vertices(G);
+    }
 
-    QPBOResult RunQPBO(double lambda, bool probe = false) {
+    QPBOResult RunQPBO(const CEP_QPBO_Config& cfg, double lambda) {
         size_t n = num_vertices(G);
         unique_ptr<QPBO<REAL>> qpbo(new QPBO<REAL>(n, 2 * num_edges(G)));
         qpbo->AddNode(n);
@@ -62,7 +74,7 @@ public:
         QPBOResult result;
         result.labels.resize(n);
         
-        if (probe) {
+        if (cfg.use_probe) {
             // Use Probe to potentially fix more nodes
             vector<int> mapping(n);
             QPBO<REAL>::ProbeOptions options;
@@ -125,8 +137,8 @@ public:
         return result;
     }
 
-    SubgraphResult FindLowerBound() {
-        auto result = CEP::Run();
+    SubgraphResult FindLowerBound(const CEP_QPBO_Config& cfg) {
+        auto result = CEP::Run(cfg);
         Reset();
         if (set_vertex_lb) {
             if (result.density < 0) {
@@ -150,26 +162,26 @@ public:
         return result;
     }
 
-    double FindUpperBoundOld(SubgraphResult& result_lb, double step_size, unsigned ub_mip_bound, unsigned mip_time_limit) {
+    double FindUpperBoundOld(const CEP_QPBO_Config& cfg, SubgraphResult& result_lb) {
         auto pos_weight_ub = *max_element(pos_weight.begin(), pos_weight.end());
-        double lambda_ub = result_lb.density * step_size;
+        double lambda_ub = result_lb.density * cfg.step_size;
         while (lambda_ub < pos_weight_ub) {
-            auto result = RunQPBO(lambda_ub, false);
+            auto result = RunQPBO(cfg, lambda_ub);
             if (result.undecided.empty() && result.fixed_in.empty()) {
                 break;
             }
-            lambda_ub *= step_size;
+            lambda_ub *= cfg.step_size;
         }
         return min(lambda_ub, pos_weight_ub);
     }
 
-    double FindUpperBound(SubgraphResult& result_lb, double step_size, unsigned ub_mip_bound, unsigned mip_time_limit) {
+    double FindUpperBound(const CEP_QPBO_Config& cfg, SubgraphResult& result_lb) {
         auto pos_weight_ub = *max_element(pos_weight.begin(), pos_weight.end());
-        double lambda_ub = result_lb.density * step_size;
+        double lambda_ub = result_lb.density * cfg.step_size;
         while (lambda_ub < pos_weight_ub) {
-            auto result = RunQPBO(lambda_ub, false);
-            if (result.undecided.size() <= ub_mip_bound) {
-                auto [solution, success] = result.undecided.empty() ? make_pair(result.fixed_in, true) : RunMIP(result, lambda_ub, mip_time_limit);
+            auto result = RunQPBO(cfg, lambda_ub);
+            if (result.undecided.size() <= cfg.findub_mip_bound) {
+                auto [solution, success] = result.undecided.empty() ? make_pair(result.fixed_in, true) : RunMIP(cfg, result, lambda_ub);
                 if (solution.empty() && success) {
                     // the density of any subgraph must be <= lambda_ub
                     return lambda_ub;
@@ -193,12 +205,12 @@ public:
                     // MIP hit time limit and solution empty, do nothing, try next lambda_ub
                 }
             }
-            lambda_ub *= step_size;
+            lambda_ub *= cfg.step_size;
         }
         return pos_weight_ub;
     }
 
-    pair<vector<Vertex>, bool> RunMIP(QPBOResult& qpbo_result, double lambda, double mip_time_limit) {
+    pair<vector<Vertex>, bool> RunMIP(const CEP_QPBO_Config& cfg, QPBOResult& qpbo_result, double lambda) {
         try {
             GRBEnv env = GRBEnv(true);
             env.set(GRB_IntParam_OutputFlag, 0);
@@ -250,7 +262,7 @@ public:
             // }
             
             model.setObjective(obj, GRB_MINIMIZE);
-            model.set(GRB_DoubleParam_TimeLimit, mip_time_limit);
+            model.set(GRB_DoubleParam_TimeLimit, cfg.mip_time_limit);
             model.optimize();
             vector<Vertex> selected = qpbo_result.fixed_in;
             if (model.get(GRB_IntAttr_SolCount) > 0) {
@@ -268,15 +280,15 @@ public:
         }
     }
 
-    SubgraphResult DinkelbachBinary(const SubgraphResult& cep_result, double upper_bound, unsigned iterations, double epsilon, double mip_time_limit) {
+    SubgraphResult DinkelbachBinary(const CEP_QPBO_Config& cfg, const SubgraphResult& cep_result, double upper_bound) {
         auto [best_solution, lower_bound] = cep_result;
-        for (auto iter = 0; iter < iterations; iter++) {
-            if ((epsilon > 0 ? (lower_bound / upper_bound) : (lower_bound - upper_bound)) >= epsilon) {
+        for (auto iter = 0; iter < cfg.dinkelbach_iterations; iter++) {
+            if ((cfg.epsilon > 0 ? (lower_bound / upper_bound) : (lower_bound - upper_bound)) >= cfg.epsilon) {
                 break;
             }
             double lambda = (lower_bound + upper_bound) / 2.0;
-            QPBOResult qpbo_result = RunQPBO(lambda, false);
-            auto [solution, success] = qpbo_result.undecided.empty() ? make_pair(qpbo_result.fixed_in, true) : RunMIP(qpbo_result, lambda, mip_time_limit);
+            QPBOResult qpbo_result = RunQPBO(cfg, lambda);
+            auto [solution, success] = qpbo_result.undecided.empty() ? make_pair(qpbo_result.fixed_in, true) : RunMIP(cfg, qpbo_result, lambda);
             // FIX: there is possibility that solution given by MIP is empty because of time limit, which cannot reflect correct upper bound
             // FIX: Just assume MIP can give exact solution here for simplicity, should fix it later
             if (solution.empty() && success) {
@@ -301,11 +313,11 @@ public:
         return {best_solution, lower_bound};
     }
 
-    SubgraphResult Dinkelbach(const SubgraphResult& cep_result, unsigned iterations, double mip_time_limit) {
+    SubgraphResult Dinkelbach(const CEP_QPBO_Config& cfg, const SubgraphResult& cep_result) {
         auto [best_solution, lower_bound] = cep_result;
-        for (auto iter = 0; iter < iterations; iter++) {
-            QPBOResult qpbo_result = RunQPBO(lower_bound, false);
-            auto solution = qpbo_result.undecided.empty() ? qpbo_result.fixed_in : RunMIP(qpbo_result, lower_bound, mip_time_limit).first;
+        for (auto iter = 0; iter < cfg.dinkelbach_iterations; iter++) {
+            QPBOResult qpbo_result = RunQPBO(cfg, lower_bound);
+            auto solution = qpbo_result.undecided.empty() ? qpbo_result.fixed_in : RunMIP(cfg, qpbo_result, lower_bound).first;
                 double density = ComputeDensity(solution);
                 if (density > lower_bound) {
                     lower_bound = density;
@@ -318,12 +330,11 @@ public:
         return {best_solution, lower_bound};
     }
 
-    SubgraphResult Run() {
-        auto& qpbo_config = static_cast<Config&>(config);
+    SubgraphResult Run(const CEP_QPBO_Config& cfg) {
         // Step 1. Result found by CEP as initial solution
-        auto result_lb = FindLowerBound();
+        auto result_lb = FindLowerBound(cfg);
         // if qpbo_result.undecided is empty and fixed_in is empty, we can directly return result found by CEP as Optimal
-        auto pre_qpbo = RunQPBO(result_lb.density, false);
+        auto pre_qpbo = RunQPBO(cfg, result_lb.density);
         if (pre_qpbo.undecided.empty() && pre_qpbo.fixed_in.empty()) {
             return result_lb;
         } else if (pre_qpbo.undecided.empty()) {
@@ -333,26 +344,13 @@ public:
             }
         }
         
-        if (qpbo_config.use_binary) {
+        if (cfg.use_binary) {
             // Step 2. Find an upper bound for QPBO
-            auto upper_bound = FindUpperBound(result_lb, qpbo_config.step_size, qpbo_config.ub_mip_bound, qpbo_config.mip_time_limit);
+            auto upper_bound = FindUpperBound(cfg, result_lb);
             // Step 3. Refine the solution by Dinkelbach
-            return DinkelbachBinary(result_lb, upper_bound, qpbo_config.dinkelbach_iterations, qpbo_config.epsilon, qpbo_config.mip_time_limit);
+            return DinkelbachBinary(cfg, result_lb, upper_bound);
         } else {
-            return Dinkelbach(result_lb, qpbo_config.dinkelbach_iterations, qpbo_config.mip_time_limit);
+            return Dinkelbach(cfg, result_lb);
         }      
-    }
-    
-    void add_config_params(boost::json::object& config_obj) override {
-        // First add CEP params
-        CEP::add_config_params(config_obj);
-        // Then add CEP_QPBO specific params
-        auto& qpbo_config = static_cast<Config&>(config);
-        config_obj["step_size"] = qpbo_config.step_size;
-        config_obj["ub_mip_bound"] = qpbo_config.ub_mip_bound;
-        config_obj["dinkelbach_iterations"] = qpbo_config.dinkelbach_iterations;
-        config_obj["epsilon"] = qpbo_config.epsilon;
-        config_obj["mip_time_limit"] = qpbo_config.mip_time_limit;
-        config_obj["use_binary"] = qpbo_config.use_binary;
     }
 };

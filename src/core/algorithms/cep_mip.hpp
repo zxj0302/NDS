@@ -3,31 +3,37 @@
 
 class CEP_MIP : public CEP {
 public:
-    struct Config : public CEP::Config {
+    struct CEP_MIP_Config : public CEP_Config {
+        bool use_binary = true;
         unsigned dinkelbach_iterations = 30;
         double epsilon = -0.00001;
         double mip_time_limit = 300.0;
-        bool use_binary = true;
         
-        void load_from_json(const string& filename) {
-            CEP::Config::load_from_json(filename);
+        void load_from_json(const string& filename) override {
+            CEP_Config::load_from_json(filename);
             
-            std::ifstream file(filename);
-            std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-            auto json = boost::json::parse(content).as_object();
+            ifstream file(filename);
+            string content((istreambuf_iterator<char>(file)), istreambuf_iterator<char>());
+            auto json = json::parse(content).as_object();
             
+            if (json.contains("use_binary")) use_binary = json.at("use_binary").as_bool();
             if (json.contains("dinkelbach_iterations")) dinkelbach_iterations = json.at("dinkelbach_iterations").to_number<unsigned>();
             if (json.contains("epsilon")) epsilon = json.at("epsilon").to_number<double>();
             if (json.contains("mip_time_limit")) mip_time_limit = json.at("mip_time_limit").to_number<double>();
-            if (json.contains("use_binary")) use_binary = json.at("use_binary").as_bool();
+        }
+        
+        void add_to_json(json::object& cfg) const override {
+            CEP_Config::add_to_json(cfg);
+            cfg["use_binary"] = use_binary;
+            cfg["dinkelbach_iterations"] = dinkelbach_iterations;
+            cfg["epsilon"] = epsilon;
+            cfg["mip_time_limit"] = mip_time_limit;
         }
     };
 
-    CEP_MIP(const string& config_file) : CEP(config_file) {
-        static_cast<Config&>(config).load_from_json(config_file);
-    }
+    CEP_MIP(const CEP_MIP_Config& cfg) : CEP(cfg) {}
 
-    pair<vector<Vertex>, bool> RunMIP(double lambda, double mip_time_limit) {
+    pair<vector<Vertex>, bool> RunMIP(const CEP_MIP_Config& cfg, double lambda) {
         try {
             GRBEnv env = GRBEnv(true);
             env.set(GRB_IntParam_OutputFlag, 0);
@@ -49,7 +55,7 @@ public:
             }
             
             model.setObjective(obj, GRB_MAXIMIZE);
-            model.set(GRB_DoubleParam_TimeLimit, mip_time_limit);
+            model.set(GRB_DoubleParam_TimeLimit, cfg.mip_time_limit);
             model.optimize();
             vector<Vertex> solution;
             if (model.get(GRB_IntAttr_SolCount) > 0) {
@@ -65,14 +71,14 @@ public:
         }
     }
 
-    SubgraphResult DinkelbachBinary(const SubgraphResult& cep_result, double upper_bound, unsigned iterations, double epsilon, double mip_time_limit) {
+    SubgraphResult DinkelbachBinary(const CEP_MIP_Config& cfg, const SubgraphResult& cep_result, double upper_bound) {
         auto [best_solution, lower_bound] = cep_result;
-        for (auto iter = 0; iter < iterations; iter++) {
-            if ((epsilon > 0 ? (lower_bound / upper_bound) : (lower_bound - upper_bound)) >= epsilon) {
+        for (auto iter = 0; iter < cfg.dinkelbach_iterations; iter++) {
+            if ((cfg.epsilon > 0 ? (lower_bound / upper_bound) : (lower_bound - upper_bound)) >= cfg.epsilon) {
                 break;
             }
             auto lambda = (lower_bound + upper_bound) / 2.0;
-            auto [solution, success] = RunMIP(lambda, mip_time_limit);
+            auto [solution, success] = RunMIP(cfg, lambda);
             // FIX: if MIP returns empty solution because of time limit, should not set upper_bound = lambda
             if (solution.empty() && success) {
                 upper_bound = lambda;
@@ -92,10 +98,10 @@ public:
         return {best_solution, lower_bound};
     }
 
-    SubgraphResult Dinkelbach(const SubgraphResult& cep_result, unsigned iterations, double mip_time_limit) {
+    SubgraphResult Dinkelbach(const CEP_MIP_Config& cfg, const SubgraphResult& cep_result) {
         auto [best_solution, lower_bound] = cep_result;
-        for (auto iter = 0; iter < iterations; iter++) {
-            auto solution = RunMIP(lower_bound, mip_time_limit).first;
+        for (auto iter = 0; iter < cfg.dinkelbach_iterations; iter++) {
+            auto solution = RunMIP(cfg, lower_bound).first;
             auto density = ComputeDensity(solution);
             if (density > lower_bound) {
                 lower_bound = density;
@@ -107,25 +113,13 @@ public:
         return {best_solution, lower_bound};
     }
 
-    SubgraphResult Run() {
-        auto& mip_config = static_cast<Config&>(config);
-        auto cep_result = CEP::Run();
-        if (mip_config.use_binary) {
+    SubgraphResult Run(const CEP_MIP_Config& cfg) {
+        auto cep_result = CEP::Run(cfg);
+        if (cfg.use_binary) {
             auto upper_bound = *max_element(pos_weight.begin(), pos_weight.end());
-            return DinkelbachBinary(cep_result, upper_bound, mip_config.dinkelbach_iterations, mip_config.epsilon, mip_config.mip_time_limit);
+            return DinkelbachBinary(cfg, cep_result, upper_bound);
         } else {
-            return Dinkelbach(cep_result, mip_config.dinkelbach_iterations, mip_config.mip_time_limit);
+            return Dinkelbach(cfg, cep_result);
         }
-    }
-    
-    void add_config_params(boost::json::object& config_obj) override {
-        // First add CEP params
-        CEP::add_config_params(config_obj);
-        // Then add CEP_MIP specific params
-        auto& mip_config = static_cast<Config&>(config);
-        config_obj["dinkelbach_iterations"] = mip_config.dinkelbach_iterations;
-        config_obj["epsilon"] = mip_config.epsilon;
-        config_obj["mip_time_limit"] = mip_config.mip_time_limit;
-        config_obj["use_binary"] = mip_config.use_binary;
     }
 };

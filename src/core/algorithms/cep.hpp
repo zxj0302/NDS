@@ -2,36 +2,37 @@
 
 class CEP : public PGraph {
 public:
-    struct Config {
-        string input;
-        string output;
-        bool reverse_weight = false;
+    struct CEP_Config : public PGraph_Config {
+        bool do_peeling = false;
+        unsigned max_local_optima = 10;
         unsigned toggle_done = 2;
         unsigned toggle_left = 20;
         double max_neg = 200;
-        unsigned max_local_optima = 10;
-        bool do_peeling = false;
-        unsigned num_iter = 1;
         
-        void load_from_json(const string& filename) {
-            std::ifstream file(filename);
-            std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-            auto json = boost::json::parse(content).as_object();
+        void load_from_json(const string& filename) override {
+            PGraph_Config::load_from_json(filename);
             
-            if (json.contains("input")) input = json.at("input").as_string().c_str();
-            if (json.contains("output")) output = json.at("output").as_string().c_str();
-            if (json.contains("reverse_weight")) reverse_weight = json.at("reverse_weight").as_bool();
+            ifstream file(filename);
+            string content((istreambuf_iterator<char>(file)), istreambuf_iterator<char>());
+            auto json = json::parse(content).as_object();
+            
+            if (json.contains("do_peeling")) do_peeling = json.at("do_peeling").as_bool();
+            if (json.contains("max_local_optima")) max_local_optima = json.at("max_local_optima").to_number<unsigned>();
             if (json.contains("toggle_done")) toggle_done = json.at("toggle_done").to_number<unsigned>();
             if (json.contains("toggle_left")) toggle_left = json.at("toggle_left").to_number<unsigned>();
             if (json.contains("max_neg")) max_neg = json.at("max_neg").to_number<double>();
-            if (json.contains("max_local_optima")) max_local_optima = json.at("max_local_optima").to_number<unsigned>();
-            if (json.contains("do_peeling")) do_peeling = json.at("do_peeling").as_bool();
-            if (json.contains("num_iter")) num_iter = json.at("num_iter").to_number<unsigned>();
+        }
+        
+        void add_to_json(json::object& cfg) const override {
+            PGraph_Config::add_to_json(cfg);
+            cfg["do_peeling"] = do_peeling;
+            cfg["max_local_optima"] = max_local_optima;
+            cfg["toggle_done"] = toggle_done;
+            cfg["toggle_left"] = toggle_left;
+            cfg["max_neg"] = max_neg;
         }
     };
     
-    Config config;
-
 protected: 
     struct MaxHeapNode {
         double key;
@@ -55,17 +56,15 @@ protected:
     size_t valid_count = 0;
 
 public:
-    CEP(const string& config_file) {
-        config.load_from_json(config_file);
-        ReadGraph(config.input, config.reverse_weight);
+    CEP(const CEP_Config& cfg) : PGraph(cfg) {
         status = vector<Status>(num_vertices(G), Status::Out);
         neighbor_in_count = vector<size_t>(num_vertices(G), 0);
         pos_weight = vector<double>(num_vertices(G), 0.0);
         valid_count = num_vertices(G);
     }
 
-    unsigned ConvertMaxNeg(double max_neg) {
-        return static_cast<unsigned>(max_neg * (max_neg < 1.0 ? num_vertices(G) : 1.0));
+    unsigned ConvertMaxNeg(const CEP_Config& cfg) {
+        return static_cast<unsigned>(cfg.max_neg * (cfg.max_neg < 1.0 ? num_vertices(G) : 1.0));
     }
 
     double ComputeDensity(const vector<Vertex>& nodes, bool iterate_edges = false) {
@@ -157,8 +156,8 @@ public:
         return pos_weight;
     }
 
-    void PruningModeToggle(unsigned it, unsigned max_local_optima, bool force_on = false) {
-        if ((!pruning_set_on && it >= config.toggle_done && max_local_optima - it >= config.toggle_left) || force_on) {
+    void PruningModeToggle(const CEP_Config& cfg, unsigned it, bool force_on = false) {
+        if ((!pruning_set_on && it >= cfg.toggle_done && cfg.max_local_optima - it >= cfg.toggle_left) || force_on) {
             pruning_set_on = true;
             pruning_handles.resize(num_vertices(G));
             for (auto [vi, ve] = vertices(G); vi != ve; ++vi) {
@@ -178,7 +177,7 @@ public:
         }
     }
 
-    SubgraphResult LocalGreedy(Vertex anchor, unsigned max_neg) {
+    SubgraphResult LocalGreedy(const CEP_Config& cfg, Vertex anchor) {
         // ============== Clear and initialization ==============
         fill(status.begin(), status.end(), Status::Out);
         fill(neighbor_in_count.begin(), neighbor_in_count.end(), 0);
@@ -192,7 +191,7 @@ public:
         Vertex next = anchor;
 
         // ============== Main loop ==============
-        while (next != Traits::null_vertex() && neg_count < max_neg) {
+        while (next != Traits::null_vertex() && neg_count < cfg.max_neg) {
             if (status[next] == Status::Fringe) {
                 // ============== If node is "fringe" → move it to "in" ==============
                 status[next] = Status::In;
@@ -414,18 +413,18 @@ public:
         }
     }
 
-    SubgraphResult Run() {
+    SubgraphResult Run(const CEP_Config& cfg) {
         // Step 1. Contraction by Peeling
-        SubgraphResult best = config.do_peeling ? Peeling() : SubgraphResult{{}, 0.0};
+        SubgraphResult best = cfg.do_peeling ? Peeling() : SubgraphResult{{}, 0.0};
 
         // Step 2. Expansion by Multi-Local Search
         InitializePositiveWeights();
-        auto converted_max_neg = ConvertMaxNeg(config.max_neg);
-        for (unsigned it = 0; it < config.max_local_optima; ++it) {
-            PruningModeToggle(it, config.max_local_optima);
+        auto converted_max_neg = ConvertMaxNeg(cfg);
+        for (unsigned it = 0; it < cfg.max_local_optima; ++it) {
+            PruningModeToggle(cfg, it);
             auto anchor = FindAnchor();
             if (anchor == Traits::null_vertex() || !valid[anchor]) break;
-            auto result = LocalGreedy(anchor, converted_max_neg);
+            auto result = LocalGreedy(cfg, anchor);
             if (result.density > best.density) {
                 best = result;
             }
@@ -446,13 +445,5 @@ public:
         if (init_pos_weight) {
             InitializePositiveWeights();
         }
-    }
-    
-    void add_config_params(boost::json::object& config_obj) override {
-        config_obj["toggle_done"] = config.toggle_done;
-        config_obj["toggle_left"] = config.toggle_left;
-        config_obj["max_neg"] = config.max_neg;
-        config_obj["max_local_optima"] = config.max_local_optima;
-        config_obj["do_peeling"] = config.do_peeling;
     }
 };

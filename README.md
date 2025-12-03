@@ -20,6 +20,7 @@ A high-performance C++ implementation of algorithms for discovering densest subg
 The negative densest subgraph problem aims to find a subgraph that maximizes the ratio of total edge weights to the number of vertices, where edge weights can be negative. This problem has applications in social network analysis, bioinformatics, and community detection.
 
 This project implements several algorithms:
+
 - **NEG_DSD**: Negative Densest Subgraph Discovery baseline
 - **DCSGreedy**: Greedy approximation algorithm
 - **CEP**: Core Expansion with Peeling (heuristic method)
@@ -32,26 +33,34 @@ This project implements several algorithms:
 ## Algorithms
 
 ### 1. NEG_DSD (Baseline)
+
 Basic algorithm for negative densest subgraph discovery.
 
 ### 2. DCSGreedy
+
 Fast greedy approximation that builds the solution incrementally.
 
 ### 3. CEP (Core Expansion with Peeling)
+
 A heuristic approach that:
+
 - Starts with a core subgraph
 - Expands by adding negative-weight neighbors
 - Uses peeling to remove low-contribution vertices
 - Employs local search for optimization
 
 ### 4. CEP_MIP
+
 Enhances CEP with Mixed Integer Programming for exact solutions within the search space.
 
 ### 5. CEP_QPBO
+
 Combines CEP with QPBO (Quadratic Pseudo-Boolean Optimization) for improved optimization.
 
 ### 6. CEP_QPBO_OPT (Recommended)
+
 The most sophisticated algorithm combining:
+
 - CEP for initialization
 - QPBO for graph pruning and partial solutions
 - MIP for exact optimization on reduced problem instances
@@ -64,22 +73,27 @@ The most sophisticated algorithm combining:
 ### Prerequisites
 
 **Required:**
+
 - **C++17** compatible compiler (GCC 7+, Clang 5+, or Apple Clang 9+)
 - **CMake** 3.26 or higher
 - **Boost** libraries (tested with 1.88.0)
 
 **Optional (for MIP-based algorithms):**
+
 - **Gurobi Optimizer** 11.0+ (required for CEP_MIP, CEP_QPBO, CEP_QPBO_OPT)
   - Set `GUROBI_HOME` environment variable or install to default location
   - Requires valid license
 
 **Python (for utilities and visualization):**
+
 - Python 3.8+
-- See `requirements.txt` for Python dependencies
+- Required packages: numpy, pandas, matplotlib, seaborn, networkx, PyYAML, tqdm, jupyter
+- See `requirements.txt` for full dependencies
 
 ### Installing Dependencies
 
 **macOS:**
+
 ```bash
 # Install Boost
 brew install boost
@@ -94,6 +108,7 @@ pip install -r requirements.txt
 ```
 
 **Linux:**
+
 ```bash
 # Ubuntu/Debian
 sudo apt-get install libboost-all-dev cmake g++
@@ -148,6 +163,7 @@ make -j$(nproc)
 ```
 
 **Executables** are placed in `build/`:
+
 - `build/neg_dsd`
 - `build/dcs_greedy`
 - `build/cep`
@@ -161,32 +177,64 @@ make -j$(nproc)
 
 ### Command Line
 
-Basic usage pattern:
+All executables take a JSON configuration file as input:
+
 ```bash
-./build/<algorithm> <input_graph> <output_json> [parameters...]
+./build/<algorithm> <config.json>
 ```
 
 **Example:**
-```bash
-./build/cep_qpbo_opt \
-    ./input/real-world/Referendum/Referendum.txt \
-    ./output/test/result.json \
-    0 2 20 200 10 0 1.02 100 30 -1e-05 600.0 1 0 1
-```
-
-### Using Configuration File
-
-The project includes `config.json` for batch experiments:
 
 ```bash
-# Edit config.json to set parameters and toggle algorithms
-# Then run experiments using Python scripts
-python main.ipynb  # or use your experiment runner
+# Create a configuration file
+cat > config.json << EOF
+{
+  "input": "./input/real-world/Referendum/Referendum.txt",
+  "output": "./output/test/result.json",
+  "reverse_weight": false,
+  "num_iter": 1,
+  "do_peeling": false,
+  "max_local_optima": 10,
+  "toggle_done": 2,
+  "toggle_left": 20,
+  "max_neg": 200,
+  "use_binary": true,
+  "use_probe": false,
+  "step_size": 1.02,
+  "direct_mip_bound": 100,
+  "dinkelbach_iterations": 30,
+  "epsilon": -1e-05,
+  "mip_time_limit": 600,
+  "skip_mip_init": true,
+  "heuristic_after_mip": true
+}
+EOF
+
+# Run the algorithm
+./build/cep_qpbo_opt config.json
 ```
+
+### Batch Experiments
+
+For running multiple algorithms on multiple datasets, use `config.yaml` with the Jupyter notebooks:
+
+```bash
+# Edit config.yaml to configure datasets and algorithms
+# Run batch experiments
+jupyter notebook main.ipynb
+```
+
+The `config.yaml` file allows you to:
+
+- Toggle multiple algorithms on/off
+- Configure parameters for each algorithm
+- Run experiments on real-world and synthetic datasets
+- Automatically generate JSON config files for each run
 
 ### Input Format
 
 Graph files should be in edge list format:
+
 ```
 # Lines starting with # are comments
 vertex1 vertex2 weight
@@ -198,34 +246,125 @@ vertex3 vertex4 weight
 - Weights can be positive or negative floating-point numbers
 - Self-loops are supported
 
+### Output Format
+
+Algorithms output JSON files with the following structure:
+
+```json
+{
+  "time": 0.0055,
+  "density": 2.058,
+  "size": 218,
+  "nodes": [31, 33, 105, ...],
+  "config": { /* input configuration */ }
+}
+```
+
+### Batch Configuration (config.yaml)
+
+The `config.yaml` file organizes batch experiments into three sections:
+
+**real-world**: Configuration for real-world datasets
+
+- `input`: List of graph files with toggle flags
+- `weight_reverse`: Whether to reverse edge weights (true for signed networks)
+- `output`: Output directory
+- `competitors`: List of algorithms with their parameters
+
+**synthetic**: Configuration for synthetic graphs
+
+- `input_folder`: List of directories containing synthetic graphs
+- Similar structure to real-world section
+
+**test**: Quick testing configuration
+
+- Simplified setup for testing individual graphs
+
+The batch experiment runner (in `main.ipynb`) reads `config.yaml`, generates individual JSON config files for each algorithm/dataset combination, and runs them sequentially.
+
 ---
 
 ## Configuration
 
-### Algorithm Parameters
+### JSON Configuration File
 
-Common parameters across CEP variants:
+Each algorithm executable requires a JSON configuration file with the following structure:
 
-- **toggle_done**: Number of iterations before considering convergence (default: 2)
-- **toggle_left**: Minimum iterations remaining before switching data structures (default: 20)
-- **max_neg**: Maximum negative weight neighbors to consider in expansion (default: 200)
-- **max_local_optima**: Maximum local search iterations (default: 10)
-- **do_peeling**: Enable/disable peeling phase (default: false)
+**Common parameters (all algorithms):**
 
-MIP-specific parameters:
+```json
+{
+  "input": "path/to/input/graph.txt",
+  "output": "path/to/output/result.json",
+  "reverse_weight": false,
+  "num_iter": 1
+}
+```
 
-- **dinkelbach_iterations**: Maximum iterations for Dinkelbach's algorithm (default: 30)
-- **epsilon**: Convergence threshold (default: -1e-05)
-- **mip_time_limit**: Time limit per MIP solve in seconds (default: 600.0)
-- **use_binary**: Use binary search for lambda values (default: true)
+- `input`: Path to input graph file
+- `output`: Path to output JSON file
+- `reverse_weight`: Whether to reverse edge weights (useful for signed networks)
+- `num_iter`: Number of iterations to run (results are averaged)
 
-QPBO-specific parameters:
+**NEG_DSD specific:**
 
-- **step_size**: Step size for upper bound search (default: 1.02)
-- **ub_mip_bound**: Upper bound for MIP node constraints (default: 100)
-- **use_probe**: Enable QPBO probing (default: false)
-- **skip_mip_init**: Skip MIP initialization phase (default: true)
-- **heuristic_after_mip**: Run heuristic refinement after MIP (default: true)
+- No additional parameters (uses default C values)
+
+**DCSGreedy specific:**
+
+- No additional parameters
+
+**CEP parameters:**
+
+```json
+{
+  "do_peeling": false,
+  "max_local_optima": 10,
+  "toggle_done": 2,
+  "toggle_left": 20,
+  "max_neg": 200
+}
+```
+
+- `do_peeling`: Enable/disable peeling phase
+- `max_local_optima`: Maximum local search iterations
+- `toggle_done`: Iterations before considering convergence
+- `toggle_left`: Min iterations left before switching data structures
+- `max_neg`: Max negative weight neighbors in expansion
+
+**CEP_MIP additional parameters:**
+
+```json
+{
+  "use_binary": false,
+  "dinkelbach_iterations": 30,
+  "epsilon": -1e-05,
+  "mip_time_limit": 600
+}
+```
+
+- `use_binary`: Use binary search for lambda values
+- `dinkelbach_iterations`: Max Dinkelbach iterations
+- `epsilon`: Convergence threshold
+- `mip_time_limit`: Time limit per MIP solve (seconds)
+
+**CEP_QPBO/CEP_QPBO_OPT additional parameters:**
+
+```json
+{
+  "use_probe": false,
+  "step_size": 1.02,
+  "direct_mip_bound": 100,
+  "skip_mip_init": true,
+  "heuristic_after_mip": true
+}
+```
+
+- `use_probe`: Enable QPBO probing (slower but more accurate)
+- `step_size`: Step size for upper bound search
+- `direct_mip_bound`: Upper bound for MIP node constraints
+- `skip_mip_init`: Skip MIP initialization phase
+- `heuristic_after_mip`: Run CEP refinement after MIP
 
 ---
 
@@ -265,8 +404,10 @@ NDS/
 │   ├── real-world/
 │   └── synthetic/
 ├── output/                     # Algorithm outputs
-├── config.json                 # Experiment configuration
+├── config.yaml                 # Experiment configuration
 ├── requirements.txt            # Python dependencies
+├── main.ipynb                  # Main experiment notebook
+├── figures.ipynb               # Visualization notebook
 └── README.md                   # This file
 ```
 
@@ -278,7 +419,7 @@ NDS/
 
 1. change to listS for edges
 2. try to use traditional methods (for non-genative weights only methods)
-3. design output name for each different configuration for the same algorithm，调整参数
+3. design output name for each different configuration for the same algorithm
 4. When initializing the pos_weights for CEP, do more 聚合邻居的值！
 
 ---
@@ -325,6 +466,7 @@ This project explores several novel contributions to the negative densest subgra
 * [12.01 Mon] Using solution from previous MIP run as next MIP's initial solution guess might be misledding, as the new lambda will be at least the same as the solution's density. If that solution is close to the current solution, then it is ok. Otherwise, it might be more time-consuming.
 * [12.01 Mon] Implemented CEP after MIP, which might improve the result further. It does help.
 * [12.01 Mon] Re-organize the code, like the order of params, and resue some code.
+* [12.04 Thu] Re-organize the code, again. Changed the structure a lot, and use config structure instead of too many params.
 
 ---
 
@@ -391,6 +533,7 @@ Pruning the graph truly helps the QPBO process to run faster.
 ### Data Structure Trade-offs
 
 The implementation uses different data structures based on workload:
+
 - **std::priority_queue with lazy updates**: Often faster than Fibonacci heap due to lower overhead
 - **Fibonacci heap**: Better for frequent decrease-key operations
 - **std::set vs on-the-fly computation**: Hybrid approach switches based on iteration count
