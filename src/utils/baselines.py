@@ -22,96 +22,85 @@ def write_config_json(params, config_dir="./temp"):
     return config_path
 
 
-def run(config, single=True, skip=True):
-    if single:
-        datasets = config.get('input')
-        output_folder = config.get('output')
-        reverse = config.get('weight_reverse', False)
-        for dataset in natsort.natsorted(datasets):
-            if dataset.get('toggle') is False:
+def get_dataset_paths(config):
+    """Extract all dataset paths from config based on input type."""
+    # Handle single file inputs
+    if 'input' in config:
+        for item in config['input']:
+            path = item.get('path') if isinstance(item, dict) else item
+            enabled = item.get('toggle', True) if isinstance(item, dict) else True
+            if enabled:
+                yield path
+    
+    # Handle folder inputs (batch processing)
+    elif 'input_folder' in config:
+        for folder_config in config['input_folder']:
+            if not folder_config.get('toggle', True):
                 continue
-            dataset_path = dataset.get('path') if isinstance(dataset, dict) else dataset
-            logger.info(f'Running on dataset: {dataset_path}')
-            dataset_name = dataset_path.split('/')[-1].split('.')[0]
-            for competitor in config.get('competitors'):
-                if not competitor.get('toggle', False):
-                    continue
-                comp_name = competitor.get('name')
-                program = competitor.get('exe')
-                params = competitor.get('params', {})
-                
-                suffix = '_r' if reverse else ''
-                output = os.path.join(output_folder, f'{dataset_name}', f'{dataset_name}_{comp_name}{suffix}.json')
-                if not os.path.exists(os.path.dirname(output)):
-                    os.makedirs(os.path.dirname(output))
-                if skip and os.path.exists(output):
-                    continue
-                
-                # Build complete config with all parameters
-                full_config = {
-                    'input': dataset_path,
-                    'output': output,
-                    'reverse_weight': reverse,
-                    **params
-                }
-                
-                # Write config JSON
-                config_path = write_config_json(full_config)
-                
-                try:
-                    # All algorithms now use single config file parameter
-                    cmd = [program, config_path]
-                    subprocess.run(cmd, check=True)
-                    result = json.load(open(output))
-                    logger.info(f'{comp_name:<15}: time: {result["time"]:.6f}s, density: {result["density"]:.6f}')
-                finally:
-                    # Clean up config file
-                    if os.path.exists(config_path):
-                        os.remove(config_path)
-    else:
-        reverse = config.get('weight_reverse', False)
-        for input_folder in config.get('input_folder'):
-            if input_folder.get('toggle') is False:
+            folder_path = folder_config['path']
+            for filename in natsort.natsorted(os.listdir(folder_path)):
+                if filename.endswith('.txt'):
+                    yield os.path.join(folder_path, filename)
+
+
+def get_output_path(dataset_path, comp_name, output_base, reverse):
+    """Generate output path for a dataset and competitor."""
+    dataset_name = os.path.splitext(os.path.basename(dataset_path))[0]
+    suffix = '_r' if reverse else ''
+    return os.path.join(output_base, dataset_name, f'{dataset_name}_{comp_name}{suffix}.json')
+
+
+def run_competitor(dataset_path, competitor, output_path, reverse):
+    """Run a single competitor on a dataset."""
+    comp_name = competitor['name']
+    program = competitor['exe']
+    params = competitor.get('params', {})
+    
+    # Build complete config
+    full_config = {
+        'input': dataset_path,
+        'output': output_path,
+        'reverse_weight': reverse,
+        **params
+    }
+    
+    # Write config and execute
+    config_path = write_config_json(full_config)
+    try:
+        subprocess.run([program, config_path], check=True)
+        result = json.load(open(output_path))
+        logger.info(f'{comp_name:<15}: time: {result["time"]:.6f}s, density: {result["density"]:.6f}')
+    finally:
+        if os.path.exists(config_path):
+            os.remove(config_path)
+
+
+def run(config, skip_existing=True):
+    """Run all enabled competitors on all enabled datasets.
+    
+    Args:
+        config: Configuration dict with 'input'/'input_folder', 'competitors', 'output', etc.
+        skip_existing: Skip if output file already exists
+    """
+    output_base = config['output']
+    reverse = config.get('weight_reverse', False)
+    competitors = [c for c in config['competitors'] if c.get('toggle', True)]
+    
+    # Process each dataset
+    for dataset_path in get_dataset_paths(config):
+        logger.info(f'Processing dataset: {dataset_path}')
+        
+        for competitor in competitors:
+            output_path = get_output_path(dataset_path, competitor['name'], output_base, reverse)
+            
+            # Ensure output directory exists
+            os.makedirs(os.path.dirname(output_path), exist_ok=True)
+            
+            # Skip if already exists
+            if skip_existing and os.path.exists(output_path):
+                logger.debug(f'Skipping existing: {output_path}')
                 continue
-            input_folder_path = input_folder.get('path')
-            logger.info(f'Running on input folder: {input_folder_path}')
-            for graph_file in tqdm(natsort.natsorted([f for f in os.listdir(input_folder_path) if f.endswith('.txt')])):
-                logger.info(f'Processing graph file: {graph_file}')
-                file_name = os.path.splitext(graph_file)[0]
-                for competitor in config.get('competitors'):
-                    if not competitor.get('toggle', False):
-                        continue
-                    comp_name = competitor.get('name')
-                    program = competitor.get('exe')
-                    params = competitor.get('params', {})
-                    
-                    dataset_path = os.path.join(input_folder_path, graph_file)
-                    suffix = '_r' if reverse else ''
-                    output = os.path.join(input_folder_path.replace('input', 'output'), f'{file_name}', f'{file_name}_{comp_name}{suffix}.json')
-                    if not os.path.exists(os.path.dirname(output)):
-                        os.makedirs(os.path.dirname(output))
-                    if skip and os.path.exists(output):
-                        continue
-                    
-                    # Build complete config with all parameters
-                    full_config = {
-                        'input': dataset_path,
-                        'output': output,
-                        'reverse_weight': reverse,
-                        **params
-                    }
-                    
-                    # Write config JSON
-                    config_path = write_config_json(full_config)
-                    
-                    try:
-                        # All algorithms now use single config file parameter
-                        cmd = [program, config_path]
-                        subprocess.run(cmd, check=True)
-                        result = json.load(open(output))
-                        logger.info(f'{comp_name:<15}: time: {result["time"]:.6f}s, density: {result["density"]:.6f}')
-                    finally:
-                        # Clean up config file
-                        if os.path.exists(config_path):
-                            os.remove(config_path)
+            
+            run_competitor(dataset_path, competitor, output_path, reverse)
+    
     logger.success('All done!')

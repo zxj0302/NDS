@@ -1,4 +1,88 @@
+# =============================================================================
+# Competitor Templates (DRY - Define Once, Use Everywhere)
+# =============================================================================
+competitor_templates:
+  neg_dsd: &neg_dsd
+    name: NEG_DSD
+    exe: ./build/neg_dsd
+    params:
+      C_values: [0.9, 1.0, 1.1, 1.2]
+      num_iter: 1
+  
+  dcs_greedy: &dcs_greedy
+    name: DCSGreedy
+    exe: ./build/dcs_greedy
+    params:
+      num_iter: 1
+  
+  cep: &cep
+    name: CEP
+    exe: ./build/cep
+    params:
+      toggle_done: 2
+      toggle_left: 20
+      max_neg: 200
+      max_local_optima: 10
+      do_peeling: false
+      num_iter: 1
+  
+  cep_mip: &cep_mip
+    name: CEP_MIP
+    exe: ./build/cep_mip
+    params:
+      toggle_done: 2
+      toggle_left: 20
+      max_neg: 200
+      max_local_optima: 10
+      do_peeling: false
+      dinkelbach_iterations: 30
+      epsilon: -0.00001
+      mip_time_limit: 600.0
+      use_binary: false
+      num_iter: 1
+  
+  cep_qpbo: &cep_qpbo
+    name: CEP_QPBO
+    exe: ./build/cep_qpbo
+    params:
+      toggle_done: 2
+      toggle_left: 20
+      max_neg: 200
+      max_local_optima: 10
+      do_peeling: false
+      step_size: 1.02
+      ub_mip_bound: 100
+      dinkelbach_iterations: 30
+      epsilon: -0.00001
+      mip_time_limit: 600.0
+      num_iter: 1
+  
+  cep_qpbo_opt: &cep_qpbo_opt
+    name: CEP_QPBO_OPT
+    exe: ./build/cep_qpbo_opt
+    params:
+      toggle_done: 2
+      toggle_left: 20
+      max_neg: 200
+      max_local_optima: 10
+      do_peeling: false
+      step_size: 1.02
+      ub_mip_bound: 100
+      dinkelbach_iterations: 30
+      epsilon: -0.00001
+      mip_time_limit: 600.0
+      use_binary: true
+      use_probe: false
+      skip_mip_init: true
+      heuristic_after_mip: true
+      num_iter: 1
+
+# =============================================================================
+# Experiment Configurations
+# =============================================================================
+
 real-world:
+  # Input datasets (individual files)
   input:
     - path: ./input/real-world/Abortion/Abortion.txt
       toggle: true
@@ -26,176 +110,54 @@ real-world:
   weight_reverse: true
   output: ./output/real-world/
   
+  # Use competitor templates with toggle flags
   competitors:
-    - name: NEG_DSD
+    - <<: *neg_dsd
       toggle: true
-      exe: ./build/neg_dsd
-      params:
-        C_values: [0.9, 1.0, 1.1, 1.2]
-        num_iter: 1
-    
-    - name: DCSGreedy
+    - <<: *dcs_greedy
       toggle: true
-      exe: ./build/dcs_greedy
-      params:
-        num_iter: 1
-    
-    - name: CEP
+    - <<: *cep
       toggle: true
-      exe: ./build/cep
-      params:
-        toggle_done: 2
-        toggle_left: 20
-        max_neg: 200
-        max_local_optima: 10
-        do_peeling: false
-        num_iter: 1
-    
-    - name: CEP_MIP
+    - <<: *cep_mip
       toggle: true
-      exe: ./build/cep_mip
-      params:
-        toggle_done: 2
-        toggle_left: 20
-        max_neg: 200
-        max_local_optima: 10
-        do_peeling: false
-        dinkelbach_iterations: 30
-        epsilon: -0.00001
-        mip_time_limit: 600.0
-        use_binary: false
-        num_iter: 1
-    
-    - name: CEP_QPBO
+    - <<: *cep_qpbo
       toggle: true
-      exe: ./build/cep_qpbo
-      params:
-        toggle_done: 2
-        toggle_left: 20
-        max_neg: 200
-        max_local_optima: 10
-        do_peeling: false
-        step_size: 1.02
-        ub_mip_bound: 100
-        dinkelbach_iterations: 30
-        epsilon: -0.00001
-        mip_time_limit: 600.0
-        num_iter: 1
-    
-    - name: CEP_QPBO_OPT
+    - <<: *cep_qpbo_opt
       toggle: true
-      exe: ./build/cep_qpbo_opt
-      params:
-        toggle_done: 2
-        toggle_left: 20
-        max_neg: 200
-        max_local_optima: 10
-        do_peeling: false
-        step_size: 1.02
-        ub_mip_bound: 100
-        dinkelbach_iterations: 30
-        epsilon: -0.00001
-        mip_time_limit: 600.0
-        use_binary: true
-        use_probe: false
-        skip_mip_init: true
-        heuristic_after_mip: true
-        num_iter: 1
 
 synthetic:
+  # Input datasets (folders containing multiple files)
   input_folder:
     - path: ./input/synthetic/BA/
       toggle: false
     - path: ./input/synthetic/ER/
-      toggle: true
+      toggle: false
     - path: ./input/synthetic/RGG/
       toggle: false
     - path: ./input/synthetic/SBM/
       toggle: false
     - path: ./input/synthetic/WS/
-      toggle: false
+      toggle: true
   
   weight_reverse: false
   output: ./output/synthetic/
   
   competitors:
-    - name: NEG_DSD
+    - <<: *neg_dsd
       toggle: true
-      exe: ./build/neg_dsd
-      params:
-        C_values: [0.9, 1.0, 1.1, 1.2]
-        num_iter: 1
-    
-    - name: DCSGreedy
+    - <<: *dcs_greedy
       toggle: true
-      exe: ./build/dcs_greedy
-      params:
-        num_iter: 1
-    
-    - name: CEP
+    - <<: *cep
       toggle: true
-      exe: ./build/cep
-      params:
-        toggle_done: 2
-        toggle_left: 20
-        max_neg: 200
-        max_local_optima: 10
-        do_peeling: false
-        num_iter: 1
-    
-    - name: CEP_MIP
+    - <<: *cep_mip
       toggle: true
-      exe: ./build/cep_mip
-      params:
-        toggle_done: 2
-        toggle_left: 20
-        max_neg: 200
-        max_local_optima: 10
-        do_peeling: false
-        dinkelbach_iterations: 30
-        epsilon: -0.00001
-        mip_time_limit: 600.0
-        use_binary: false
-        num_iter: 1
-    
-    - name: CEP_QPBO
+    - <<: *cep_qpbo
       toggle: true
-      exe: ./build/cep_qpbo
-      params:
-        toggle_done: 2
-        toggle_left: 20
-        max_neg: 200
-        max_local_optima: 10
-        do_peeling: false
-        step_size: 1.02
-        ub_mip_bound: 100
-        dinkelbach_iterations: 30
-        epsilon: -0.00001
-        mip_time_limit: 600.0
-        use_binary: true
-        num_iter: 1
-    
-    - name: CEP_QPBO_OPT
+    - <<: *cep_qpbo_opt
       toggle: true
-      exe: ./build/cep_qpbo_opt
-      params:
-        toggle_done: 2
-        toggle_left: 20
-        max_neg: 200
-        max_local_optima: 10
-        do_peeling: false
-        step_size: 1.02
-        ub_mip_bound: 100
-        dinkelbach_iterations: 30
-        epsilon: -0.00001
-        mip_time_limit: 600.0
-        use_binary: true
-        use_probe: false
-        skip_mip_init: true
-        heuristic_after_mip: true
-        num_iter: 1
 
 test:
+  # Quick test configuration with minimal settings
   input:
     - ./input/real-world/Referendum/Referendum.txt
   
@@ -203,24 +165,12 @@ test:
   output: ./output/test/
   
   competitors:
-    - name: NEG_DSD
+    - <<: *neg_dsd
       toggle: true
-      exe: ./build/neg_dsd
-      params:
+      params:  # Override default params for testing
         C_values: [1.0]
         num_iter: 1
-    
-    - name: DCSGreedy
+    - <<: *dcs_greedy
       toggle: true
-      exe: ./build/dcs_greedy
-      params:
-        num_iter: 1
-    
-    - name: CEP
+    - <<: *cep
       toggle: true
-      exe: ./build/cep
-      params:
-        max_neg: 200
-        max_local_optima: 10
-        do_peeling: false
-        num_iter: 1
