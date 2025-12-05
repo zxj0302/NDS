@@ -128,7 +128,7 @@ endfunction()
 add_nds_algorithm(neg_dsd FALSE FALSE)
 add_nds_algorithm(dcs_greedy FALSE FALSE)
 add_nds_algorithm(cep FALSE FALSE)
-add_nds_algorithm(cep_mip FALSE TRUE)
+add_nds_algorithm(cep_mip TRUE FALSE)
 add_nds_algorithm(cep_qpbo TRUE TRUE)
 add_nds_algorithm(cep_qpbo_opt TRUE TRUE)
 

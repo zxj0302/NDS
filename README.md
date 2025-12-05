@@ -467,6 +467,7 @@ This project explores several novel contributions to the negative densest subgra
 * [12.01 Mon] Implemented CEP after MIP, which might improve the result further. It does help.
 * [12.01 Mon] Re-organize the code, like the order of params, and resue some code.
 * [12.04 Thu] Re-organize the code, again. Changed the structure a lot, and use config structure instead of too many params.
+* [12.05 Fri] I transferred the code from Macbook air M1 with 16G RAM (used Clang) to Windows system with R7 7735H and 32G RAM. M1 has 4 big cores (3.2 GHz) and 4 small cores (2.0 GHz), while R7 7735H has 8 cores (3.2 GHz). I expected that all algorithms should be faster than on Macbook. However, I find that most of them are are about 1.5-3 times slower. It always needs to take two times runtime. It shocked me a lot. I tried to use windows + docker + gcc, and also tried msvc the situation still there. The only difference is that when the graph is hard to solve, like the setting 5 in BA, the msvc is slightly faster than m1 while docker+gcc is much slower than m1. Also tried docker+clang, similar with docker+gcc. And this slowness shows different ratio on different algorithms. For CEP_MIP, which is the most slow one, it takes about 1-1.5 runtime, while for neg_dsd, dcs_greedy and cep it is about 2 times. For CEP_QPBO and CEP_QPBO_OPT, it takes about 2-4 times runtime. This is amazing!
 
 ---
 

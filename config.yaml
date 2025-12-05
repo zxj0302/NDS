@@ -107,7 +107,7 @@ real-world:
     - path: ./input/real-world/Referendum/Referendum.txt
       toggle: true
   
-  weight_reverse: true
+  weight_reverse: false
   output: ./output/real-world/
   
   # Use competitor templates with toggle flags
@@ -129,9 +129,9 @@ synthetic:
   # Input datasets (folders containing multiple files)
   input_folder:
     - path: ./input/synthetic/BA/
-      toggle: false
+      toggle: true
     - path: ./input/synthetic/ER/
-      toggle: false
+      toggle: true
     - path: ./input/synthetic/RGG/
       toggle: false
     - path: ./input/synthetic/SBM/
@@ -144,13 +144,13 @@ synthetic:
   
   competitors:
     - <<: *neg_dsd
-      toggle: true
+      toggle: false
     - <<: *dcs_greedy
-      toggle: true
+      toggle: false
     - <<: *cep
-      toggle: true
+      toggle: false
     - <<: *cep_mip
-      toggle: true
+      toggle: false
     - <<: *cep_qpbo
       toggle: true
     - <<: *cep_qpbo_opt
