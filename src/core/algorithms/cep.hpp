@@ -157,7 +157,7 @@ public:
     }
 
     void PruningModeToggle(const CEP_Config& cfg, unsigned it, bool force_on = false) {
-        if ((!pruning_set_on && it >= cfg.toggle_done && cfg.max_local_optima - it >= cfg.toggle_left) || force_on) {
+        if (!pruning_set_on && ((it >= cfg.toggle_done && cfg.max_local_optima - it >= cfg.toggle_left) || force_on)) {
             pruning_set_on = true;
             pruning_handles.resize(num_vertices(G));
             for (auto [vi, ve] = vertices(G); vi != ve; ++vi) {
@@ -445,5 +445,6 @@ public:
         if (init_pos_weight) {
             InitializePositiveWeights();
         }
+        LOG("Reset: done.");
     }
 };

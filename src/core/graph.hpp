@@ -23,6 +23,14 @@
 using namespace std;
 using namespace boost;
 
+#ifdef ENABLE_LOG
+    #define LOG(msg) \
+        do { cerr << msg << std::endl; } while (0)
+#else
+    #define LOG(msg) \
+        do { } while (0)
+#endif
+
 class PGraph {
 public:
     struct PGraph_Config {
@@ -73,6 +81,7 @@ protected:
     vector<bool> valid;
     double total_weight = 0.0;
     vector<double> loop_weight;
+    string info = "| Start | ";
 
     PGraph() = default;
 
@@ -131,6 +140,7 @@ public:
         
         // Build config object
         json::object config;
+        config["info"] = info + " End |";
         cfg.add_to_json(config);
         json_output["config"] = config;
         

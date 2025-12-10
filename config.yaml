@@ -18,64 +18,85 @@ competitor_templates:
   cep: &cep
     name: CEP
     exe: ./build/cep
-    params:
+    params: &cep_params
       toggle_done: 2
       toggle_left: 20
       max_neg: 200
       max_local_optima: 10
       do_peeling: false
       num_iter: 1
-  
+
   cep_mip: &cep_mip
     name: CEP_MIP
-    exe: ./build/cep_mip
-    params:
-      toggle_done: 2
-      toggle_left: 20
-      max_neg: 200
-      max_local_optima: 10
-      do_peeling: false
-      dinkelbach_iterations: 30
-      epsilon: -0.00001
+    exe: ./build/exact
+    params: &cep_mip_params
+      <<: *cep_params
+      dinkelbach_iterations: 50
+      epsilon: 0.9999
       mip_time_limit: 600.0
-      use_binary: false
-      num_iter: 1
-  
-  cep_qpbo: &cep_qpbo
-    name: CEP_QPBO
-    exe: ./build/cep_qpbo
-    params:
-      toggle_done: 2
-      toggle_left: 20
-      max_neg: 200
-      max_local_optima: 10
-      do_peeling: false
+      enable_cep_init: true
+      enable_binary_search: false
+      enable_qpbo: false
+      enable_qpbo_probe: false
+      enable_graph_pruning: false
+      enable_pruning_set: false
+      enable_cep_middle: false
+      enable_cep_lambda: false
+      enable_qpboi: false
+      enable_mip_init: false
+      enable_mip_constrains_vertex_lb: false
+      enable_mip_constrains_vertex_ub: false
+      enable_cep_final: false
+      
+  cep_qpbo_mip: &cep_qpbo_mip
+    name: CEP_QPBO_MIP
+    exe: ./build/exact
+    params: &cep_qpbo_mip_params
+      <<: *cep_mip_params
       step_size: 1.02
-      ub_mip_bound: 100
-      dinkelbach_iterations: 30
-      epsilon: -0.00001
-      mip_time_limit: 600.0
-      num_iter: 1
-  
-  cep_qpbo_opt: &cep_qpbo_opt
-    name: CEP_QPBO_OPT
-    exe: ./build/cep_qpbo_opt
-    params:
-      toggle_done: 2
-      toggle_left: 20
-      max_neg: 200
-      max_local_optima: 10
-      do_peeling: false
-      step_size: 1.02
-      ub_mip_bound: 100
-      dinkelbach_iterations: 30
-      epsilon: -0.00001
-      mip_time_limit: 600.0
-      use_binary: true
-      use_probe: false
-      skip_mip_init: true
-      heuristic_after_mip: true
-      num_iter: 1
+      direct_mip_bound: 100
+      enable_binary_search: true
+      enable_qpbo: true
+      enable_qpbo_probe: false
+      
+  cep_pruning_qpbo_mip: &cep_pruning_qpbo_mip
+    name: CEP_PRUNING_QPBO_MIP
+    exe: ./build/exact
+    params: &cep_pruning_qpbo_mip_params
+      <<: *cep_qpbo_mip_params
+      enable_graph_pruning: true
+      enable_pruning_set: false
+
+  cep_pruning_qpbo_cep_mip: &cep_pruning_qpbo_cep_mip
+    name: CEP_PRUNING_QPBO_CEP_MIP
+    exe: ./build/exact
+    params: &cep_pruning_qpbo_cep_mip_params
+      <<: *cep_pruning_qpbo_mip_params
+      enable_cep_middle: true
+
+  cep_pruning_qpbo_cep_init_mip: &cep_pruning_qpbo_cep_init_mip
+    name: CEP_PRUNING_QPBO_CEP_INIT_MIP
+    exe: ./build/exact
+    params: &cep_pruning_qpbo_cep_init_mip_params
+      <<: *cep_pruning_qpbo_cep_mip_params
+      enable_cep_lambda: false
+      enable_qpboi: false
+      enable_mip_init: false
+
+  cep_pruning_qpbo_cep_init_mip_constrain: &cep_pruning_qpbo_cep_init_mip_constrain
+    name: CEP_PRUNING_QPBO_CEP_INIT_MIP_CONSTRAIN
+    exe: ./build/exact
+    params: &cep_pruning_qpbo_cep_init_mip_constrain_params
+      <<: *cep_pruning_qpbo_cep_init_mip_params
+      enable_mip_constrains_vertex_lb: true
+      enable_mip_constrains_vertex_ub: true
+
+  cep_pruning_qpbo_cep_init_mip_constrain_cep: &cep_pruning_qpbo_cep_init_mip_constrain_cep
+    name: CEP_PRUNING_QPBO_CEP_INIT_MIP_CONSTRAIN_CEP
+    exe: ./build/exact
+    params: &cep_pruning_qpbo_cep_init_mip_constrain_cep_params
+      <<: *cep_pruning_qpbo_cep_init_mip_constrain_params
+      enable_cep_final: true
 
 # =============================================================================
 # Experiment Configurations
@@ -89,7 +110,7 @@ real-world:
     - path: ./input/real-world/Biogrid/Biogrid.txt
       toggle: true
     - path: ./input/real-world/Brexit/Brexit.txt
-      toggle: false
+      toggle: true
     - path: ./input/real-world/Collins/Collins.txt
       toggle: true
     - path: ./input/real-world/Election/Election.txt
@@ -111,18 +132,26 @@ real-world:
   output: ./output/real-world/
   
   # Use competitor templates with toggle flags
-  competitors:
+  competitors: &real_world_competitors
     - <<: *neg_dsd
-      toggle: true
+      toggle: false
     - <<: *dcs_greedy
-      toggle: true
+      toggle: false
     - <<: *cep
-      toggle: true
+      toggle: false
     - <<: *cep_mip
+      toggle: false
+    - <<: *cep_qpbo_mip
+      toggle: false
+    - <<: *cep_pruning_qpbo_mip
+      toggle: false
+    - <<: *cep_pruning_qpbo_cep_mip
       toggle: true
-    - <<: *cep_qpbo
+    - <<: *cep_pruning_qpbo_cep_init_mip
       toggle: true
-    - <<: *cep_qpbo_opt
+    - <<: *cep_pruning_qpbo_cep_init_mip_constrain
+      toggle: true
+    - <<: *cep_pruning_qpbo_cep_init_mip_constrain_cep
       toggle: true
 
 synthetic:
@@ -141,36 +170,13 @@ synthetic:
   
   weight_reverse: false
   output: ./output/synthetic/
-  
-  competitors:
-    - <<: *neg_dsd
-      toggle: false
-    - <<: *dcs_greedy
-      toggle: false
-    - <<: *cep
-      toggle: false
-    - <<: *cep_mip
-      toggle: false
-    - <<: *cep_qpbo
-      toggle: true
-    - <<: *cep_qpbo_opt
-      toggle: true
+  competitors: *real_world_competitors
 
 test:
   # Quick test configuration with minimal settings
   input:
-    - ./input/real-world/Referendum/Referendum.txt
+    - ./input/synthetic/BA/BA_n10000_m3_setting5_inst0.txt
   
   weight_reverse: false
   output: ./output/test/
-  
-  competitors:
-    - <<: *neg_dsd
-      toggle: true
-      params:  # Override default params for testing
-        C_values: [1.0]
-        num_iter: 1
-    - <<: *dcs_greedy
-      toggle: true
-    - <<: *cep
-      toggle: true
+  competitors: *real_world_competitors

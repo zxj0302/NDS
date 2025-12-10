@@ -26,7 +26,7 @@ int main(int argc, char* argv[]) {
         }
         
         if (iter < cfg.num_iter - 1) {
-            graph.Reset();
+            graph.Reset(false);
         }
     }
 

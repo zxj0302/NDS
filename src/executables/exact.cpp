@@ -1,4 +1,4 @@
-#include "../core/algorithms/cep_qpbo_opt.hpp"
+#include "../core/algorithms/exact.hpp"
 
 int main(int argc, char* argv[]) {
     if (argc != 2) {
@@ -6,9 +6,9 @@ int main(int argc, char* argv[]) {
         return EXIT_FAILURE;
     }
 
-    auto cfg = CEP_QPBO_OPT::CEP_QPBO_OPT_Config();
+    auto cfg = EXACT::EXACT_Config();
     cfg.load_from_json(argv[1]);
-    CEP_QPBO_OPT graph(cfg);
+    EXACT graph(cfg);
     
     PGraph::SubgraphResult first_result;
     double total_time = 0.0;
@@ -26,7 +26,7 @@ int main(int argc, char* argv[]) {
         }
         
         if (iter < cfg.num_iter - 1) {
-            graph.Reset();
+            graph.Reset(cfg);
         }
     }
 

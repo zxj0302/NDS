@@ -417,12 +417,11 @@ NDS/
 
 ### Implementation TODO:
 
-1. change to listS for edges
-2. try to use traditional methods (for non-genative weights only methods)
-3. design output name for each different configuration for the same algorithm
-4. When initializing the pos_weights for CEP, do more 聚合邻居的值！
-
----
+1. try to use traditional methods (for non-genative weights only methods)
+2. design output name for each different configuration for the same algorithm
+3. When initializing the pos_weights for CEP, do more 聚合邻居的值！
+4. 使用之前的来初始化ceplambda，使用ceplambda来初始化mip
+5. CEP_MIP_QPBO里关于mip的部分可以优化一下
 
 ## Research Contributions
 
@@ -447,11 +446,9 @@ This project explores several novel contributions to the negative densest subgra
 ### Planned Experiments:
 
 1. Compare the runtime & density across real-word and synthetic graphs **widely**. Should use many different simulator to see how it performs on different kinds of graphs. Can use avg. ranks, p-value, non-dominated ratio, avg. time to demonstrate.
-2. Analyze the parameter settings' influence on the CEP and other works. CEP with/without Peeling.
-3. What if initialize the upper_bound in CEP_QPBO randomly, or don't use up-down method to find the upper_bound? Does QPBO really helps? What if Only use MIP?
-4. Do the existing works for non-negative weights graphs really not working?
-5. Runtime of different epsion for exact methods
-6. which one is better, P+BP+I, or P+CEP+I?
+2. Do the existing works for non-negative weights graphs really not working?
+3. 消融实验：1. find lower_bound/upper_bound的必要性，即一个好的初始化能够提升返回的速度, 否则会有很多时间的额外消耗；但是很多情况下这样的时间消耗也是不可忽视的，导致up-down的方法比Dinkelbach更慢。2. 使用QPBO的必要性，即能够大幅削减MIP的时间；3.pruning 图的必要性，即提升QPBO的时间；4. 使用CEP in the middle的用处，即尽量避免MIP；5.初始化MIP并且限制node的必要性，或许能提升速度. 总结下来需要研究如下变种：（1）纯MIP，使用CEP初始化的二分（2）CEP初始化二分+QPBO+MIP （3）加上pruning的效果 （4）再加上使用CEP in the middle的效果 （5）再加上限制node的效果。
+4. 总实验：（1）CEP的参数改变的影响 （2）Exact方法的每个组分的有用与否，即上述消融实验 （3）不同方法之间的对比，包含CEP的不同参数之间的，包含Exact方法的不同epsilon，以及baselines （4）不同类别的simulated图上的效果
 
 ---
 

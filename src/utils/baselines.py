@@ -2,7 +2,6 @@ from loguru import logger
 import os
 import subprocess
 import json
-from tqdm import tqdm
 import natsort
 
 
@@ -69,7 +68,7 @@ def run_competitor(dataset_path, competitor, output_path, reverse):
     try:
         subprocess.run([program, config_path], check=True)
         result = json.load(open(output_path))
-        logger.info(f'{comp_name:<15}: time: {result["time"]:.6f}s, density: {result["density"]:.6f}')
+        logger.info(f'{comp_name:<45}: time: {result["time"]:.6f}s, density: {result["density"]:.6f}')
     finally:
         if os.path.exists(config_path):
             os.remove(config_path)

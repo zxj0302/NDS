@@ -12,9 +12,9 @@ def set_logger():
     logger.add(
         sys.stderr,
         format=(
-            "<bg #2C3E50><white><bold>{time:YYYY-MM-DD HH:mm:ss}</bold></white></bg #2C3E50> "
-            "| <level><bold>{level: <8}</bold></level> | "
-            "<cyan><bold>{name}:{function}:{line}</bold></cyan> | "
+            # "<bg #2C3E50><white><bold>{time:YYYY-MM-DD HH:mm:ss}</bold></white></bg #2C3E50> "
+            "| <bg #2ECC71><white><bold>{level: <7}</bold></white></bg #2ECC71> | "
+            # "<cyan><bold>{name}:{function}:{line}</bold></cyan> | "
             "<level><bold>{message}</bold></level>"
         ),
         colorize=True,
@@ -52,7 +52,8 @@ def set_logger():
     # CRITICAL: Red background (extreme severity)
     
     logger.level("DEBUG", color="<bg #3498DB><white>")      # Blue background
-    logger.level("INFO", color="<bg #2ECC71><white>")       # Green background
+    # logger.level("INFO", color="<bg #2ECC71><white>")       # Green background
+    logger.level("INFO", color="<fg #444444>")
     logger.level("SUCCESS", color="<bg #1ABC9C><white>")    # Cyan background
     logger.level("WARNING", color="<bg #F39C12><black>")    # Yellow background
     logger.level("ERROR", color="<bg #E67E22><white>")      # Orange background

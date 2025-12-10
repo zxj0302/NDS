@@ -9,12 +9,13 @@ option(BUILD_ALL "Build all executables" ON)
 option(BUILD_NEG_DSD "Build neg_dsd executable" ON)
 option(BUILD_DCS_GREEDY "Build dcs_greedy executable" ON)
 option(BUILD_CEP "Build cep executable" ON)
-option(BUILD_CEP_MIP "Build cep_mip executable (requires Gurobi)" ON)
-option(BUILD_CEP_QPBO "Build cep_qpbo executable (requires Gurobi)" ON)
-option(BUILD_CEP_QPBO_OPT "Build cep_qpbo_opt executable (requires Gurobi)" ON)
+option(BUILD_EXACT "Build exact executable (requires Gurobi)" ON)
 
 option(USE_GUROBI "Enable Gurobi support for MIP-based algorithms" ON)
 option(VERBOSE_BUILD "Show detailed build information" OFF)
+
+option(ENABLE_LOG "Enable logging macro ENABLE_LOG" ON)
+option(DISABLE_WARNINGS "Disable compiler warnings" OFF)
 
 # ============================================================================
 # Build Configuration
@@ -22,6 +23,16 @@ option(VERBOSE_BUILD "Show detailed build information" OFF)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)  # For IDE integration
+
+# Compiler flags
+if(DISABLE_WARNINGS)
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
+        add_compile_options(-w)  # Disable all warnings
+    endif()
+    if(MSVC)
+        add_compile_options(/W0)  # Disable all warnings on MSVC
+    endif()
+endif()
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
@@ -52,9 +63,7 @@ if(USE_GUROBI)
         message(STATUS "✓ Gurobi found: ${GUROBI_DIR}")
     else()
         message(WARNING "✗ Gurobi not found. MIP-based algorithms will be disabled.")
-        set(BUILD_CEP_MIP OFF)
-        set(BUILD_CEP_QPBO OFF)
-        set(BUILD_CEP_QPBO_OPT OFF)
+        set(BUILD_EXACT OFF)
     endif()
 endif()
 
@@ -89,6 +98,11 @@ function(add_nds_algorithm NAME REQUIRES_GUROBI REQUIRES_QPBO)
         
         # Build the executable
         add_executable(${NAME} executables/${NAME}.cpp)
+
+        # Compiler flags
+        if(ENABLE_LOG)
+            target_compile_definitions(${NAME} PRIVATE ENABLE_LOG)
+        endif()
         
         # Include directories
         target_include_directories(${NAME} PRIVATE 
@@ -128,9 +142,7 @@ endfunction()
 add_nds_algorithm(neg_dsd FALSE FALSE)
 add_nds_algorithm(dcs_greedy FALSE FALSE)
 add_nds_algorithm(cep FALSE FALSE)
-add_nds_algorithm(cep_mip TRUE FALSE)
-add_nds_algorithm(cep_qpbo TRUE TRUE)
-add_nds_algorithm(cep_qpbo_opt TRUE TRUE)
+add_nds_algorithm(exact TRUE TRUE)
 
 # ============================================================================
 # Summary
@@ -164,12 +176,6 @@ endif()
 if(TARGET cep)
     install(TARGETS cep RUNTIME DESTINATION bin)
 endif()
-if(TARGET cep_mip)
-    install(TARGETS cep_mip RUNTIME DESTINATION bin)
-endif()
-if(TARGET cep_qpbo)
-    install(TARGETS cep_qpbo RUNTIME DESTINATION bin)
-endif()
-if(TARGET cep_qpbo_opt)
-    install(TARGETS cep_qpbo_opt RUNTIME DESTINATION bin)
+if(TARGET exact)
+    install(TARGETS exact RUNTIME DESTINATION bin)
 endif()
