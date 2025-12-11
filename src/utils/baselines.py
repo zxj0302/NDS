@@ -42,11 +42,10 @@ def get_dataset_paths(config):
                     yield os.path.join(folder_path, filename)
 
 
-def get_output_path(dataset_path, comp_name, output_base, reverse):
+def get_output_path(dataset_path, comp_name, output_base, reverse, suffix):
     """Generate output path for a dataset and competitor."""
     dataset_name = os.path.splitext(os.path.basename(dataset_path))[0]
-    suffix = '_r' if reverse else ''
-    return os.path.join(output_base, dataset_name, f'{dataset_name}_{comp_name}{suffix}.json')
+    return os.path.join(output_base, dataset_name, f"{'r_' if reverse else ''}{comp_name}{'_' + suffix if suffix else ''}.json")
 
 
 def run_competitor(dataset_path, competitor, output_path, reverse):
@@ -83,14 +82,22 @@ def run(config, skip_existing=True):
     """
     output_base = config['output']
     reverse = config.get('weight_reverse', False)
-    competitors = [c for c in config['competitors'] if c.get('toggle', True)]
+    competitors = [c for c in config['competitors'].values() if c.get('toggle', True)]
     
     # Process each dataset
     for dataset_path in get_dataset_paths(config):
+        if dataset_path is None:
+            continue
         logger.info(f'Processing dataset: {dataset_path}')
+
+        if 'input_folder' in config:
+            # concat the last folder name to output base if the input is from a folder
+            true_output_base = os.path.join(output_base, os.path.basename(os.path.dirname(dataset_path)))
+        else:
+            true_output_base = output_base
         
         for competitor in competitors:
-            output_path = get_output_path(dataset_path, competitor['name'], output_base, reverse)
+            output_path = get_output_path(dataset_path, competitor['name'], true_output_base, reverse, competitor.get('suffix', ''))
             
             # Ensure output directory exists
             os.makedirs(os.path.dirname(output_path), exist_ok=True)

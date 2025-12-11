@@ -418,10 +418,8 @@ NDS/
 ### Implementation TODO:
 
 1. try to use traditional methods (for non-genative weights only methods)
-2. design output name for each different configuration for the same algorithm
-3. When initializing the pos_weights for CEP, do more 聚合邻居的值！
-4. 使用之前的来初始化ceplambda，使用ceplambda来初始化mip
-5. CEP_MIP_QPBO里关于mip的部分可以优化一下
+2. When initializing the pos_weights for CEP, do more 聚合邻居的值！
+3. 使用之前的来初始化ceplambda，使用ceplambda来初始化mip
 
 ## Research Contributions
 

@@ -1,8 +1,9 @@
 # =============================================================================
 # Competitor Templates (DRY - Define Once, Use Everywhere)
 # =============================================================================
-competitor_templates:
+competitor_templates: &competitor_templates
   neg_dsd: &neg_dsd
+    toggle: false
     name: NEG_DSD
     exe: ./build/neg_dsd
     params:
@@ -10,12 +11,14 @@ competitor_templates:
       num_iter: 1
   
   dcs_greedy: &dcs_greedy
+    toggle: false
     name: DCSGreedy
     exe: ./build/dcs_greedy
     params:
       num_iter: 1
   
   cep: &cep
+    toggle: false
     name: CEP
     exe: ./build/cep
     params: &cep_params
@@ -27,6 +30,7 @@ competitor_templates:
       num_iter: 1
 
   cep_mip: &cep_mip
+    toggle: false
     name: CEP_MIP
     exe: ./build/exact
     params: &cep_mip_params
@@ -49,6 +53,7 @@ competitor_templates:
       enable_cep_final: false
       
   cep_qpbo_mip: &cep_qpbo_mip
+    toggle: false
     name: CEP_QPBO_MIP
     exe: ./build/exact
     params: &cep_qpbo_mip_params
@@ -60,6 +65,7 @@ competitor_templates:
       enable_qpbo_probe: false
       
   cep_pruning_qpbo_mip: &cep_pruning_qpbo_mip
+    toggle: false
     name: CEP_PRUNING_QPBO_MIP
     exe: ./build/exact
     params: &cep_pruning_qpbo_mip_params
@@ -68,35 +74,42 @@ competitor_templates:
       enable_pruning_set: false
 
   cep_pruning_qpbo_cep_mip: &cep_pruning_qpbo_cep_mip
+    toggle: true
     name: CEP_PRUNING_QPBO_CEP_MIP
     exe: ./build/exact
     params: &cep_pruning_qpbo_cep_mip_params
       <<: *cep_pruning_qpbo_mip_params
       enable_cep_middle: true
 
-  cep_pruning_qpbo_cep_init_mip: &cep_pruning_qpbo_cep_init_mip
-    name: CEP_PRUNING_QPBO_CEP_INIT_MIP
+  cep_pruning_qpbo_cep_mip_constrain: &cep_pruning_qpbo_cep_mip_constrain
+    toggle: true
+    name: CEP_PRUNING_QPBO_CEP_MIP_CONSTRAIN
     exe: ./build/exact
-    params: &cep_pruning_qpbo_cep_init_mip_params
+    params: &cep_pruning_qpbo_cep_mip_constrain_params
       <<: *cep_pruning_qpbo_cep_mip_params
-      enable_cep_lambda: false
-      enable_qpboi: false
-      enable_mip_init: false
-
-  cep_pruning_qpbo_cep_init_mip_constrain: &cep_pruning_qpbo_cep_init_mip_constrain
-    name: CEP_PRUNING_QPBO_CEP_INIT_MIP_CONSTRAIN
-    exe: ./build/exact
-    params: &cep_pruning_qpbo_cep_init_mip_constrain_params
-      <<: *cep_pruning_qpbo_cep_init_mip_params
       enable_mip_constrains_vertex_lb: true
       enable_mip_constrains_vertex_ub: true
 
+  cep_pruning_qpbo_cep_mip_constrain_cep: &cep_pruning_qpbo_cep_mip_constrain_cep
+    toggle: true
+    name: CEP_PRUNING_QPBO_CEP_MIP_CONSTRAIN_CEP
+    exe: ./build/exact
+    params: &cep_pruning_qpbo_cep_mip_constrain_cep_params
+      <<: *cep_pruning_qpbo_cep_mip_constrain_params
+      enable_cep_final: true
+
   cep_pruning_qpbo_cep_init_mip_constrain_cep: &cep_pruning_qpbo_cep_init_mip_constrain_cep
+    toggle: true
     name: CEP_PRUNING_QPBO_CEP_INIT_MIP_CONSTRAIN_CEP
     exe: ./build/exact
     params: &cep_pruning_qpbo_cep_init_mip_constrain_cep_params
-      <<: *cep_pruning_qpbo_cep_init_mip_constrain_params
-      enable_cep_final: true
+      <<: *cep_pruning_qpbo_cep_mip_constrain_cep_params
+      # enable_mip_constrains_vertex_lb: false
+      # enable_mip_constrains_vertex_ub: false
+      # enable_cep_final: false
+      enable_cep_lambda: true
+      enable_qpboi: false
+      enable_mip_init: true
 
 # =============================================================================
 # Experiment Configurations
@@ -132,27 +145,7 @@ real-world:
   output: ./output/real-world/
   
   # Use competitor templates with toggle flags
-  competitors: &real_world_competitors
-    - <<: *neg_dsd
-      toggle: false
-    - <<: *dcs_greedy
-      toggle: false
-    - <<: *cep
-      toggle: false
-    - <<: *cep_mip
-      toggle: false
-    - <<: *cep_qpbo_mip
-      toggle: false
-    - <<: *cep_pruning_qpbo_mip
-      toggle: false
-    - <<: *cep_pruning_qpbo_cep_mip
-      toggle: true
-    - <<: *cep_pruning_qpbo_cep_init_mip
-      toggle: true
-    - <<: *cep_pruning_qpbo_cep_init_mip_constrain
-      toggle: true
-    - <<: *cep_pruning_qpbo_cep_init_mip_constrain_cep
-      toggle: true
+  competitors: *competitor_templates
 
 synthetic:
   # Input datasets (folders containing multiple files)
@@ -170,7 +163,7 @@ synthetic:
   
   weight_reverse: false
   output: ./output/synthetic/
-  competitors: *real_world_competitors
+  competitors: *competitor_templates
 
 test:
   # Quick test configuration with minimal settings
@@ -179,4 +172,4 @@ test:
   
   weight_reverse: false
   output: ./output/test/
-  competitors: *real_world_competitors
+  competitors: *competitor_templates
