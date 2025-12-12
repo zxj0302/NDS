@@ -24,9 +24,7 @@ This project implements several algorithms:
 - **NEG_DSD**: Negative Densest Subgraph Discovery baseline
 - **DCSGreedy**: Greedy approximation algorithm
 - **CEP**: Core Expansion with Peeling (heuristic method)
-- **CEP_MIP**: CEP enhanced with Mixed Integer Programming
-- **CEP_QPBO**: CEP with QPBO-based optimization
-- **CEP_QPBO_OPT**: Optimized version combining CEP, QPBO, and MIP
+- **EXACT**: Unified exact solver with modular components (CEP, QPBO, MIP) configurable via flags for ablation studies
 
 ---
 
@@ -49,22 +47,19 @@ A heuristic approach that:
 - Uses peeling to remove low-contribution vertices
 - Employs local search for optimization
 
-### 4. CEP_MIP
+### 4. EXACT
 
-Enhances CEP with Mixed Integer Programming for exact solutions within the search space.
+A unified exact solver with modular components that can be selectively enabled:
 
-### 5. CEP_QPBO
+- **CEP initialization**: Uses CEP to find initial lower/upper bounds
+- **Binary search**: Dinkelbach-style iterative refinement vs direct MIP
+- **QPBO**: Quadratic Pseudo-Boolean Optimization for partial solutions
+- **Graph pruning**: Reduces problem size before QPBO/MIP
+- **CEP middle/final**: Additional CEP refinement steps
+- **MIP**: Mixed Integer Programming for exact optimization
+- **Vertex constraints**: Lower/upper bounds on solution size
 
-Combines CEP with QPBO (Quadratic Pseudo-Boolean Optimization) for improved optimization.
-
-### 6. CEP_QPBO_OPT (Recommended)
-
-The most sophisticated algorithm combining:
-
-- CEP for initialization
-- QPBO for graph pruning and partial solutions
-- MIP for exact optimization on reduced problem instances
-- Iterative refinement with Dinkelbach's method
+The modular design enables comprehensive ablation studies by toggling individual components via configuration flags.
 
 ---
 
@@ -78,9 +73,9 @@ The most sophisticated algorithm combining:
 - **CMake** 3.26 or higher
 - **Boost** libraries (tested with 1.88.0)
 
-**Optional (for MIP-based algorithms):**
+**Optional (for exact algorithms):**
 
-- **Gurobi Optimizer** 11.0+ (required for CEP_MIP, CEP_QPBO, CEP_QPBO_OPT)
+- **Gurobi Optimizer** 11.0+ (required for EXACT with MIP components enabled)
   - Set `GUROBI_HOME` environment variable or install to default location
   - Requires valid license
 
@@ -138,7 +133,7 @@ cd src
 ./build.sh --help
 
 # Build specific algorithm only
-./build.sh -a cep_qpbo_opt
+./build.sh -a exact
 
 # Build in Debug mode
 ./build.sh -t Debug
@@ -146,8 +141,14 @@ cd src
 # Clean and rebuild
 ./build.sh -c
 
-# Build without Gurobi (only non-MIP algorithms)
+# Build without Gurobi (excludes exact executable)
 ./build.sh --no-gurobi
+
+# Enable logging
+./build.sh --log
+
+# Disable compiler warnings
+./build.sh --no-warnings
 
 # Use specific number of parallel jobs
 ./build.sh -j 8
@@ -167,9 +168,7 @@ make -j$(nproc)
 - `build/neg_dsd`
 - `build/dcs_greedy`
 - `build/cep`
-- `build/cep_mip`
-- `build/cep_qpbo`
-- `build/cep_qpbo_opt`
+- `build/exact`
 
 ---
 
@@ -203,15 +202,13 @@ cat > config.json << EOF
   "step_size": 1.02,
   "direct_mip_bound": 100,
   "dinkelbach_iterations": 30,
-  "epsilon": -1e-05,
-  "mip_time_limit": 600,
-  "skip_mip_init": true,
-  "heuristic_after_mip": true
+  "epsilon": 0.9999,
+  "mip_time_limit": 600.0
 }
 EOF
 
 # Run the algorithm
-./build/cep_qpbo_opt config.json
+./build/exact config.json
 ```
 
 ### Batch Experiments
@@ -262,25 +259,29 @@ Algorithms output JSON files with the following structure:
 
 ### Batch Configuration (config.yaml)
 
-The `config.yaml` file organizes batch experiments into three sections:
+The `config.yaml` file uses a DRY (Don't Repeat Yourself) design with YAML anchors and references for competitor templates.
 
-**real-world**: Configuration for real-world datasets
+**Structure:**
 
-- `input`: List of graph files with toggle flags
-- `weight_reverse`: Whether to reverse edge weights (true for signed networks)
-- `output`: Output directory
-- `competitors`: List of algorithms with their parameters
+1. **competitor_templates**: Defines all algorithms and their default parameters once
+   - Each algorithm has a `toggle` flag to enable/disable
+   - Parameters can use YAML inheritance (`<<: *anchor`) to avoid duplication
+   - Modular EXACT configurations for ablation studies
 
-**synthetic**: Configuration for synthetic graphs
+2. **real-world**: Configuration for real-world datasets
+   - `input`: List of graph files with individual toggle flags
+   - `weight_reverse`: Whether to reverse edge weights
+   - `output`: Output directory
+   - `competitors`: References competitor_templates
 
-- `input_folder`: List of directories containing synthetic graphs
-- Similar structure to real-world section
+3. **synthetic**: Configuration for synthetic graphs
+   - `input_folder`: List of directories with toggle flags
+   - Similar structure to real-world section
 
-**test**: Quick testing configuration
+4. **test**: Quick testing configuration
+   - Simplified setup for individual test cases
 
-- Simplified setup for testing individual graphs
-
-The batch experiment runner (in `main.ipynb`) reads `config.yaml`, generates individual JSON config files for each algorithm/dataset combination, and runs them sequentially.
+The batch experiment runner (in `main.ipynb`) reads `config.yaml`, generates individual JSON config files for each enabled algorithm/dataset combination, and runs them sequentially. Toggle any algorithm or dataset on/off without deleting configuration.
 
 ---
 
@@ -308,7 +309,13 @@ Each algorithm executable requires a JSON configuration file with the following 
 
 **NEG_DSD specific:**
 
-- No additional parameters (uses default C values)
+```json
+{
+  "C_values": [0.9, 1.0, 1.1, 1.2]
+}
+```
+
+- `C_values`: Array of C parameter values to try (returns best result)
 
 **DCSGreedy specific:**
 
@@ -332,39 +339,52 @@ Each algorithm executable requires a JSON configuration file with the following 
 - `toggle_left`: Min iterations left before switching data structures
 - `max_neg`: Max negative weight neighbors in expansion
 
-**CEP_MIP additional parameters:**
+**EXACT additional parameters:**
 
 ```json
 {
-  "use_binary": false,
-  "dinkelbach_iterations": 30,
-  "epsilon": -1e-05,
-  "mip_time_limit": 600
-}
-```
-
-- `use_binary`: Use binary search for lambda values
-- `dinkelbach_iterations`: Max Dinkelbach iterations
-- `epsilon`: Convergence threshold
-- `mip_time_limit`: Time limit per MIP solve (seconds)
-
-**CEP_QPBO/CEP_QPBO_OPT additional parameters:**
-
-```json
-{
-  "use_probe": false,
   "step_size": 1.02,
   "direct_mip_bound": 100,
-  "skip_mip_init": true,
-  "heuristic_after_mip": true
+  "dinkelbach_iterations": 50,
+  "epsilon": 0.9999,
+  "mip_time_limit": 600.0,
+  "enable_cep_init": true,
+  "enable_binary_search": true,
+  "enable_qpbo": true,
+  "enable_qpbo_probe": false,
+  "enable_graph_pruning": true,
+  "enable_pruning_set": false,
+  "enable_cep_middle": true,
+  "enable_cep_lambda": true,
+  "enable_qpboi": false,
+  "enable_mip_init": true,
+  "enable_mip_constrains_vertex_lb": true,
+  "enable_mip_constrains_vertex_ub": true,
+  "enable_cep_final": true
 }
 ```
 
-- `use_probe`: Enable QPBO probing (slower but more accurate)
+**Search parameters:**
 - `step_size`: Step size for upper bound search
-- `direct_mip_bound`: Upper bound for MIP node constraints
-- `skip_mip_init`: Skip MIP initialization phase
-- `heuristic_after_mip`: Run CEP refinement after MIP
+- `direct_mip_bound`: Threshold for direct MIP vs binary search
+- `dinkelbach_iterations`: Max iterations for Dinkelbach method
+- `epsilon`: Convergence threshold (density difference)
+- `mip_time_limit`: Time limit per MIP solve (seconds)
+
+**Component toggle flags (for ablation studies):**
+- `enable_cep_init`: Use CEP to find initial bounds
+- `enable_binary_search`: Use binary search (Dinkelbach) instead of direct MIP
+- `enable_qpbo`: Use QPBO for partial solutions
+- `enable_qpbo_probe`: Enable QPBO probing (slower but more accurate)
+- `enable_graph_pruning`: Prune graph before QPBO
+- `enable_pruning_set`: Use set-based pruning optimization
+- `enable_cep_middle`: Run CEP between QPBO and MIP
+- `enable_cep_lambda`: Initialize QPBO with CEP solution
+- `enable_qpboi`: Use QPBO improvement strategy
+- `enable_mip_init`: Use previous MIP solution as warm start
+- `enable_mip_constrains_vertex_lb`: Add lower bound constraint on vertex count
+- `enable_mip_constrains_vertex_ub`: Add upper bound constraint on vertex count
+- `enable_cep_final`: Run CEP refinement after MIP
 
 ---
 
@@ -378,19 +398,15 @@ NDS/
 │   ├── core/
 │   │   ├── graph.hpp           # Base graph class
 │   │   └── algorithms/         # Algorithm implementations
-│   │       ├── neg_dsd.hpp
-│   │       ├── dcs_greedy.hpp
-│   │       ├── cep.hpp
-│   │       ├── cep_mip.hpp
-│   │       ├── cep_qpbo.hpp
-│   │       └── cep_qpbo_opt.hpp
+│   │       ├── neg_dsd.hpp     # NEG_DSD algorithm
+│   │       ├── dcs_greedy.hpp  # DCSGreedy algorithm
+│   │       ├── cep.hpp         # CEP algorithm
+│   │       └── exact.hpp       # EXACT unified solver
 │   ├── executables/            # Main entry points
 │   │   ├── neg_dsd.cpp
 │   │   ├── dcs_greedy.cpp
 │   │   ├── cep.cpp
-│   │   ├── cep_mip.cpp
-│   │   ├── cep_qpbo.cpp
-│   │   └── cep_qpbo_opt.cpp
+│   │   └── exact.cpp
 │   ├── external/               # Third-party libraries
 │   │   └── QPBO/              # QPBO library
 │   ├── cmake/
@@ -401,10 +417,13 @@ NDS/
 │       └── graph_generator/
 ├── build/                      # Build output directory
 ├── input/                      # Input graphs
-│   ├── real-world/
-│   └── synthetic/
+│   ├── real-world/            # Real-world datasets
+│   └── synthetic/             # Generated synthetic graphs
 ├── output/                     # Algorithm outputs
-├── config.yaml                 # Experiment configuration
+├── backups/                    # Previous code versions
+├── logs/                       # Execution logs
+├── temp/                       # Temporary files
+├── config.yaml                 # Batch experiment configuration
 ├── requirements.txt            # Python dependencies
 ├── main.ipynb                  # Main experiment notebook
 ├── figures.ipynb               # Visualization notebook
@@ -419,7 +438,6 @@ NDS/
 
 1. try to use traditional methods (for non-genative weights only methods)
 2. When initializing the pos_weights for CEP, do more 聚合邻居的值！
-3. 使用之前的来初始化ceplambda，使用ceplambda来初始化mip
 
 ## Research Contributions
 
@@ -463,6 +481,7 @@ This project explores several novel contributions to the negative densest subgra
 * [12.01 Mon] Re-organize the code, like the order of params, and resue some code.
 * [12.04 Thu] Re-organize the code, again. Changed the structure a lot, and use config structure instead of too many params.
 * [12.05 Fri] I transferred the code from Macbook air M1 with 16G RAM (used Clang) to Windows system with R7 7735H and 32G RAM. M1 has 4 big cores (3.2 GHz) and 4 small cores (2.0 GHz), while R7 7735H has 8 cores (3.2 GHz). I expected that all algorithms should be faster than on Macbook. However, I find that most of them are are about 1.5-3 times slower. It always needs to take two times runtime. It shocked me a lot. I tried to use windows + docker + gcc, and also tried msvc the situation still there. The only difference is that when the graph is hard to solve, like the setting 5 in BA, the msvc is slightly faster than m1 while docker+gcc is much slower than m1. Also tried docker+clang, similar with docker+gcc. And this slowness shows different ratio on different algorithms. For CEP_MIP, which is the most slow one, it takes about 1-1.5 runtime, while for neg_dsd, dcs_greedy and cep it is about 2 times. For CEP_QPBO and CEP_QPBO_OPT, it takes about 2-4 times runtime. This is amazing!
+* [12.11 Thu] Re-organize the code, make all CEP_* baselines into one file: exact.hpp. Also make the config file easier to maintain.
 
 ---
 
@@ -493,7 +512,7 @@ Have found that sometimes a smaller max_neg could make the final peeling phase i
 Cannot shift edge weights to positive, as if do so, subgraphs with denser unweighted-density will get more gain from this shift. However, can we derive a solution take this into consideration? I mean like finding the density of densest unweighted subgraph and this is already the bound.
 ```
 
-### For CEP_QPBO:
+### For Exact (old name: CEP_QPBO):
 
 ```
 Using Probe() instead of QPBO standard can make the runtime longer, because sometimes it uses too much time to make the unlabeled set smaller, but not smaller that enough. However, the time cost of Probe() can be larger than MIP when the unlabeled set is already small(MIP runs fast enough to solve).Finding a tight upper bound for the init.
@@ -522,8 +541,13 @@ Compared with purely peeling, CEP (with both expansion and peeling) combine bett
 Pruning the graph truly helps the QPBO process to run faster.
 ```
 
----
+```
+Add constrains might make the program slower, but 'might'. Can also help it runs faster.
+```
 
+---
+Add MIP initialization might improve the performance, or make it even worse
+---
 ## Performance Considerations
 
 ### Data Structure Trade-offs
@@ -536,10 +560,11 @@ The implementation uses different data structures based on workload:
 
 ### Optimization Tips
 
-1. **For large graphs**: Use CEP_QPBO_OPT with appropriate `max_neg` limit
+1. **For large graphs**: Use EXACT with appropriate `max_neg` limit and graph pruning enabled
 2. **For quick results**: Use CEP or DCSGreedy
-3. **For exact solutions**: Use CEP_MIP or CEP_QPBO_OPT with sufficient time limits
-4. **Memory constraints**: Reduce `max_neg` and `ub_mip_bound` parameters
+3. **For exact solutions**: Use EXACT with all components enabled and sufficient time limits
+4. **Memory constraints**: Reduce `max_neg` and `direct_mip_bound` parameters
+5. **For ablation studies**: Toggle individual EXACT components via `enable_*` flags
 
 ---
 

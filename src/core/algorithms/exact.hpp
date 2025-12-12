@@ -132,7 +132,6 @@ private:
 
 public:
     EXACT(const EXACT_Config& cfg) : CEP(cfg) {
-        InitializePositiveWeights();
         if (cfg.enable_mip_constrains_vertex_lb) {
             vertex_lower_bound = 3;
             naive_lb = NaiveLowerBound();
@@ -289,11 +288,10 @@ public:
         // 1. Run CEP to get initial solution
         auto result_lb = SubgraphResult{{}, 0.0};
         if (cfg.enable_cep_init) {
-            
             result_lb = CEP::Run(cfg);
-            CEP::Reset(true);
             LOG("FindLowerBound: CEP init lb: " << result_lb.density);
         }
+        CEP::Reset(true);
         // 2. Need to find better lower bound among single nodes and edges if set vertex lb
         if (cfg.enable_mip_constrains_vertex_lb || !cfg.enable_cep_init) {
             if (naive_lb.density > result_lb.density) {

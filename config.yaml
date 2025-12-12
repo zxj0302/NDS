@@ -104,9 +104,6 @@ competitor_templates: &competitor_templates
     exe: ./build/exact
     params: &cep_pruning_qpbo_cep_init_mip_constrain_cep_params
       <<: *cep_pruning_qpbo_cep_mip_constrain_cep_params
-      # enable_mip_constrains_vertex_lb: false
-      # enable_mip_constrains_vertex_ub: false
-      # enable_cep_final: false
       enable_cep_lambda: true
       enable_qpboi: false
       enable_mip_init: true
