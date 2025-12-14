@@ -264,21 +264,22 @@ The `config.yaml` file uses a DRY (Don't Repeat Yourself) design with YAML ancho
 **Structure:**
 
 1. **competitor_templates**: Defines all algorithms and their default parameters once
+
    - Each algorithm has a `toggle` flag to enable/disable
    - Parameters can use YAML inheritance (`<<: *anchor`) to avoid duplication
    - Modular EXACT configurations for ablation studies
-
 2. **real-world**: Configuration for real-world datasets
+
    - `input`: List of graph files with individual toggle flags
    - `weight_reverse`: Whether to reverse edge weights
    - `output`: Output directory
    - `competitors`: References competitor_templates
-
 3. **synthetic**: Configuration for synthetic graphs
+
    - `input_folder`: List of directories with toggle flags
    - Similar structure to real-world section
-
 4. **test**: Quick testing configuration
+
    - Simplified setup for individual test cases
 
 The batch experiment runner (in `main.ipynb`) reads `config.yaml`, generates individual JSON config files for each enabled algorithm/dataset combination, and runs them sequentially. Toggle any algorithm or dataset on/off without deleting configuration.
@@ -365,6 +366,7 @@ Each algorithm executable requires a JSON configuration file with the following 
 ```
 
 **Search parameters:**
+
 - `step_size`: Step size for upper bound search
 - `direct_mip_bound`: Threshold for direct MIP vs binary search
 - `dinkelbach_iterations`: Max iterations for Dinkelbach method
@@ -372,6 +374,7 @@ Each algorithm executable requires a JSON configuration file with the following 
 - `mip_time_limit`: Time limit per MIP solve (seconds)
 
 **Component toggle flags (for ablation studies):**
+
 - `enable_cep_init`: Use CEP to find initial bounds
 - `enable_binary_search`: Use binary search (Dinkelbach) instead of direct MIP
 - `enable_qpbo`: Use QPBO for partial solutions
@@ -482,6 +485,7 @@ This project explores several novel contributions to the negative densest subgra
 * [12.04 Thu] Re-organize the code, again. Changed the structure a lot, and use config structure instead of too many params.
 * [12.05 Fri] I transferred the code from Macbook air M1 with 16G RAM (used Clang) to Windows system with R7 7735H and 32G RAM. M1 has 4 big cores (3.2 GHz) and 4 small cores (2.0 GHz), while R7 7735H has 8 cores (3.2 GHz). I expected that all algorithms should be faster than on Macbook. However, I find that most of them are are about 1.5-3 times slower. It always needs to take two times runtime. It shocked me a lot. I tried to use windows + docker + gcc, and also tried msvc the situation still there. The only difference is that when the graph is hard to solve, like the setting 5 in BA, the msvc is slightly faster than m1 while docker+gcc is much slower than m1. Also tried docker+clang, similar with docker+gcc. And this slowness shows different ratio on different algorithms. For CEP_MIP, which is the most slow one, it takes about 1-1.5 runtime, while for neg_dsd, dcs_greedy and cep it is about 2 times. For CEP_QPBO and CEP_QPBO_OPT, it takes about 2-4 times runtime. This is amazing!
 * [12.11 Thu] Re-organize the code, make all CEP_* baselines into one file: exact.hpp. Also make the config file easier to maintain.
+* [12.14 Sun] Find that unique_ptr<QPBO `<REAL>`> qpbo(newQPBO `<REAL>`(valid_count, 2*num_edges(G))); can lead to failure on some datasets, but don't know why. Maybe it is because of the implementation of QPBO. But if change it to num_edges(G) or valid_edge_count, then it works well. Thus use and maintain valid_edge_count now.
 
 ---
 
@@ -546,8 +550,10 @@ Add constrains might make the program slower, but 'might'. Can also help it runs
 ```
 
 ---
+
 Add MIP initialization might improve the performance, or make it even worse
----
+---------------------------------------------------------------------------
+
 ## Performance Considerations
 
 ### Data Structure Trade-offs
