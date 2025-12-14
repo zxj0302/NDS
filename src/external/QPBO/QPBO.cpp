@@ -60,8 +60,8 @@ template <typename REAL>
 	if (node_num_max < 16) node_num_max = 16;
 	if (edge_num_max < 16) edge_num_max = 16;
 
-	nodes[0] = (Node*) malloc(2*node_num_max*sizeof(Node));
-	arcs[0] = (Arc*) malloc(4*edge_num_max*sizeof(Arc));
+	nodes[0] = (Node*) malloc(2*(size_t)node_num_max*sizeof(Node));
+	arcs[0] = (Arc*) malloc(4*(size_t)edge_num_max*sizeof(Arc));
 	if (!nodes[0] || !arcs[0]) { if (error_function) (*error_function)("Not enough memory!"); exit(1); }
 
 	node_last[0] = nodes[0];

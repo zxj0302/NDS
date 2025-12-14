@@ -471,8 +471,8 @@ private:
 	void InitFreeList();
 
 	int		node_num;
-	int		node_shift; // = node_num_max*sizeof(Node)
-	int		arc_shift; // = 2*edge_num_max*sizeof(Arc)
+	size_t		node_shift; // = node_num_max*sizeof(Node)
+	size_t		arc_shift; // = 2*edge_num_max*sizeof(Arc)
 
 	DBlock<nodeptr>		*nodeptr_block;
 
