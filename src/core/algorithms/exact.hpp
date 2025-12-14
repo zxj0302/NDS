@@ -144,7 +144,7 @@ public:
     QPBOResult RunQPBO(const EXACT_Config& cfg, double lambda, bool improve, vector<Vertex> init_label = {}) {
         LOG("RunQPBO: lambda = " << lambda << ", improve = " << improve << ", init_label size = " << init_label.size());
         size_t n = num_vertices(G);
-        unique_ptr<QPBO<REAL>> qpbo(new QPBO<REAL>(valid_count, 2 * num_edges(G)));
+        unique_ptr<QPBO<REAL>> qpbo(new QPBO<REAL>(valid_count, valid_edge_count));
         qpbo->AddNode(valid_count);
         vector<size_t> node_to_id(num_vertices(G), -1);
         vector<size_t> id_to_node;
@@ -824,8 +824,8 @@ public:
         }
 
         // 7. if have small undecided nodes, or want to handle large undecided, return result from MIP
+        LOG("QPBO_CEP_MIP: RunMIP on undecided nodes " << (cfg.enable_mip_init ? "with" : "without") << " initialization, density: " << density);
         auto indicator = have_large_undecided ? (cfg.enable_mip_init ? Indicator::MIP_INDIRECT_WITH_INIT : Indicator::MIP_INDIRECT_NO_INIT) : Indicator::UNDER_MIP_DIRECT_UB;
-        LOG("QPBO_CEP_MIP: RunMIP on undecided nodes " << cfg.enable_mip_init ? "with" : "without" << " initialization, density: " << density);
         return {mip_result.first, density, mip_result.second, indicator};
     }
 

@@ -54,6 +54,7 @@ protected:
     set<MaxHeapNode> pruning_set;
     vector<set<MaxHeapNode>::iterator> pruning_handles;
     size_t valid_count = 0;
+    size_t valid_edge_count = 0;
 
 public:
     CEP(const CEP_Config& cfg) : PGraph(cfg) {
@@ -61,6 +62,7 @@ public:
         neighbor_in_count = vector<size_t>(num_vertices(G), 0);
         pos_weight = vector<double>(num_vertices(G), 0.0);
         valid_count = num_vertices(G);
+        valid_edge_count = num_edges(G);
     }
 
     unsigned ConvertMaxNeg(const CEP_Config& cfg) {
@@ -383,6 +385,9 @@ public:
             for (auto [ei, ee] = out_edges(node, G); ei != ee; ++ei) {
                 auto v = target(*ei, G);
                 if (valid[v]) {
+                    if (maintain_valid_count) {
+                        --valid_edge_count;
+                    }
                     double weight = G[*ei].weight;
                     if (weight > 0) {
                         pos_weight[v] -= weight;
@@ -403,6 +408,9 @@ public:
                 for (auto [ei, ee] = out_edges(i, G); ei != ee; ++ei) {
                     auto v = target(*ei, G);
                     if (valid[v]) {
+                        if (maintain_valid_count) {
+                            --valid_edge_count;
+                        }
                         double weight = G[*ei].weight;
                         if (weight > 0) {
                             pos_weight[v] -= weight;
@@ -436,6 +444,7 @@ public:
     void Reset(bool init_pos_weight = true) {
         fill(valid.begin(), valid.end(), true);
         valid_count = num_vertices(G);
+        valid_edge_count = num_edges(G);
         fill(status.begin(), status.end(), Status::Out);
         fill(neighbor_in_count.begin(), neighbor_in_count.end(), 0);
         fill(pos_weight.begin(), pos_weight.end(), 0.0);

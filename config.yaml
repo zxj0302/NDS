@@ -74,7 +74,7 @@ competitor_templates: &competitor_templates
       enable_pruning_set: false
 
   cep_pruning_qpbo_cep_mip: &cep_pruning_qpbo_cep_mip
-    toggle: true
+    toggle: false
     name: CEP_PRUNING_QPBO_CEP_MIP
     exe: ./build/exact
     params: &cep_pruning_qpbo_cep_mip_params
@@ -82,7 +82,7 @@ competitor_templates: &competitor_templates
       enable_cep_middle: true
 
   cep_pruning_qpbo_cep_mip_constrain: &cep_pruning_qpbo_cep_mip_constrain
-    toggle: true
+    toggle: false
     name: CEP_PRUNING_QPBO_CEP_MIP_CONSTRAIN
     exe: ./build/exact
     params: &cep_pruning_qpbo_cep_mip_constrain_params
@@ -99,7 +99,7 @@ competitor_templates: &competitor_templates
       enable_cep_final: true
 
   cep_pruning_qpbo_cep_init_mip_constrain_cep: &cep_pruning_qpbo_cep_init_mip_constrain_cep
-    toggle: true
+    toggle: false
     name: CEP_PRUNING_QPBO_CEP_INIT_MIP_CONSTRAIN_CEP
     exe: ./build/exact
     params: &cep_pruning_qpbo_cep_init_mip_constrain_cep_params
@@ -165,7 +165,7 @@ synthetic:
 test:
   # Quick test configuration with minimal settings
   input:
-    - ./input/synthetic/BA/BA_n10000_m3_setting5_inst0.txt
+    - ./input/synthetic/ER/ER_n5000000_m10000000_setting135_inst0.txt
   
   weight_reverse: false
   output: ./output/test/
