@@ -30,7 +30,7 @@ competitor_templates: &competitor_templates
       num_iter: 1
 
   cep_mip: &cep_mip
-    toggle: false
+    toggle: true
     name: CEP_MIP
     exe: ./build/exact
     params: &cep_mip_params
@@ -53,19 +53,19 @@ competitor_templates: &competitor_templates
       enable_cep_final: false
       
   cep_qpbo_mip: &cep_qpbo_mip
-    toggle: false
+    toggle: true
     name: CEP_QPBO_MIP
     exe: ./build/exact
     params: &cep_qpbo_mip_params
       <<: *cep_mip_params
-      step_size: 1.02
+      step_size: 1.1
       direct_mip_bound: 100
       enable_binary_search: true
       enable_qpbo: true
       enable_qpbo_probe: false
       
   cep_pruning_qpbo_mip: &cep_pruning_qpbo_mip
-    toggle: false
+    toggle: true
     name: CEP_PRUNING_QPBO_MIP
     exe: ./build/exact
     params: &cep_pruning_qpbo_mip_params
@@ -74,7 +74,7 @@ competitor_templates: &competitor_templates
       enable_pruning_set: false
 
   cep_pruning_qpbo_cep_mip: &cep_pruning_qpbo_cep_mip
-    toggle: false
+    toggle: true
     name: CEP_PRUNING_QPBO_CEP_MIP
     exe: ./build/exact
     params: &cep_pruning_qpbo_cep_mip_params
@@ -82,7 +82,7 @@ competitor_templates: &competitor_templates
       enable_cep_middle: true
 
   cep_pruning_qpbo_cep_mip_constrain: &cep_pruning_qpbo_cep_mip_constrain
-    toggle: false
+    toggle: true
     name: CEP_PRUNING_QPBO_CEP_MIP_CONSTRAIN
     exe: ./build/exact
     params: &cep_pruning_qpbo_cep_mip_constrain_params
@@ -99,7 +99,7 @@ competitor_templates: &competitor_templates
       enable_cep_final: true
 
   cep_pruning_qpbo_cep_init_mip_constrain_cep: &cep_pruning_qpbo_cep_init_mip_constrain_cep
-    toggle: false
+    toggle: true
     name: CEP_PRUNING_QPBO_CEP_INIT_MIP_CONSTRAIN_CEP
     exe: ./build/exact
     params: &cep_pruning_qpbo_cep_init_mip_constrain_cep_params
@@ -152,9 +152,9 @@ synthetic:
     - path: ./input/synthetic/ER/
       toggle: true
     - path: ./input/synthetic/RGG/
-      toggle: false
+      toggle: true
     - path: ./input/synthetic/SBM/
-      toggle: false
+      toggle: true
     - path: ./input/synthetic/WS/
       toggle: true
   

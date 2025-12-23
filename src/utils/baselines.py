@@ -21,7 +21,7 @@ def write_config_json(params, config_dir="./temp"):
     return config_path
 
 
-def get_dataset_paths(config):
+def get_dataset_paths(config, skip_set):
     """Extract all dataset paths from config based on input type."""
     # Handle single file inputs
     if 'input' in config:
@@ -38,6 +38,9 @@ def get_dataset_paths(config):
                 continue
             folder_path = folder_config['path']
             for filename in natsort.natsorted(os.listdir(folder_path)):
+                if filename in skip_set:
+                    logger.debug(f"Skip filter: {filename}")
+                    continue
                 if filename.endswith('.txt'):
                     yield os.path.join(folder_path, filename)
 
@@ -73,11 +76,12 @@ def run_competitor(dataset_path, competitor, output_path, reverse):
             os.remove(config_path)
 
 
-def run(config, skip_existing=True):
+def run(config, skip_list=[], skip_existing=True):
     """Run all enabled competitors on all enabled datasets.
     
     Args:
         config: Configuration dict with 'input'/'input_folder', 'competitors', 'output', etc.
+        skip_list: Skip some graphs.
         skip_existing: Skip if output file already exists
     """
     output_base = config['output']
@@ -85,7 +89,7 @@ def run(config, skip_existing=True):
     competitors = [c for c in config['competitors'].values() if c.get('toggle', True)]
     
     # Process each dataset
-    for dataset_path in get_dataset_paths(config):
+    for dataset_path in get_dataset_paths(config, set(skip_list)):
         if dataset_path is None:
             continue
         logger.info(f'Processing dataset: {dataset_path}')
