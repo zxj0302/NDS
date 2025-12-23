@@ -309,7 +309,9 @@ public:
                 case Indicator::UNDER_MIP_DIRECT_UB:
                     // (1). Optimal found
                     if (result.nodes.empty() && result.exact) {
-                        LOG("FindLowerBound: Optimal found.");
+                        string msg = "FindLowerBound: Optimal found.";
+                        LOG(msg);
+                        info += msg + " | ";
                         return {result_lb, true};
                     }
 
@@ -830,7 +832,13 @@ public:
     }
 
     bool Terminate(const EXACT_Config& cfg, double lower_bound, double upper_bound) {
-        return (cfg.epsilon > 0 ? (lower_bound / upper_bound) : (lower_bound - upper_bound)) >= cfg.epsilon;
+        auto stop = (cfg.epsilon > 0 ? (lower_bound / upper_bound) : (lower_bound - upper_bound)) >= cfg.epsilon;
+        if (stop) {
+            string msg = "Terminate: Termination condition met. Lower bound: " + to_string(lower_bound) + ", Upper bound: " + to_string(upper_bound) + ", Epsilon: " + to_string(cfg.epsilon);
+            LOG(msg);
+            info += msg + " | "; 
+        }
+        return stop;
     }
 
     SubgraphResult DinkelbachBinary(const EXACT_Config& cfg, SubgraphResult& result_lb, double upper_bound) {
