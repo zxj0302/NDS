@@ -38,10 +38,11 @@ def get_dataset_paths(config, skip_set):
                 continue
             folder_path = folder_config['path']
             for filename in natsort.natsorted(os.listdir(folder_path)):
-                if filename in skip_set:
-                    logger.debug(f"Skip filter: {filename}")
-                    continue
                 if filename.endswith('.txt'):
+                    name_without_ext = os.path.splitext(filename)[0]
+                    if name_without_ext in skip_set:
+                        logger.debug(f"Skip filter: {name_without_ext}")
+                        continue
                     yield os.path.join(folder_path, filename)
 
 
