@@ -1,5 +1,7 @@
 from .utils.baselines import *
-from .utils.painter import *
+from .utils.analyze_results.list_failed import *
+from .utils.analyze_results.collect_results import *
+from .utils.analyze_results.analyze_results import *
 from loguru import logger
 import yaml
 import sys
