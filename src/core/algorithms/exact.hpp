@@ -927,6 +927,7 @@ public:
     }
 
     void Reset(const EXACT_Config& cfg) {
+        info = "| Start | ";
         if (cfg.enable_mip_constrains_vertex_ub) {
             vertex_upper_bound = num_vertices(G);
         }
