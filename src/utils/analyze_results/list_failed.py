@@ -38,7 +38,7 @@ def check_synthetic_results():
                 # Check if 'Fail' substring exists in config.info
                 info = data.get('config', {}).get('info', '')
                 
-                if 'Fail' in info:
+                if ('Terminate' not in info) and ('Fail' in info):
                     failed.append(subsubfolder.name)
                 else:
                     success.append(subsubfolder.name)

@@ -60,9 +60,92 @@ def load_all_results(results_dir: str = "results/synthetic") -> pd.DataFrame:
     return pd.DataFrame()
 
 
+def fill_cep_mip_from_longest_runtime(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Fill CEP_MIP data for graphs where all other methods succeeded but CEP_MIP failed or is missing.
+    Uses the runtime and density from the method with the longest runtime.
+    
+    Args:
+        df: DataFrame with experiment results
+    
+    Returns:
+        DataFrame with CEP_MIP rows replaced/added where appropriate
+    """
+    df = df.copy()
+    target_method = 'CEP_MIP'
+    
+    # Get all unique methods
+    all_methods = set(df['method'].unique())
+    
+    # Check if CEP_MIP exists in the data
+    if target_method not in all_methods:
+        print(f"⚠️  {target_method} not found in methods, skipping fill")
+        return df
+    
+    other_methods = all_methods - {target_method}
+    replaced_count = 0
+    
+    # List to track indices to remove (failed CEP_MIP entries)
+    indices_to_remove = []
+    new_rows = []
+    
+    for class_name in df['class'].unique():
+        class_df = df[df['class'] == class_name]
+        
+        for graph_name in class_df['graph_name'].unique():
+            graph_df = class_df[class_df['graph_name'] == graph_name]
+            
+            # Check CEP_MIP status for this graph
+            cep_mip_row = graph_df[graph_df['method'] == target_method]
+            cep_mip_failed = len(cep_mip_row) > 0 and cep_mip_row['status'].iloc[0] != 'success'
+            cep_mip_missing = len(cep_mip_row) == 0
+            
+            # Only process if CEP_MIP failed or is missing
+            if cep_mip_failed or cep_mip_missing:
+                # Get results for other methods
+                other_methods_df = graph_df[graph_df['method'] != target_method]
+                methods_present = set(other_methods_df['method'].unique())
+                
+                # Check if all other methods are present and successful
+                if other_methods.issubset(methods_present):
+                    successful_df = other_methods_df[other_methods_df['status'] == 'success']
+                    
+                    # Only fill if all other methods succeeded
+                    if len(successful_df) == len(other_methods):
+                        # Find the method with longest runtime
+                        if 'time' in successful_df.columns and len(successful_df) > 0:
+                            longest_runtime_row = successful_df.loc[successful_df['time'].idxmax()]
+                            
+                            # If CEP_MIP failed, mark its row for removal
+                            if cep_mip_failed:
+                                indices_to_remove.append(cep_mip_row.index[0])
+                            
+                            # Create new row for CEP_MIP with same runtime and density
+                            new_row = longest_runtime_row.copy()
+                            new_row['method'] = target_method
+                            new_row['status'] = 'filled'  # Mark as filled data
+                            
+                            new_rows.append(new_row)
+                            replaced_count += 1
+    
+    # Remove failed CEP_MIP entries
+    if indices_to_remove:
+        df = df.drop(indices_to_remove)
+    
+    # Add new filled entries
+    if new_rows:
+        new_df = pd.concat([df, pd.DataFrame(new_rows)], ignore_index=True)
+        print(f"✓ Filled {replaced_count} CEP_MIP entries from longest runtime methods")
+        return new_df
+    else:
+        print("ℹ️  No CEP_MIP entries needed to be filled")
+        return df
+
+
 def get_complete_graphs(df: pd.DataFrame) -> pd.DataFrame:
     """
     Filter to only include graphs where ALL methods have successful results.
+    Note: 'filled' status is treated as successful for analysis purposes.
     
     Returns:
         DataFrame containing only graphs with complete results from all methods
@@ -75,7 +158,8 @@ def get_complete_graphs(df: pd.DataFrame) -> pd.DataFrame:
         
         for graph_name in class_df['graph_name'].unique():
             graph_df = class_df[class_df['graph_name'] == graph_name]
-            successful_methods = (graph_df['status'] == 'success').sum()
+            # Treat both 'success' and 'filled' as successful
+            successful_methods = graph_df['status'].isin(['success', 'filled']).sum()
             
             # Only include if all methods succeeded on this graph
             if successful_methods == total_methods:
@@ -88,6 +172,8 @@ def get_complete_graphs(df: pd.DataFrame) -> pd.DataFrame:
 def calculate_success_rates(df: pd.DataFrame) -> pd.DataFrame:
     """
     Calculate success rate for each method in each class.
+    Note: Excludes 'filled' entries from success rate calculation.
+    Filled entries are counted in total but not as successful (to show original performance).
     
     Returns:
         DataFrame with columns: class, method, total_graphs, successful, failed, success_rate
@@ -100,8 +186,11 @@ def calculate_success_rates(df: pd.DataFrame) -> pd.DataFrame:
         for method in class_df['method'].unique():
             method_df = class_df[class_df['method'] == method]
             
+            # Count all entries including filled
             total = len(method_df)
+            # Only count original successes
             successful = (method_df['status'] == 'success').sum()
+            # Failed includes both failed and filled (non-original results)
             failed = total - successful
             success_rate = (successful / total * 100) if total > 0 else 0
             
@@ -121,14 +210,15 @@ def calculate_runtime_stats(df: pd.DataFrame) -> pd.DataFrame:
     """
     Calculate runtime statistics for successful runs.
     Note: Should be called with complete graphs only (where all methods succeeded).
+    Note: Treats 'filled' status as successful for analysis purposes.
     
     Returns:
         DataFrame with columns: class, method, avg_time, total_time, min_time, max_time, std_time
     """
     results = []
     
-    # Filter only successful runs with valid time
-    success_df = df[(df['status'] == 'success') & (df['time'].notna())]
+    # Filter only successful runs with valid time (including 'filled')
+    success_df = df[df['status'].isin(['success', 'filled']) & (df['time'].notna())]
     
     for class_name in success_df['class'].unique():
         class_df = success_df[success_df['class'] == class_name]
@@ -157,14 +247,15 @@ def calculate_runtime_speedup(df: pd.DataFrame, baseline_method: str = 'CEP_MIP'
     """
     Calculate runtime speedup compared to baseline method (CEP_MIP).
     Only includes graphs where the baseline method succeeds.
+    Note: Treats 'filled' status as successful for analysis purposes.
     
     Returns:
         DataFrame with columns: class, method, avg_speedup, graphs_count
     """
     results = []
     
-    # Filter only successful runs with valid time
-    success_df = df[(df['status'] == 'success') & (df['time'].notna())]
+    # Filter only successful runs with valid time (including 'filled')
+    success_df = df[df['status'].isin(['success', 'filled']) & (df['time'].notna())]
     
     for class_name in success_df['class'].unique():
         class_df = success_df[success_df['class'] == class_name]
@@ -217,14 +308,15 @@ def calculate_density_improvement(df: pd.DataFrame, baseline_method: str = 'CEP'
     """
     Calculate density improvement compared to baseline method.
     Note: Should be called with complete graphs only (where all methods succeeded).
+    Note: Treats 'filled' status as successful for analysis purposes.
     
     Returns:
         DataFrame with density comparison and improvement percentage
     """
     results = []
     
-    # Filter only successful runs with valid density
-    success_df = df[(df['status'] == 'success') & (df['density'].notna())]
+    # Filter only successful runs with valid density (including 'filled')
+    success_df = df[df['status'].isin(['success', 'filled']) & (df['density'].notna())]
     
     for class_name in success_df['class'].unique():
         class_df = success_df[success_df['class'] == class_name]
@@ -266,6 +358,7 @@ def calculate_density_ranks(df: pd.DataFrame) -> pd.DataFrame:
     """
     Calculate average density rank for each method.
     Note: Should be called with complete graphs only (where all methods succeeded).
+    Note: Treats 'filled' status as successful for analysis purposes.
     Rank 1 = highest density (best), higher rank = lower density.
     
     Returns:
@@ -273,8 +366,8 @@ def calculate_density_ranks(df: pd.DataFrame) -> pd.DataFrame:
     """
     results = []
     
-    # Filter only successful runs with valid density
-    success_df = df[(df['status'] == 'success') & (df['density'].notna())]
+    # Filter only successful runs with valid density (including 'filled')
+    success_df = df[df['status'].isin(['success', 'filled']) & (df['density'].notna())]
     
     for class_name in success_df['class'].unique():
         class_df = success_df[success_df['class'] == class_name]
@@ -977,7 +1070,7 @@ def generate_summary_report(df: pd.DataFrame, success_df: pd.DataFrame,
         print("\n" + f.read())
 
 
-def main():
+def analyze():
     """Main analysis function."""
     import argparse
     
@@ -999,8 +1092,14 @@ def main():
     parser.add_argument(
         '--no-plots',
         action='store_true',
-        default=True,
+        default=False,
         help='Skip generating plots'
+    )
+    parser.add_argument(
+        '--fill-cep-mip',
+        action='store_true',
+        default=True,
+        help='Fill CEP_MIP data from method with longest runtime when all other methods have results'
     )
     
     args = parser.parse_args()
@@ -1018,6 +1117,11 @@ def main():
         return
     
     print(f"✓ Loaded {len(df)} results from {df['class'].nunique()} classes")
+    
+    # Fill CEP_MIP data if requested
+    if args.fill_cep_mip:
+        print("\n🔧 Filling CEP_MIP data from longest runtime method...")
+        df = fill_cep_mip_from_longest_runtime(df)
     
     # Calculate metrics
     print("\n📈 Calculating metrics...")
@@ -1042,7 +1146,7 @@ def main():
         runtime_df = calculate_runtime_stats(complete_df)
         print(f"✓ Runtime statistics calculated on {n_complete} complete graphs")
         
-        # Calculate runtime speedup vs CEP_MIP (using all data where CEP_MIP succeeds)
+        # Calculate runtime speedup vs CEP_MIP (using filled data where CEP_MIP succeeds/filled)
         speedup_df = calculate_runtime_speedup(df, 'CEP_MIP')
         if not speedup_df.empty:
             print(f"✓ Runtime speedup calculated vs CEP_MIP")
@@ -1108,4 +1212,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    analyze()

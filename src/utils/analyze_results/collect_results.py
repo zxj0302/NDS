@@ -35,7 +35,7 @@ def is_result_successful(data: Optional[Dict]) -> bool:
     
     try:
         info = data.get('config', {}).get('info', '')
-        if 'Fail' in info:
+        if ('Terminate' not in info) and ('Fail' in info):
             return False
         return True
     except Exception:
