@@ -10,6 +10,7 @@ option(BUILD_NEG_DSD "Build neg_dsd executable" ON)
 option(BUILD_DCS_GREEDY "Build dcs_greedy executable" ON)
 option(BUILD_CEP "Build cep executable" ON)
 option(BUILD_EXACT "Build exact executable (requires Gurobi)" ON)
+option(BUILD_MIQCP "Build miqcp executable (requires Gurobi)" ON)
 
 option(USE_GUROBI "Enable Gurobi support for MIP-based algorithms" ON)
 option(VERBOSE_BUILD "Show detailed build information" OFF)
@@ -143,6 +144,7 @@ add_nds_algorithm(neg_dsd FALSE FALSE)
 add_nds_algorithm(dcs_greedy FALSE FALSE)
 add_nds_algorithm(cep FALSE FALSE)
 add_nds_algorithm(exact TRUE TRUE)
+add_nds_algorithm(miqcp TRUE FALSE)
 
 # ============================================================================
 # Summary
@@ -178,4 +180,7 @@ if(TARGET cep)
 endif()
 if(TARGET exact)
     install(TARGETS exact RUNTIME DESTINATION bin)
+endif()
+if(TARGET miqcp)
+    install(TARGETS miqcp RUNTIME DESTINATION bin)
 endif()

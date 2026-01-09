@@ -443,6 +443,7 @@ NDS/
 2. When initializing the pos_weights for CEP, do more 聚合邻居的值！
 3. Should think ways to avoid RunMIP on the same set for many times. And try to use the information from MIP like vertex number upper bound to run heuristic algorithms.
 4. In FindUpperBound, should return/exit as long as the termination rule is met.
+5. If epsilon is not too strict, should use lambda = epsilon * lb to iteratively find lower bound.
 
 ## Research Contributions
 
@@ -491,6 +492,7 @@ This project explores several novel contributions to the negative densest subgra
 * [12.14 Sun] Have found the bug for the above problem. In QPBO.h, the arc_shift is set as int type, which has INT_MAX=2,147,483,647 = 2^31-1. However, when the edge_num_max passed to QPBO `<REAL>`::QPBO(intnode_num_max, intedge_num_max, void (*err_function)(constchar*)) is very large, the line 74 in QPBO.cpp computes: arc_shift=2*edge_num_max*sizeof(Arc);, and in line memset(arcs[0], 0, 2*arc_shift);, the 2*arc_shift might overflow before convert into the default param type size_t in memset. Thus it will be super large, about 18 EB on 64 bit system (data from claude-sonnet-4.5). The program will definitely abort. Thus I have changed the node_shift and arc_shift from int to size_t in QPBO.h line 474-475.
 * [1.3 Sat] Have found that the cep_in_middle could hurt the performance, it might return mediocre improvements that skip potentially successful MIP calls, the algorithm takes a suboptimal search path through the lambda space, more iterations and harder MIP problems are encountered overall. Can draw a figure showing this.
 * [1.3 Sat] From the output can find that it might run MIP on the same undecided set for many times, which is a waste of time. Should think ways to avoid this. Also, found that adding constrains could also be a burden for MIP sometimes. In constraint programming—sometimes less is more!
+* [1.8 Thu] Implemented the MIQCP for NDS. However, for a Claude-generated random graph with 50 nodes and 98 edges (weights between -1 and 1), it cannot even solve it within time limit (600s) while CEP+MIP solves with 0.027s. For a Claude-generated random graph with 20 nodes and 51 edges, it takes 53 seconds, while CEP+MIP takes only 0.006s. Thus MIQCP is not a strong baseline.
 
 ---
 
