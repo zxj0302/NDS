@@ -1,6 +1,7 @@
 import json
 import yaml
 from pathlib import Path
+from natsort import natsorted
 
 def check_synthetic_results():
     """
@@ -14,16 +15,20 @@ def check_synthetic_results():
     
     # Iterate through all subfolders (BA, ER, RGG, SBM, WS)
     for subfolder in synthetic_dir.iterdir():
+        # only process ER folder
+        if subfolder.name != "ER":
+            continue
+
         if not subfolder.is_dir():
             continue
             
         # Iterate through all subsubfolders
-        for subsubfolder in subfolder.iterdir():
+        for subsubfolder in natsorted(subfolder.iterdir()):
             if not subsubfolder.is_dir():
                 continue
                 
             # Construct path to the JSON file
-            json_file = subsubfolder / 'CEP_PRUNING_QPBO_CEP_MIP_CONSTRAIN_CEP.json'
+            json_file = subsubfolder / 'CEP_PRUNING_QPBO_CEP_MIP_CONSTRAIN_CEP_NB.json'
             
             # Check if file exists
             if not json_file.exists():
