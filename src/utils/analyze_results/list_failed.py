@@ -33,6 +33,7 @@ def check_synthetic_results():
             # Check if file exists
             if not json_file.exists():
                 print(f"Warning: {json_file} not found")
+                failed.append(subsubfolder.name)
                 continue
             
             # Read and check the JSON file

@@ -29,6 +29,17 @@ competitor_templates: &competitor_templates
       do_peeling: false
       num_iter: 1
 
+  miqcp: &miqcp
+    toggle: false
+    name: MIQCP
+    exe: ./build/miqcp
+    params:
+      time_limit: 600.0
+      mip_gap: 0.0001
+      threads: 0
+      verbose: false
+      num_iter: 1
+
   cep_mip: &cep_mip
     toggle: false
     name: CEP_MIP
@@ -126,6 +137,88 @@ competitor_templates: &competitor_templates
       enable_mip_init: true
 
 # =============================================================================
+# Extended Competitor Templates with Epsilon Variations
+# =============================================================================
+competitor_templates_epsilon: &competitor_templates_epsilon
+  <<: *competitor_templates
+  
+  cep_pruning_qpbo_mip_constrain_eps_90:
+    toggle: false
+    name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_90
+    exe: ./build/exact
+    params:
+      <<: *cep_pruning_qpbo_mip_constrain_params
+      epsilon: 0.9
+  
+  cep_pruning_qpbo_mip_constrain_eps_95:
+    toggle: false
+    name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_95
+    exe: ./build/exact
+    params:
+      <<: *cep_pruning_qpbo_mip_constrain_params
+      epsilon: 0.95
+  
+  cep_pruning_qpbo_mip_constrain_eps_99:
+    toggle: false
+    name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_99
+    exe: ./build/exact
+    params:
+      <<: *cep_pruning_qpbo_mip_constrain_params
+      epsilon: 0.99
+  
+  cep_pruning_qpbo_mip_constrain_eps_999:
+    toggle: false
+    name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_999
+    exe: ./build/exact
+    params:
+      <<: *cep_pruning_qpbo_mip_constrain_params
+      epsilon: 0.999
+
+# =============================================================================
+# Extended Competitor Templates with Non-Binary Logic
+# =============================================================================
+competitor_templates_nb: &competitor_templates_nb
+  <<: *competitor_templates
+  
+  cep_pruning_qpbo_mip_constrain_nb:
+    toggle: true
+    name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_NB
+    exe: ./build/exact
+    params:
+      <<: *cep_pruning_qpbo_mip_constrain_params
+      enable_binary_search: false
+  
+  cep_pruning_qpbo_mip_constrain_cep_nb:
+    toggle: true
+    name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_CEP_NB
+    exe: ./build/exact
+    params:
+      <<: *cep_pruning_qpbo_mip_constrain_cep_params
+      enable_binary_search: false
+  
+  cep_pruning_qpbo_cep_mip_constrain_nb:
+    toggle: true
+    name: CEP_PRUNING_QPBO_CEP_MIP_CONSTRAIN_NB
+    exe: ./build/exact
+    params:
+      <<: *cep_pruning_qpbo_cep_mip_constrain_params
+      enable_binary_search: false
+  
+  cep_pruning_qpbo_cep_mip_constrain_cep_nb:
+    toggle: false
+    name: CEP_PRUNING_QPBO_CEP_MIP_CONSTRAIN_CEP_NB
+    exe: ./build/exact
+    params:
+      <<: *cep_pruning_qpbo_cep_mip_constrain_cep_params
+      enable_binary_search: false
+
+# =============================================================================
+# Final Competitors Selection
+# =============================================================================
+competitors: &competitors
+  <<: *competitor_templates_nb
+
+# =============================================================================
 # Experiment Configurations
 # =============================================================================
 
@@ -158,32 +251,34 @@ real-world:
   weight_reverse: false
   output: ./output/real-world/
   
-  # Use competitor templates with toggle flags
-  competitors: *competitor_templates
+  # Use final competitors template
+  competitors: *competitors
 
 synthetic:
   # Input datasets (folders containing multiple files)
   input_folder:
     - path: ./input/synthetic/BA/
-      toggle: true
+      toggle: false
     - path: ./input/synthetic/ER/
       toggle: true
     - path: ./input/synthetic/RGG/
-      toggle: true
+      toggle: false
     - path: ./input/synthetic/SBM/
-      toggle: true
+      toggle: false
     - path: ./input/synthetic/WS/
-      toggle: true
+      toggle: false
   
   weight_reverse: false
   output: ./output/synthetic/
-  competitors: *competitor_templates
+  competitors: *competitors
 
 test:
   # Quick test configuration with minimal settings
   input:
-    - ./input/synthetic/BA/BA_n10000_m3_setting5_inst0.txt
+    # - ./input/synthetic/BA/BA_n50000_m3_setting25_inst0.txt
+    - ./input/synthetic/ER/ER_n100000_m500000_setting71_inst0.txt
+    # - ./input/synthetic/WS/WS_n500000_k10_p0.3_setting172_inst0.txt
   
   weight_reverse: false
   output: ./output/test/
-  competitors: *competitor_templates
+  competitors: *competitors
