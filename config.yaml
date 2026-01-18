@@ -41,7 +41,7 @@ competitor_templates: &competitor_templates
       num_iter: 1
 
   cep_mip: &cep_mip
-    toggle: false
+    toggle: true
     name: CEP_MIP
     exe: ./build/exact
     params: &cep_mip_params
@@ -50,7 +50,7 @@ competitor_templates: &competitor_templates
       epsilon: 0.9999
       mip_time_limit: 600.0
       enable_cep_init: true
-      enable_binary_search: false
+      enable_binary_search: true
       enable_qpbo: false
       enable_qpbo_probe: false
       enable_graph_pruning: false
@@ -85,7 +85,7 @@ competitor_templates: &competitor_templates
       enable_pruning_set: false
 
   cep_pruning_qpbo_mip_constrain: &cep_pruning_qpbo_mip_constrain
-    toggle: false
+    toggle: true
     name: CEP_PRUNING_QPBO_MIP_CONSTRAIN
     exe: ./build/exact
     params: &cep_pruning_qpbo_mip_constrain_params
@@ -179,6 +179,14 @@ competitor_templates_epsilon: &competitor_templates_epsilon
 # =============================================================================
 competitor_templates_nb: &competitor_templates_nb
   <<: *competitor_templates
+
+  cep_mip_nb:
+    toggle: true
+    name: CEP_MIP_NB
+    exe: ./build/exact
+    params:
+      <<: *cep_mip_params
+      enable_binary_search: false
   
   cep_pruning_qpbo_mip_constrain_nb:
     toggle: true
@@ -189,7 +197,7 @@ competitor_templates_nb: &competitor_templates_nb
       enable_binary_search: false
   
   cep_pruning_qpbo_mip_constrain_cep_nb:
-    toggle: true
+    toggle: false
     name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_CEP_NB
     exe: ./build/exact
     params:
@@ -197,7 +205,7 @@ competitor_templates_nb: &competitor_templates_nb
       enable_binary_search: false
   
   cep_pruning_qpbo_cep_mip_constrain_nb:
-    toggle: true
+    toggle: false
     name: CEP_PRUNING_QPBO_CEP_MIP_CONSTRAIN_NB
     exe: ./build/exact
     params:
@@ -226,27 +234,27 @@ real-world:
   # Input datasets (individual files)
   input:
     - path: ./input/real-world/Abortion/Abortion.txt
-      toggle: true
+      toggle: false
     - path: ./input/real-world/Biogrid/Biogrid.txt
-      toggle: true
+      toggle: false
     - path: ./input/real-world/Brexit/Brexit.txt
       toggle: true
     - path: ./input/real-world/Collins/Collins.txt
-      toggle: true
+      toggle: false
     - path: ./input/real-world/Election/Election.txt
-      toggle: true
+      toggle: false
     - path: ./input/real-world/Gavin/Gavin.txt
-      toggle: true
+      toggle: false
     - path: ./input/real-world/Gun/Gun.txt
-      toggle: true
+      toggle: false
     - path: ./input/real-world/Krogan-Core/Krogan-Core.txt
-      toggle: true
+      toggle: false
     - path: ./input/real-world/Krogan-Extended/Krogan-Extended.txt
-      toggle: true
+      toggle: false
     - path: ./input/real-world/Partisanship/Partisanship.txt
-      toggle: true
+      toggle: false
     - path: ./input/real-world/Referendum/Referendum.txt
-      toggle: true
+      toggle: false
   
   weight_reverse: false
   output: ./output/real-world/

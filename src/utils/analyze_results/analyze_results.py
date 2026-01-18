@@ -18,6 +18,50 @@ sns.set_style("whitegrid")
 plt.rcParams['figure.figsize'] = (12, 6)
 plt.rcParams['font.size'] = 10
 
+# Method name abbreviations for display
+METHOD_ABBR = {
+    'CEP_PRUNING_QPBO_MIP_CONSTRAIN': 'CQM-B',
+    'CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_95': 'CQM-B-95',
+    'CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_95_NB': 'CQM-D-95',
+    'CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_90': 'CQM-B-90',
+    'CEP_PRUNING_QPBO_CEP_MIP': 'CQM-B w/o Con w/ C1',
+    'CEP_PRUNING_QPBO_MIP_CONSTRAIN_NB': 'CQM-D',
+    'CEP_PRUNING_QPBO_CEP_INIT_MIP_CONSTRAIN_CEP': 'CQM-B w/ C1+C2+I',
+    'CEP_PRUNING_QPBO_CEP_MIP_CONSTRAIN_CEP': 'CQM-B w/ C1+C2',
+    'CEP_PRUNING_QPBO_CEP_MIP_CONSTRAIN': 'CQM-B w/ C1',
+    'CEP_MIP': 'MIQP-B',
+    'CEP_MIP_NB': 'MIQP-D',
+    'CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_99_NB': 'CQM-D-99',
+    'CEP_PRUNING_QPBO_CEP_MIP_CONSTRAIN_NB': 'CQM-D w/ C1',
+    'NEG_DSD': 'NEG-DSD',
+    'CEP_PRUNING_QPBO_MIP_CONSTRAIN_CEP': 'CQM-B w/ C2',
+    'CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_999_NB': 'CQM-D-999',
+    'CEP': 'CEP',
+    'CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_99': 'CQM-B-99',
+    'CEP_QPBO_MIP': 'CQM-B w/o P+Con',
+    'CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_999': 'CQM-B-999',
+    'CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_90_NB': 'CQM-D-90',
+    'CEP_PRUNING_QPBO_MIP': 'CQM-B w/o Con',
+    'CEP_PRUNING_QPBO_MIP_CONSTRAIN_CEP_NB': 'CQM-D w/C2',
+    'CEP_PRUNING_QPBO_CEP_MIP_CONSTRAIN_CEP_NB': 'CQM-D w/ C1+C2',
+    'DCSGreedy': 'DCSGreedy',
+    'CEP_L1': 'CEP-L1',
+    'CEP_L5': 'CEP-L5',
+    'CEP_L20': 'CEP-L20',
+    'CEP_L50': 'CEP-L50',
+    'CEP_K0': 'CEP-K0',
+    'CEP_K50': 'CEP-K50',
+    'CEP_K100': 'CEP-K100',
+    'CEP_K500': 'CEP-K500'
+}
+
+def apply_method_abbr(df: pd.DataFrame) -> pd.DataFrame:
+    """Apply method abbreviations to dataframe for display."""
+    df = df.copy()
+    if 'method' in df.columns:
+        df['method'] = df['method'].map(METHOD_ABBR).fillna(df['method'])
+    return df
+
 
 def load_results(graph_class: str, results_dir: str = "results/synthetic") -> pd.DataFrame:
     """Load results for a specific graph class."""
@@ -145,7 +189,7 @@ def fill_cep_mip_from_longest_runtime(df: pd.DataFrame) -> pd.DataFrame:
 def get_complete_graphs(df: pd.DataFrame) -> pd.DataFrame:
     """
     Filter to only include graphs where ALL methods have successful results.
-    Note: 'filled' status is treated as successful for analysis purposes.
+    Only counts actual 'success' status - excludes 'filled' data.
     
     Returns:
         DataFrame containing only graphs with complete results from all methods
@@ -158,8 +202,8 @@ def get_complete_graphs(df: pd.DataFrame) -> pd.DataFrame:
         
         for graph_name in class_df['graph_name'].unique():
             graph_df = class_df[class_df['graph_name'] == graph_name]
-            # Treat both 'success' and 'filled' as successful
-            successful_methods = graph_df['status'].isin(['success', 'filled']).sum()
+            # Only count actual success, not filled data
+            successful_methods = (graph_df['status'] == 'success').sum()
             
             # Only include if all methods succeeded on this graph
             if successful_methods == total_methods:
@@ -210,15 +254,15 @@ def calculate_runtime_stats(df: pd.DataFrame) -> pd.DataFrame:
     """
     Calculate runtime statistics for successful runs.
     Note: Should be called with complete graphs only (where all methods succeeded).
-    Note: Treats 'filled' status as successful for analysis purposes.
+    Only uses actual 'success' status - excludes 'filled' data.
     
     Returns:
         DataFrame with columns: class, method, avg_time, total_time, min_time, max_time, std_time
     """
     results = []
     
-    # Filter only successful runs with valid time (including 'filled')
-    success_df = df[df['status'].isin(['success', 'filled']) & (df['time'].notna())]
+    # Filter only successful runs with valid time (excluding 'filled')
+    success_df = df[(df['status'] == 'success') & (df['time'].notna())]
     
     for class_name in success_df['class'].unique():
         class_df = success_df[success_df['class'] == class_name]
@@ -247,15 +291,15 @@ def calculate_runtime_speedup(df: pd.DataFrame, baseline_method: str = 'CEP_MIP'
     """
     Calculate runtime speedup compared to baseline method (CEP_MIP).
     Only includes graphs where the baseline method succeeds.
-    Note: Treats 'filled' status as successful for analysis purposes.
+    Only uses actual 'success' status - excludes 'filled' data.
     
     Returns:
         DataFrame with columns: class, method, avg_speedup, graphs_count
     """
     results = []
     
-    # Filter only successful runs with valid time (including 'filled')
-    success_df = df[df['status'].isin(['success', 'filled']) & (df['time'].notna())]
+    # Filter only successful runs with valid time (excluding 'filled')
+    success_df = df[(df['status'] == 'success') & (df['time'].notna())]
     
     for class_name in success_df['class'].unique():
         class_df = success_df[success_df['class'] == class_name]
@@ -308,15 +352,15 @@ def calculate_density_improvement(df: pd.DataFrame, baseline_method: str = 'CEP'
     """
     Calculate density improvement compared to baseline method.
     Note: Should be called with complete graphs only (where all methods succeeded).
-    Note: Treats 'filled' status as successful for analysis purposes.
+    Only uses actual 'success' status - excludes 'filled' data.
     
     Returns:
         DataFrame with density comparison and improvement percentage
     """
     results = []
     
-    # Filter only successful runs with valid density (including 'filled')
-    success_df = df[df['status'].isin(['success', 'filled']) & (df['density'].notna())]
+    # Filter only successful runs with valid density (excluding 'filled')
+    success_df = df[(df['status'] == 'success') & (df['density'].notna())]
     
     for class_name in success_df['class'].unique():
         class_df = success_df[success_df['class'] == class_name]
@@ -358,7 +402,7 @@ def calculate_density_ranks(df: pd.DataFrame) -> pd.DataFrame:
     """
     Calculate average density rank for each method.
     Note: Should be called with complete graphs only (where all methods succeeded).
-    Note: Treats 'filled' status as successful for analysis purposes.
+    Only uses actual 'success' status - excludes 'filled' data.
     Rank 1 = highest density (best), higher rank = lower density.
     
     Returns:
@@ -366,8 +410,8 @@ def calculate_density_ranks(df: pd.DataFrame) -> pd.DataFrame:
     """
     results = []
     
-    # Filter only successful runs with valid density (including 'filled')
-    success_df = df[df['status'].isin(['success', 'filled']) & (df['density'].notna())]
+    # Filter only successful runs with valid density (excluding 'filled')
+    success_df = df[(df['status'] == 'success') & (df['density'].notna())]
     
     for class_name in success_df['class'].unique():
         class_df = success_df[success_df['class'] == class_name]
@@ -796,30 +840,124 @@ def plot_density_improvement(improvement_df: pd.DataFrame, baseline_method: str 
     plt.savefig(f"{save_dir}/density_improvement_bars.png", dpi=300, bbox_inches='tight')
     plt.close()
     
-    # Plot 2: Box plot of improvement distribution
-    fig, axes = plt.subplots(1, len(classes), figsize=(16, 5), sharey=True)
+    # Plot 2: Box plot of improvement distribution (separate figures for each class)
+    # Define professional color palette
+    color_positive = '#2ecc71'  # Green for positive improvement
+    color_negative = '#e74c3c'  # Red for negative improvement
+    color_avg_line = '#3498db'  # Blue for average line
+    color_baseline = '#34495e'  # Dark gray for baseline
     
-    for idx, class_name in enumerate(classes):
+    for class_name in classes:
         class_data = improvement_df[
             (improvement_df['class'] == class_name) & 
             (improvement_df['method'] != baseline_method)
-        ]
+        ].copy()
         
-        if len(class_data) > 0:
-            class_data.boxplot(column='improvement_pct', by='method', ax=axes[idx])
-            axes[idx].set_title(class_name, fontsize=12, fontweight='bold')
-            axes[idx].set_xlabel('Method', fontsize=10)
-            axes[idx].set_ylabel(f'Improvement vs {baseline_method} (%)' if idx == 0 else '', 
-                                fontsize=10)
-            axes[idx].axhline(y=0, color='red', linestyle='--', linewidth=1, alpha=0.5)
-            plt.setp(axes[idx].xaxis.get_majorticklabels(), rotation=45, ha='right')
-            axes[idx].get_figure().suptitle('')  # Remove default title
-    
-    fig.suptitle(f'Distribution of Density Improvement vs {baseline_method} by Class', 
-                 fontsize=14, fontweight='bold', y=1.02)
-    plt.tight_layout()
-    plt.savefig(f"{save_dir}/density_improvement_boxplot.png", dpi=300, bbox_inches='tight')
-    plt.close()
+        if len(class_data) == 0:
+            continue
+        
+        # Calculate average improvement per method and sort
+        method_avg = class_data.groupby('method')['improvement_pct'].mean().sort_values()
+        methods = method_avg.index.tolist()
+        
+        # Create publication-quality figure
+        fig, ax = plt.subplots(figsize=(12, 8))
+        fig.patch.set_facecolor('white')
+        
+        # Prepare data for boxplot
+        boxplot_data = []
+        avg_improvements = []
+        
+        for method in methods:
+            method_data = class_data[class_data['method'] == method]['improvement_pct']
+            boxplot_data.append(method_data.values)
+            avg_improvements.append(method_data.mean())
+        
+        # Create boxplot with enhanced styling
+        bp = ax.boxplot(boxplot_data, patch_artist=True, vert=False,
+                       widths=0.6,
+                       boxprops=dict(linewidth=1.5),
+                       whiskerprops=dict(linewidth=1.5),
+                       capprops=dict(linewidth=1.5),
+                       medianprops=dict(color='#2c3e50', linewidth=2),
+                       flierprops=dict(marker='o', markerfacecolor='gray', 
+                                     markersize=5, alpha=0.5))
+        
+        ax.set_yticklabels(methods, fontsize=11)
+        
+        # Color boxes based on whether improvement is positive
+        for i, (patch, avg) in enumerate(zip(bp['boxes'], avg_improvements)):
+            if avg > 0:
+                color = color_positive
+                alpha = 0.6
+            else:
+                color = color_negative
+                alpha = 0.6
+            patch.set_facecolor(color)
+            patch.set_alpha(alpha)
+            patch.set_edgecolor('#2c3e50')
+        
+        # Add average improvement curve with secondary axis
+        ax2 = ax.twiny()
+        y_positions = range(1, len(methods) + 1)
+        
+        # Plot the average line with enhanced styling
+        line = ax2.plot(avg_improvements, y_positions, 
+                       color=color_avg_line, linewidth=2.5, 
+                       marker='D', markersize=8, 
+                       label='Average Improvement',
+                       markerfacecolor=color_avg_line,
+                       markeredgecolor='white',
+                       markeredgewidth=1.5,
+                       alpha=0.9, zorder=10)
+        
+        ax2.set_xlabel('Average Improvement (%)', fontsize=13, fontweight='bold', 
+                      color=color_avg_line, labelpad=10)
+        ax2.tick_params(axis='x', labelcolor=color_avg_line, labelsize=11, width=1.5)
+        ax2.set_ylim(ax.get_ylim())
+        ax2.spines['top'].set_color(color_avg_line)
+        ax2.spines['top'].set_linewidth(2)
+        
+        # Style the baseline reference line
+        ax.axvline(x=0, color=color_baseline, linestyle='--', 
+                  linewidth=2, alpha=0.7, label='Baseline (0%)', zorder=1)
+        
+        # Enhanced axis labels and title
+        ax.set_xlabel('Density Improvement (%)', fontsize=13, fontweight='bold', labelpad=10)
+        ax.set_ylabel('Method', fontsize=13, fontweight='bold', labelpad=10)
+        # ax.set_title(f'{class_name} Graph Class', fontsize=16, fontweight='bold', pad=20)
+        
+        # Improve grid
+        ax.grid(axis='x', alpha=0.25, linestyle='-', linewidth=0.8, color='gray')
+        ax.set_axisbelow(True)
+        
+        # Style the spines
+        for spine in ['bottom', 'left', 'right']:
+            ax.spines[spine].set_linewidth(1.5)
+            ax.spines[spine].set_color('#2c3e50')
+        ax.spines['right'].set_visible(False)
+        
+        # Improve tick styling
+        ax.tick_params(axis='both', which='major', labelsize=11, width=1.5, length=6)
+        ax.tick_params(axis='both', which='minor', width=1, length=3)
+        
+        # Add legend with better positioning and styling
+        legend1 = ax.legend(loc='lower right', frameon=True, fancybox=True, 
+                          shadow=True, fontsize=11, framealpha=0.95)
+        legend1.get_frame().set_facecolor('white')
+        legend1.get_frame().set_edgecolor('#2c3e50')
+        legend1.get_frame().set_linewidth(1.5)
+        
+        # Add a subtle text note
+        note_text = f'Baseline: {baseline_method}'
+        ax.text(0.02, 0.98, note_text, transform=ax.transAxes,
+               fontsize=10, verticalalignment='top',
+               bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.3))
+        
+        plt.tight_layout()
+        plt.savefig(f"{save_dir}/density_improvement_vs_{baseline_method}_{class_name}.pdf", 
+                   bbox_inches='tight', facecolor='white', edgecolor='none')
+        plt.close()
     
     # Plot 3: Heatmap of average improvement
     pivot_improvement = avg_improvement.pivot(index='method', columns='class', values='mean')
@@ -848,15 +986,10 @@ def plot_runtime_speedup(speedup_df: pd.DataFrame, baseline_method: str = 'CEP_M
         return
     
     classes = sorted(speedup_df['class'].unique())
-    n_classes = len(classes)
     
-    # Plot 1: Speedup bar chart for each class
-    fig, axes = plt.subplots(1, n_classes, figsize=(5*n_classes, 5), sharey=False)
-    if n_classes == 1:
-        axes = [axes]
-    
-    for idx, class_name in enumerate(classes):
-        class_data = speedup_df[speedup_df['class'] == class_name].sort_values('avg_speedup', ascending=False)
+    # Plot 1: Boxplot for each class (separate figures)
+    for class_name in classes:
+        class_data = speedup_df[speedup_df['class'] == class_name].copy()
         
         # Filter out baseline (speedup = 1.0)
         class_data = class_data[class_data['method'] != baseline_method]
@@ -864,27 +997,126 @@ def plot_runtime_speedup(speedup_df: pd.DataFrame, baseline_method: str = 'CEP_M
         if len(class_data) == 0:
             continue
         
-        colors = ['green' if x > 1 else 'red' for x in class_data['avg_speedup']]
-        axes[idx].barh(range(len(class_data)), class_data['avg_speedup'], color=colors, alpha=0.7)
-        axes[idx].set_yticks(range(len(class_data)))
-        axes[idx].set_yticklabels(class_data['method'])
-        axes[idx].set_xlabel('Speedup Factor', fontsize=11)
-        axes[idx].set_title(f'{class_name}', fontsize=13, fontweight='bold')
-        axes[idx].axvline(x=1, color='black', linestyle='--', linewidth=1, alpha=0.5)
-        axes[idx].grid(axis='x', alpha=0.3)
-        axes[idx].set_xscale('log')
+        # Sort methods by average speedup for better visualization
+        class_data = class_data.sort_values('avg_speedup')
         
-        # Add value labels
-        for i, (_, row) in enumerate(class_data.iterrows()):
-            speedup = row['avg_speedup']
-            label = f'{speedup:.2f}x'
-            axes[idx].text(speedup, i, label, ha='left', va='center', fontsize=8)
-    
-    fig.suptitle(f'Runtime Speedup vs {baseline_method} (log scale)', 
-                 fontsize=15, fontweight='bold', y=1.02)
-    plt.tight_layout()
-    plt.savefig(f"{save_dir}/runtime_speedup_vs_{baseline_method}.png", dpi=300, bbox_inches='tight')
-    plt.close()
+        # Create figure with publication-quality settings
+        fig, ax = plt.subplots(figsize=(12, 8))
+        fig.patch.set_facecolor('white')
+        
+        # Prepare data for boxplot
+        methods = class_data['method'].tolist()
+        boxplot_data = []
+        avg_speedups = []
+        
+        for method in methods:
+            method_data = class_data[class_data['method'] == method]
+            if len(method_data) > 0:
+                # Collect all speedup values for this method
+                speedups = [method_data['avg_speedup'].iloc[0]]
+                if 'median_speedup' in method_data.columns:
+                    speedups.append(method_data['median_speedup'].iloc[0])
+                if 'min_speedup' in method_data.columns:
+                    speedups.append(method_data['min_speedup'].iloc[0])
+                if 'max_speedup' in method_data.columns:
+                    speedups.append(method_data['max_speedup'].iloc[0])
+                
+                boxplot_data.append(speedups)
+                avg_speedups.append(method_data['avg_speedup'].iloc[0])
+        
+        # Define professional color palette
+        color_faster = '#2ecc71'  # Green for faster (speedup > 1)
+        color_slower = '#e74c3c'  # Red for slower (speedup < 1)
+        color_avg_line = '#3498db'  # Blue for average line
+        color_baseline = '#34495e'  # Dark gray for baseline
+        
+        # Create boxplot with enhanced styling
+        bp = ax.boxplot(boxplot_data, patch_artist=True, vert=False,
+                       widths=0.6,
+                       boxprops=dict(linewidth=1.5),
+                       whiskerprops=dict(linewidth=1.5),
+                       capprops=dict(linewidth=1.5),
+                       medianprops=dict(color='#2c3e50', linewidth=2),
+                       flierprops=dict(marker='o', markerfacecolor='gray', 
+                                     markersize=5, alpha=0.5))
+        
+        ax.set_yticklabels(methods, fontsize=11)
+        
+        # Color boxes based on whether speedup > 1 with gradient effect
+        for i, (patch, avg) in enumerate(zip(bp['boxes'], avg_speedups)):
+            if avg > 1:
+                color = color_faster
+                alpha = 0.6
+            else:
+                color = color_slower
+                alpha = 0.6
+            patch.set_facecolor(color)
+            patch.set_alpha(alpha)
+            patch.set_edgecolor('#2c3e50')
+        
+        # Add average speedup curve with secondary axis
+        ax2 = ax.twiny()
+        y_positions = range(1, len(methods) + 1)
+        
+        # Plot the average line with enhanced styling
+        line = ax2.plot(avg_speedups, y_positions, 
+                       color=color_avg_line, linewidth=2.5, 
+                       marker='D', markersize=8, 
+                       label='Average Speedup',
+                       markerfacecolor=color_avg_line,
+                       markeredgecolor='white',
+                       markeredgewidth=1.5,
+                       alpha=0.9, zorder=10)
+        
+        ax2.set_xscale('log')
+        ax2.set_xlabel('Average Speedup Factor', fontsize=13, fontweight='bold', 
+                      color=color_avg_line, labelpad=10)
+        ax2.tick_params(axis='x', labelcolor=color_avg_line, labelsize=11, width=1.5)
+        ax2.set_ylim(ax.get_ylim())
+        ax2.spines['top'].set_color(color_avg_line)
+        ax2.spines['top'].set_linewidth(2)
+        
+        # Style the baseline reference line
+        ax.axvline(x=1, color=color_baseline, linestyle='--', 
+                  linewidth=2, alpha=0.7, label='Baseline (1×)', zorder=1)
+        
+        # Enhanced axis labels and title
+        ax.set_xlabel('Speedup Factor (log scale)', fontsize=13, fontweight='bold', labelpad=10)
+        ax.set_ylabel('Method', fontsize=13, fontweight='bold', labelpad=10)
+        # ax.set_title(f'{class_name} Graph Class', fontsize=16, fontweight='bold', pad=20)
+        
+        # Set log scale and improve grid
+        ax.set_xscale('log')
+        ax.grid(axis='x', alpha=0.25, linestyle='-', linewidth=0.8, color='gray')
+        ax.set_axisbelow(True)
+        
+        # Style the spines
+        for spine in ['bottom', 'left', 'right']:
+            ax.spines[spine].set_linewidth(1.5)
+            ax.spines[spine].set_color('#2c3e50')
+        ax.spines['right'].set_visible(False)
+        
+        # Improve tick styling
+        ax.tick_params(axis='both', which='major', labelsize=11, width=1.5, length=6)
+        ax.tick_params(axis='both', which='minor', width=1, length=3)
+        
+        # Add legend with better positioning and styling
+        legend1 = ax.legend(loc='lower right', frameon=True, fancybox=True, 
+                          shadow=True, fontsize=11, framealpha=0.95)
+        legend1.get_frame().set_facecolor('white')
+        legend1.get_frame().set_edgecolor('#2c3e50')
+        legend1.get_frame().set_linewidth(1.5)
+        
+        # Add a subtle text note
+        note_text = f'Baseline: {baseline_method}'
+        ax.text(0.02, 0.98, note_text, transform=ax.transAxes,
+               fontsize=10, verticalalignment='top',
+               bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.3))
+        
+        plt.tight_layout()
+        plt.savefig(f"{save_dir}/runtime_speedup_vs_{baseline_method}_{class_name}.pdf", 
+                   bbox_inches='tight', facecolor='white', edgecolor='none')
+        plt.close()
     
     # Plot 2: Heatmap of speedup
     pivot_speedup = speedup_df.pivot(index='method', columns='class', values='avg_speedup')
@@ -1086,7 +1318,7 @@ def analyze():
     parser.add_argument(
         '--baseline',
         type=str,
-        default='CEP',
+        default='DCSGreedy',
         help='Baseline method for density comparison'
     )
     parser.add_argument(
@@ -1098,7 +1330,7 @@ def analyze():
     parser.add_argument(
         '--fill-cep-mip',
         action='store_true',
-        default=True,
+        default=False,
         help='Fill CEP_MIP data from method with longest runtime when all other methods have results'
     )
     
@@ -1156,13 +1388,21 @@ def analyze():
         print(f"✓ Density ranks calculated on {n_complete} complete graphs")
         
         improvement_df = calculate_density_improvement(complete_df, args.baseline)
-        print(f"✓ Density improvements calculated on {n_complete} complete graphs")
+        print(f"✓ Density improvements calculated on {n_complete} complete graphs vs {args.baseline}")
+    
+    # Apply method abbreviations for display
+    print("\n🏷️  Applying method abbreviations...")
+    success_df = apply_method_abbr(success_df)
+    runtime_df = apply_method_abbr(runtime_df)
+    speedup_df = apply_method_abbr(speedup_df)
+    rank_df = apply_method_abbr(rank_df)
+    improvement_df = apply_method_abbr(improvement_df)
     
     # Export success rate table
     print("\n📋 Exporting tables...")
     export_success_rate_table(success_df, args.results_dir)
     if not speedup_df.empty:
-        export_speedup_table(speedup_df, 'CEP_MIP', args.results_dir)
+        export_speedup_table(speedup_df, METHOD_ABBR.get('CEP_MIP', 'CEP_MIP'), args.results_dir)
     if not rank_df.empty:
         export_rank_table(rank_df, args.results_dir)
     
@@ -1179,7 +1419,7 @@ def analyze():
             print("⚠️  Skipping runtime plots (no complete graphs)")
         
         if not speedup_df.empty:
-            plot_runtime_speedup(speedup_df, 'CEP_MIP', save_dir)
+            plot_runtime_speedup(speedup_df, METHOD_ABBR.get('CEP_MIP', 'CEP_MIP'), save_dir)
         else:
             print("⚠️  Skipping speedup plots (no CEP_MIP results)")
         
@@ -1189,13 +1429,15 @@ def analyze():
             print("⚠️  Skipping density rank plots (no complete graphs)")
         
         if not improvement_df.empty:
-            plot_density_improvement(improvement_df, args.baseline, save_dir)
+            baseline_abbr = METHOD_ABBR.get(args.baseline, args.baseline) or args.baseline
+            plot_density_improvement(improvement_df, baseline_abbr, save_dir)
         else:
             print("⚠️  Skipping density improvement plots (no complete graphs)")
     
     # Generate summary report
     print("\n📝 Generating summary report...")
-    generate_summary_report(df, success_df, runtime_df, improvement_df, args.results_dir)
+    df_abbr = apply_method_abbr(df)
+    generate_summary_report(df_abbr, success_df, runtime_df, improvement_df, args.results_dir)
     
     # Save detailed DataFrames
     print("\n💾 Saving detailed results...")
