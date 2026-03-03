@@ -344,27 +344,27 @@ real-world:
   # Input datasets (individual files)
   input:
     - path: ./input/real-world/Abortion/Abortion.txt
-      toggle: true
+      toggle: false
     - path: ./input/real-world/Biogrid/Biogrid.txt
-      toggle: true
+      toggle: false
     - path: ./input/real-world/Brexit/Brexit.txt
       toggle: true
     - path: ./input/real-world/Collins/Collins.txt
-      toggle: true
+      toggle: false
     - path: ./input/real-world/Election/Election.txt
-      toggle: true
+      toggle: false
     - path: ./input/real-world/Gavin/Gavin.txt
-      toggle: true
+      toggle: false
     - path: ./input/real-world/Gun/Gun.txt
-      toggle: true
+      toggle: false
     - path: ./input/real-world/Krogan-Core/Krogan-Core.txt
-      toggle: true
+      toggle: false
     - path: ./input/real-world/Krogan-Extended/Krogan-Extended.txt
-      toggle: true
+      toggle: false
     - path: ./input/real-world/Partisanship/Partisanship.txt
-      toggle: true
+      toggle: false
     - path: ./input/real-world/Referendum/Referendum.txt
-      toggle: true
+      toggle: false
   
   weight_reverse: false
   output: ./output/real-world/
