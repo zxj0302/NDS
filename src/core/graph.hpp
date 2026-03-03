@@ -120,6 +120,9 @@ public:
 
     virtual ~PGraph() = default;
 
+    // Subclasses may add sub-process timing fields into the shared timings dict.
+    virtual void add_timings_to_json(json::object&) const {}
+
     struct SubgraphResult {
         vector<Vertex> nodes;
         double density;
@@ -143,7 +146,13 @@ public:
         config["info"] = info + " End |";
         cfg.add_to_json(config);
         json_output["config"] = config;
-        
+
+        // All timing data in one dict: total wall-clock + any sub-process breakdowns
+        json::object timings_obj;
+        timings_obj["total"] = avg_time;
+        add_timings_to_json(timings_obj);
+        json_output["timings"] = timings_obj;
+
         // Write to file with pretty-printed formatting
         ofstream out(cfg.output);
         if (!out) throw runtime_error("Cannot open " + cfg.output);

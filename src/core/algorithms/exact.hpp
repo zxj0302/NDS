@@ -130,6 +130,33 @@ private:
     size_t vertex_lower_bound, vertex_upper_bound;
     SubgraphResult naive_lb;
 
+    struct Timings {
+        double cep_init       = 0.0;  // CEP::Run in FindLowerBound
+        double qpbo           = 0.0;  // RunQPBO (standard + improve)
+        double mip            = 0.0;  // RunMIP
+        double pruning        = 0.0;  // Pruning + PruningModeToggle
+        double cep_middle     = 0.0;  // CEPDensity before MIP
+        double cep_lambda     = 0.0;  // CEPLambda for MIP initialization
+        double cep_final      = 0.0;  // CEPDensity after MIP
+        double compute_density = 0.0; // ComputeDensity calls
+    };
+    Timings timings;
+
+    // Time a callable and accumulate the elapsed seconds into `acc`.
+    // Works for both void-returning and value-returning callables.
+    template<typename Fn>
+    decltype(auto) timed(double& acc, Fn&& fn) {
+        auto t = chrono::steady_clock::now();
+        if constexpr (is_void_v<invoke_result_t<Fn>>) {
+            fn();
+            acc += chrono::duration<double>(chrono::steady_clock::now() - t).count();
+        } else {
+            decltype(auto) result = fn();
+            acc += chrono::duration<double>(chrono::steady_clock::now() - t).count();
+            return result;
+        }
+    }
+
 public:
     EXACT(const EXACT_Config& cfg) : CEP(cfg) {
         if (cfg.enable_mip_constrains_vertex_lb) {
@@ -288,7 +315,7 @@ public:
         // 1. Run CEP to get initial solution
         auto result_lb = SubgraphResult{{}, 0.0};
         if (cfg.enable_cep_init) {
-            result_lb = CEP::Run(cfg);
+            result_lb = timed(timings.cep_init, [&]{ return CEP::Run(cfg); });
             LOG("FindLowerBound: CEP init lb: " << result_lb.density);
         }
         CEP::Reset(true);
@@ -300,7 +327,7 @@ public:
             }
         }
         // 3. Run QPBO to check whether it is already optimal, or update lower bound if possible
-        if (cfg.enable_graph_pruning) Pruning({}, result_lb.density);
+        if (cfg.enable_graph_pruning) timed(timings.pruning, [&]{ Pruning({}, result_lb.density); });
         if (cfg.enable_qpbo) {
             auto result = QPBO_CEP_MIP(cfg, result_lb, result_lb.density, false);
             switch (result.info) {
@@ -364,7 +391,7 @@ public:
                     // (2). Have found a better lower bound
                     if (result.density > result_lb.density) {
                         result_lb = {result.nodes, result.density};
-                        if (cfg.enable_graph_pruning) Pruning({}, result.density);
+                        if (cfg.enable_graph_pruning) timed(timings.pruning, [&]{ Pruning({}, result.density); });
                         if (result.exact) {
                             if (cfg.enable_mip_constrains_vertex_ub) {
                                 vertex_upper_bound = result.nodes.size() - 1;
@@ -758,7 +785,7 @@ public:
         // Run QPBO
         QPBOResult qpbo_result;
         if (cfg.enable_qpbo) {
-            qpbo_result = RunQPBO(cfg, lambda, false);
+            qpbo_result = timed(timings.qpbo, [&]{ return RunQPBO(cfg, lambda, false); });
             if (qpbo_result.undecided.empty()) { // QPBO fixed all nodes
                 if (qpbo_result.fixed_in.empty()) { // all nodes are labeled as 0
                     // 1. if QPBO labels all nodes as 0, lambda is a new upper bound
@@ -766,7 +793,7 @@ public:
                     return {SubgraphResult{}, true, Indicator::QPBO_UB};
                 } else { // some are labeled as 1
                     // 2. if QPBO labels some nodes as 1, compute new density as lower bound
-                    auto density = ComputeDensity(qpbo_result.fixed_in); // will be >= lambda
+                    auto density = timed(timings.compute_density, [&]{ return ComputeDensity(qpbo_result.fixed_in); }); // will be >= lambda
                     LOG("QPBO_CEP_MIP: QPBO fixed all nodes, new lower bound density: " << density);
                     return {qpbo_result.fixed_in, density, true, Indicator::QPBO_LB};
                 }
@@ -788,7 +815,7 @@ public:
         vector<Vertex> mip_init = {};
         if (have_large_undecided && handle_large_undecided) { // there are many undecided nodes and want to handle them
             if (cfg.enable_cep_middle) {
-                auto cep_density_result = CEPDensity(cfg, qpbo_result, cfg.max_local_optima); // try to use CEPDensity to get better lower bound
+                auto cep_density_result = timed(timings.cep_middle, [&]{ return CEPDensity(cfg, qpbo_result, cfg.max_local_optima); }); // try to use CEPDensity to get better lower bound
                 if (cep_density_result.density > lb.density) { // CEPDensity gets new lower bound
                     // 4. if CEPDensity gets new lower bound, return to update lower bound
                     LOG("QPBO_CEP_MIP: CEPDensity gets new lower bound: " << cep_density_result.density << " rather than " << lb.density);
@@ -796,10 +823,14 @@ public:
                 }
             }
             if (cfg.enable_mip_init) { // CEPDensity cannot get better lower bound, run CEPLambda and QPBOI on undecided nodes if allowed
-                auto cep_lambda_result = cfg.enable_cep_lambda ? CEPLambda(cfg, qpbo_result, lambda) : SubgraphResult{qpbo_result.fixed_in, 0.0}; // get some initial solution from CEPLambda based on lambda
+                auto cep_lambda_result = cfg.enable_cep_lambda
+                    ? timed(timings.cep_lambda, [&]{ return CEPLambda(cfg, qpbo_result, lambda); })
+                    : SubgraphResult{qpbo_result.fixed_in, 0.0}; // get some initial solution from CEPLambda based on lambda
                 // cout << "CEP Lambda result density: " << cep_lambda_result.density << endl;
-                mip_init = cfg.enable_qpboi ? RunQPBO(cfg, lambda, true, cep_lambda_result.nodes).fixed_in : cep_lambda_result.nodes; // run QPBOI to improve the initial solution
-                auto density = ComputeDensity(mip_init);
+                mip_init = cfg.enable_qpboi
+                    ? timed(timings.qpbo, [&]{ return RunQPBO(cfg, lambda, true, cep_lambda_result.nodes).fixed_in; })
+                    : cep_lambda_result.nodes; // run QPBOI to improve the initial solution
+                auto density = timed(timings.compute_density, [&]{ return ComputeDensity(mip_init); });
                 if (density > lb.density) { // QPBOI gets new lower bound
                     // 5. if QPBOI gets new lower bound, return to update lower bound
                     LOG("QPBO_CEP_MIP: QPBOI gets new lower bound: " << density << " rather than " << lb.density);
@@ -809,13 +840,13 @@ public:
         }
 
         // Undecided nodes are small, or handle large undecided nodes
-        auto mip_result = RunMIP(cfg, qpbo_result, lambda, mip_init);
-        auto density = ComputeDensity(mip_result.first);
+        auto mip_result = timed(timings.mip, [&]{ return RunMIP(cfg, qpbo_result, lambda, mip_init); });
+        auto density = timed(timings.compute_density, [&]{ return ComputeDensity(mip_result.first); });
         
         // Run CEP to try to improve the MIP result
         if (have_large_undecided && cfg.enable_cep_final && !mip_result.first.empty()) {
             // 6. run CEPDensity after MIP to try to further improve the solution
-            auto cep_after_result = CEPDensity(cfg, qpbo_result, 1, mip_result.first, density); // run CEPDensity
+            auto cep_after_result = timed(timings.cep_final, [&]{ return CEPDensity(cfg, qpbo_result, 1, mip_result.first, density); }); // run CEPDensity
             if (cep_after_result.density > density) { // CEPDensity after MIP gets better lower bound
                 if (mip_result.second) { // update the constrains for MIP if MIP is optimal
                     if (cfg.enable_mip_constrains_vertex_ub) {
@@ -871,7 +902,7 @@ public:
                     // (2). Have found a better lower bound
                     if (result.density > result_lb.density) {
                         result_lb = {result.nodes, result.density};
-                        if (cfg.enable_graph_pruning) Pruning({}, result_lb.density);
+                        if (cfg.enable_graph_pruning) timed(timings.pruning, [&]{ Pruning({}, result_lb.density); });
                         if (result.exact) {
                             if (cfg.enable_mip_constrains_vertex_ub) {
                                 vertex_upper_bound = result.nodes.size() - 1;
@@ -923,7 +954,7 @@ public:
                     // (2). Have found a better lower bound
                     if (result.density > result_lb.density) {
                         result_lb = {result.nodes, result.density};
-                        if (cfg.enable_graph_pruning) Pruning({}, result_lb.density);
+                        if (cfg.enable_graph_pruning) timed(timings.pruning, [&]{ Pruning({}, result_lb.density); });
                         if (result.exact) {
                             if (cfg.enable_mip_constrains_vertex_ub) {
                                 vertex_upper_bound = result.nodes.size() - 1;
@@ -947,14 +978,25 @@ public:
         return result_lb;
     }
 
+    void add_timings_to_json(json::object& t) const override {
+        t["cep_init"]   = timings.cep_init;
+        t["qpbo"]       = timings.qpbo;
+        t["mip"]        = timings.mip;
+        t["pruning"]    = timings.pruning;
+        t["cep_middle"] = timings.cep_middle;
+        t["cep_lambda"]      = timings.cep_lambda;
+        t["cep_final"]       = timings.cep_final;
+        t["compute_density"] = timings.compute_density;
+    }
+
     SubgraphResult Run(const EXACT_Config& cfg) {
         // Step 1. Result found by CEP as initial solution
         LOG("Start Running on " << cfg.input);
         auto [result_lb, optima] = FindLowerBound(cfg);
         if (optima) return result_lb;
         LOG("FindLowerBound: Lower bound set to: " << result_lb.density);
-        if (cfg.enable_pruning_set) PruningModeToggle(cfg, 0, true);
-        if (cfg.enable_graph_pruning) Pruning({}, result_lb.density);
+        if (cfg.enable_pruning_set) timed(timings.pruning, [&]{ PruningModeToggle(cfg, 0, true); });
+        if (cfg.enable_graph_pruning) timed(timings.pruning, [&]{ Pruning({}, result_lb.density); });
         
         // Step 2. Find an upper bound for QPBO
         auto upper_bound = FindUpperBound(cfg, result_lb);
@@ -966,6 +1008,7 @@ public:
 
     void Reset(const EXACT_Config& cfg) {
         info = "| Start | ";
+        timings = Timings{};
         if (cfg.enable_mip_constrains_vertex_ub) {
             vertex_upper_bound = num_vertices(G);
         }
