@@ -2,7 +2,7 @@
 # Competitor Templates (DRY - Define Once, Use Everywhere)
 # =============================================================================
 competitor_templates: &competitor_templates
-  neg_dsd: &neg_dsd
+  neg_dsd:
     toggle: false
     name: NEG_DSD
     exe: ./build/neg_dsd
@@ -10,14 +10,14 @@ competitor_templates: &competitor_templates
       C_values: [0.9, 1.0, 1.1, 1.2]
       num_iter: 1
   
-  dcs_greedy: &dcs_greedy
+  dcs_greedy:
     toggle: false
     name: DCSGreedy
     exe: ./build/dcs_greedy
     params:
       num_iter: 1
   
-  cep: &cep
+  cep:
     toggle: false
     name: CEP
     exe: ./build/cep
@@ -29,7 +29,7 @@ competitor_templates: &competitor_templates
       do_peeling: false
       num_iter: 1
 
-  miqcp: &miqcp
+  miqcp:
     toggle: false
     name: MIQCP
     exe: ./build/miqcp
@@ -40,17 +40,17 @@ competitor_templates: &competitor_templates
       verbose: false
       num_iter: 1
 
-  cep_mip: &cep_mip
+  cep_mip_b:
     toggle: false
-    name: CEP_MIP
+    name: CEP_MIP_B
     exe: ./build/exact
-    params: &cep_mip_params
+    params: &cep_mip_b_params
       <<: *cep_params
       dinkelbach_iterations: 50
       epsilon: 0.9999
       mip_time_limit: 600.0
       enable_cep_init: true
-      enable_binary_search: false
+      enable_binary_search: true
       enable_qpbo: false
       enable_qpbo_probe: false
       enable_graph_pruning: false
@@ -62,76 +62,132 @@ competitor_templates: &competitor_templates
       enable_mip_constrains_vertex_lb: false
       enable_mip_constrains_vertex_ub: false
       enable_cep_final: false
-      
-  cep_qpbo_mip: &cep_qpbo_mip
+
+  # Competitor with Dinkelbach Logic
+  cep_mip_d:
     toggle: false
-    name: CEP_QPBO_MIP
+    name: CEP_MIP_D
     exe: ./build/exact
-    params: &cep_qpbo_mip_params
-      <<: *cep_mip_params
-      step_size: 1.1
+    params:
+      <<: *cep_mip_b_params
+      enable_binary_search: false
+      
+  cep_qpbo_mip_b:
+    toggle: false
+    name: CEP_QPBO_MIP_B
+    exe: ./build/exact
+    params: &cep_qpbo_mip_b_params
+      <<: *cep_mip_b_params
+      step_size: 1.2
       direct_mip_bound: 100
-      enable_binary_search: true
       enable_qpbo: true
       enable_qpbo_probe: false
-      
-  cep_pruning_qpbo_mip: &cep_pruning_qpbo_mip
+
+  cep_qpbo_mip_d:
     toggle: false
-    name: CEP_PRUNING_QPBO_MIP
+    name: CEP_QPBO_MIP_D
     exe: ./build/exact
-    params: &cep_pruning_qpbo_mip_params
-      <<: *cep_qpbo_mip_params
+    params:
+      <<: *cep_qpbo_mip_b_params
+      enable_binary_search: false
+      
+  cep_pruning_qpbo_mip_b:
+    toggle: false
+    name: CEP_PRUNING_QPBO_MIP_B
+    exe: ./build/exact
+    params: &cep_pruning_qpbo_mip_b_params
+      <<: *cep_qpbo_mip_b_params
       enable_graph_pruning: true
       enable_pruning_set: false
 
-  cep_pruning_qpbo_mip_constrain: &cep_pruning_qpbo_mip_constrain
+  cep_pruning_qpbo_mip_d:
     toggle: false
-    name: CEP_PRUNING_QPBO_MIP_CONSTRAIN
+    name: CEP_PRUNING_QPBO_MIP_D
     exe: ./build/exact
-    params: &cep_pruning_qpbo_mip_constrain_params
-      <<: *cep_pruning_qpbo_mip_params
+    params:
+      <<: *cep_pruning_qpbo_mip_b_params
+      enable_binary_search: false
+
+  cep_pruning_qpbo_mip_constrain_b:
+    toggle: false
+    name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_B
+    exe: ./build/exact
+    params: &cep_pruning_qpbo_mip_constrain_b_params
+      <<: *cep_pruning_qpbo_mip_b_params
       enable_mip_constrains_vertex_lb: true
       enable_mip_constrains_vertex_ub: true
 
-  cep_pruning_qpbo_mip_constrain_cep: &cep_pruning_qpbo_mip_constrain_cep
+  cep_pruning_qpbo_mip_constrain_d:
     toggle: false
-    name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_CEP
+    name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_D
     exe: ./build/exact
-    params: &cep_pruning_qpbo_mip_constrain_cep_params
-      <<: *cep_pruning_qpbo_mip_constrain_params
+    params: &cep_pruning_qpbo_mip_constrain_d_params
+      <<: *cep_pruning_qpbo_mip_constrain_b_params
+      enable_binary_search: false
+
+  cep_pruning_qpbo_mip_constrain_cep_b:
+    toggle: false
+    name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_CEP_B
+    exe: ./build/exact
+    params: &cep_pruning_qpbo_mip_constrain_cep_b_params
+      <<: *cep_pruning_qpbo_mip_constrain_b_params
       enable_cep_final: true
 
-  cep_pruning_qpbo_cep_mip: &cep_pruning_qpbo_cep_mip
+  cep_pruning_qpbo_mip_constrain_cep_d:
     toggle: false
-    name: CEP_PRUNING_QPBO_CEP_MIP
+    name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_CEP_D
     exe: ./build/exact
-    params: &cep_pruning_qpbo_cep_mip_params
-      <<: *cep_pruning_qpbo_mip_params
+    params:
+      <<: *cep_pruning_qpbo_mip_constrain_cep_b_params
+      enable_binary_search: false
+
+  cep_pruning_qpbo_cep_mip_b:
+    toggle: false
+    name: CEP_PRUNING_QPBO_CEP_MIP_B
+    exe: ./build/exact
+    params: &cep_pruning_qpbo_cep_mip_b_params
+      <<: *cep_pruning_qpbo_mip_b_params
       enable_cep_middle: true
 
-  cep_pruning_qpbo_cep_mip_constrain: &cep_pruning_qpbo_cep_mip_constrain
+  cep_pruning_qpbo_cep_mip_constrain_b:
     toggle: false
-    name: CEP_PRUNING_QPBO_CEP_MIP_CONSTRAIN
+    name: CEP_PRUNING_QPBO_CEP_MIP_CONSTRAIN_B
     exe: ./build/exact
-    params: &cep_pruning_qpbo_cep_mip_constrain_params
-      <<: *cep_pruning_qpbo_cep_mip_params
+    params: &cep_pruning_qpbo_cep_mip_constrain_b_params
+      <<: *cep_pruning_qpbo_cep_mip_b_params
       enable_mip_constrains_vertex_lb: true
       enable_mip_constrains_vertex_ub: true
 
-  cep_pruning_qpbo_cep_mip_constrain_cep: &cep_pruning_qpbo_cep_mip_constrain_cep
+  cep_pruning_qpbo_cep_mip_constrain_d:
     toggle: false
-    name: CEP_PRUNING_QPBO_CEP_MIP_CONSTRAIN_CEP
+    name: CEP_PRUNING_QPBO_CEP_MIP_CONSTRAIN_D
     exe: ./build/exact
-    params: &cep_pruning_qpbo_cep_mip_constrain_cep_params
-      <<: *cep_pruning_qpbo_cep_mip_constrain_params
+    params:
+      <<: *cep_pruning_qpbo_cep_mip_constrain_b_params
+      enable_binary_search: false
+
+  cep_pruning_qpbo_cep_mip_constrain_cep_b:
+    toggle: false
+    name: CEP_PRUNING_QPBO_CEP_MIP_CONSTRAIN_CEP_B
+    exe: ./build/exact
+    params: &cep_pruning_qpbo_cep_mip_constrain_cep_b_params
+      <<: *cep_pruning_qpbo_cep_mip_constrain_b_params
       enable_cep_final: true
 
-  cep_pruning_qpbo_cep_init_mip_constrain_cep: &cep_pruning_qpbo_cep_init_mip_constrain_cep
+  cep_pruning_qpbo_cep_mip_constrain_cep_d:
     toggle: false
-    name: CEP_PRUNING_QPBO_CEP_INIT_MIP_CONSTRAIN_CEP
+    name: CEP_PRUNING_QPBO_CEP_MIP_CONSTRAIN_CEP_D
     exe: ./build/exact
-    params: &cep_pruning_qpbo_cep_init_mip_constrain_cep_params
-      <<: *cep_pruning_qpbo_cep_mip_constrain_cep_params
+    params:
+      <<: *cep_pruning_qpbo_cep_mip_constrain_cep_b_params
+      enable_binary_search: false
+
+  cep_pruning_qpbo_cep_init_mip_constrain_cep_b:
+    toggle: false
+    name: CEP_PRUNING_QPBO_CEP_INIT_MIP_CONSTRAIN_CEP_B
+    exe: ./build/exact
+    params: &cep_pruning_qpbo_cep_init_mip_constrain_cep_b_params
+      <<: *cep_pruning_qpbo_cep_mip_constrain_cep_b_params
       enable_cep_lambda: true
       enable_qpboi: false
       enable_mip_init: true
@@ -141,82 +197,144 @@ competitor_templates: &competitor_templates
 # =============================================================================
 competitor_templates_epsilon: &competitor_templates_epsilon
   <<: *competitor_templates
-  
-  cep_pruning_qpbo_mip_constrain_eps_90:
-    toggle: false
-    name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_90
+  cep_pruning_qpbo_mip_constrain_eps_90_b:
+    toggle: true
+    name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_90_B
     exe: ./build/exact
     params:
-      <<: *cep_pruning_qpbo_mip_constrain_params
+      <<: *cep_pruning_qpbo_mip_constrain_b_params
+      epsilon: 0.9
+
+  cep_pruning_qpbo_mip_constrain_eps_90_d:
+    toggle: true
+    name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_90_D
+    exe: ./build/exact
+    params:
+      <<: *cep_pruning_qpbo_mip_constrain_d_params
       epsilon: 0.9
   
-  cep_pruning_qpbo_mip_constrain_eps_95:
-    toggle: false
-    name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_95
+  cep_pruning_qpbo_mip_constrain_eps_95_b:
+    toggle: true
+    name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_95_B
     exe: ./build/exact
     params:
-      <<: *cep_pruning_qpbo_mip_constrain_params
+      <<: *cep_pruning_qpbo_mip_constrain_b_params
+      epsilon: 0.95
+
+  cep_pruning_qpbo_mip_constrain_eps_95_d:
+    toggle: true
+    name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_95_D
+    exe: ./build/exact
+    params:
+      <<: *cep_pruning_qpbo_mip_constrain_d_params
       epsilon: 0.95
   
-  cep_pruning_qpbo_mip_constrain_eps_99:
-    toggle: false
-    name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_99
+  cep_pruning_qpbo_mip_constrain_eps_99_b:
+    toggle: true
+    name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_99_B
     exe: ./build/exact
     params:
-      <<: *cep_pruning_qpbo_mip_constrain_params
+      <<: *cep_pruning_qpbo_mip_constrain_b_params
+      epsilon: 0.99
+
+  cep_pruning_qpbo_mip_constrain_eps_99_d:
+    toggle: true
+    name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_99_D
+    exe: ./build/exact
+    params:
+      <<: *cep_pruning_qpbo_mip_constrain_d_params
       epsilon: 0.99
   
-  cep_pruning_qpbo_mip_constrain_eps_999:
-    toggle: false
-    name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_999
+  cep_pruning_qpbo_mip_constrain_eps_999_b:
+    toggle: true
+    name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_999_B
     exe: ./build/exact
     params:
-      <<: *cep_pruning_qpbo_mip_constrain_params
+      <<: *cep_pruning_qpbo_mip_constrain_b_params
+      epsilon: 0.999
+
+  cep_pruning_qpbo_mip_constrain_eps_999_d:
+    toggle: true
+    name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_999_D
+    exe: ./build/exact
+    params:
+      <<: *cep_pruning_qpbo_mip_constrain_d_params
       epsilon: 0.999
 
 # =============================================================================
-# Extended Competitor Templates with Non-Binary Logic
+# Extended Competitor Templates For CEP Settings
 # =============================================================================
-competitor_templates_nb: &competitor_templates_nb
+competitor_templates_cep: &competitor_templates_cep
   <<: *competitor_templates
-  
-  cep_pruning_qpbo_mip_constrain_nb:
-    toggle: true
-    name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_NB
-    exe: ./build/exact
-    params:
-      <<: *cep_pruning_qpbo_mip_constrain_params
-      enable_binary_search: false
-  
-  cep_pruning_qpbo_mip_constrain_cep_nb:
-    toggle: true
-    name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_CEP_NB
-    exe: ./build/exact
-    params:
-      <<: *cep_pruning_qpbo_mip_constrain_cep_params
-      enable_binary_search: false
-  
-  cep_pruning_qpbo_cep_mip_constrain_nb:
-    toggle: true
-    name: CEP_PRUNING_QPBO_CEP_MIP_CONSTRAIN_NB
-    exe: ./build/exact
-    params:
-      <<: *cep_pruning_qpbo_cep_mip_constrain_params
-      enable_binary_search: false
-  
-  cep_pruning_qpbo_cep_mip_constrain_cep_nb:
+  cep_l1:
     toggle: false
-    name: CEP_PRUNING_QPBO_CEP_MIP_CONSTRAIN_CEP_NB
-    exe: ./build/exact
+    name: CEP_L1
+    exe: ./build/cep
     params:
-      <<: *cep_pruning_qpbo_cep_mip_constrain_cep_params
-      enable_binary_search: false
+      <<: *cep_params
+      max_local_optima: 1
+
+  cep_l5:
+    toggle: false
+    name: CEP_L5
+    exe: ./build/cep
+    params:
+      <<: *cep_params
+      max_local_optima: 5
+
+  cep_l20:
+    toggle: false
+    name: CEP_L20
+    exe: ./build/cep
+    params:
+      <<: *cep_params
+      max_local_optima: 20
+
+  cep_l50:
+    toggle: false
+    name: CEP_L50
+    exe: ./build/cep
+    params:
+      <<: *cep_params
+      max_local_optima: 50
+
+  cep_k0:
+    toggle: false
+    name: CEP_K0
+    exe: ./build/cep
+    params:
+      <<: *cep_params
+      max_neg: 1
+
+  cep_k50:
+    toggle: false
+    name: CEP_K50
+    exe: ./build/cep
+    params:
+      <<: *cep_params
+      max_neg: 50
+
+  cep_k100:
+    toggle: false
+    name: CEP_K100
+    exe: ./build/cep
+    params:
+      <<: *cep_params
+      max_neg: 100
+
+  cep_k500:
+    toggle: false
+    name: CEP_K500
+    exe: ./build/cep
+    params:
+      <<: *cep_params
+      max_neg: 500
 
 # =============================================================================
 # Final Competitors Selection
 # =============================================================================
 competitors: &competitors
-  <<: *competitor_templates_nb
+  <<: *competitor_templates_epsilon
 
 # =============================================================================
 # Experiment Configurations
