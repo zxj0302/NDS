@@ -72,6 +72,10 @@ def run_competitor(dataset_path, competitor, output_path, reverse):
         subprocess.run([program, config_path], check=True)
         result = json.load(open(output_path))
         logger.info(f'{comp_name:<45}: time: {result["time"]:.6f}s, density: {result["density"]:.6f}')
+    except subprocess.CalledProcessError as e:
+        logger.error(f'{comp_name:<45}: crashed with exit code {e.returncode} on {dataset_path}')
+    except Exception as e:
+        logger.error(f'{comp_name:<45}: failed on {dataset_path}: {e}')
     finally:
         if os.path.exists(config_path):
             os.remove(config_path)
