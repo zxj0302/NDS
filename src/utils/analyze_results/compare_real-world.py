@@ -95,7 +95,13 @@ def create_separate_tables(df, algorithms):
     
     return density_df, time_df
 
-def create_latex_tables(density_df, time_df, algorithms):
+def create_latex_tables(
+    density_df,
+    time_df,
+    algorithms,
+    runtime_exclude_datasets=None,
+    density_exclude_datasets=None
+):
     """
     Create separate LaTeX tables for runtime and density.
     Runtime is shown in milliseconds.
@@ -114,15 +120,52 @@ def create_latex_tables(density_df, time_df, algorithms):
         'Krogan-Core': 'KC',
         'Krogan-Extended': 'KE',
         'Partisanship': 'PA',
-        'Referendum': 'RF'
+        'Referendum': 'RF',
+        'Amazon': 'AM',
+        'Epinions': 'EP',
+        'Stackoverflow': 'SO',
+        'WikiData': 'WD',
+        'WikiPolitics': 'WP'
     }
+    
+    # Define desired column order for runtime table (by abbreviation)
+    desired_runtime_order = ['CL', 'GV', 'KC', 'RF', 'KE', 'AB', 'BG', 'GN', 'BX', 'PA', 'EL', 'EP', 'WP', 'WD', 'AM', 'SO']
+    
+    # Create reverse mapping: abbr -> full name
+    abbr_to_dataset = {v: k for k, v in dataset_abbr.items()}
+    
+    # Convert desired order to full dataset names
+    desired_datasets_ordered = [abbr_to_dataset[abbr] for abbr in desired_runtime_order if abbr in abbr_to_dataset]
+
+    # Keep only datasets that actually exist in the current data.
+    available_datasets = set(datasets)
+
+    # Build ordered, unique dataset list from the shared order and a per-table exclude set.
+    def build_selected_datasets(exclude_datasets):
+        exclude_set = {str(x).strip() for x in (exclude_datasets or set()) if str(x).strip()}
+        selected = []
+        seen = set()
+        for dataset in desired_datasets_ordered:
+            if dataset not in available_datasets:
+                continue
+            if dataset in exclude_set or dataset_abbr.get(dataset, dataset) in exclude_set:
+                continue
+            if dataset in seen:
+                continue
+            selected.append(dataset)
+            seen.add(dataset)
+        return selected
+
+    runtime_datasets = build_selected_datasets(runtime_exclude_datasets)
+    density_datasets = build_selected_datasets(density_exclude_datasets)
     
     # Method name abbreviations for LaTeX
     method_abbr = {
-        'CEP_MIP': 'MIQP-B',
-        'CEP_MIP_NB': 'MIQP-D',
-        'CEP_PRUNING_QPBO_MIP_CONSTRAIN': 'CQM-B',
-        'CEP_PRUNING_QPBO_MIP_CONSTRAIN_NB': 'CQM-D'
+        'NEG_DSD': 'NEG-DSD',
+        'CEP_MIP_B': 'MIQP-B',
+        'CEP_MIP_D': 'MIQP-D',
+        'CEP_PRUNING_QPBO_MIP_CONSTRAIN_B': 'CQM-B',
+        'CEP_PRUNING_QPBO_MIP_CONSTRAIN_D': 'CQM-D'
     }
     
     # Format numeric values
@@ -167,46 +210,82 @@ def create_latex_tables(density_df, time_df, algorithms):
         
         time_data[dataset] = time_vals
         density_data[dataset] = density_vals
+
+    # Determine per-dataset runtime ranking from raw numeric values.
+    # Fastest gets bold; second-fastest distinct time gets underline.
+    time_styles = {}
+    for dataset in datasets:
+        raw_times = []
+        for i, algo in enumerate(algorithms):
+            raw_val = time_df[time_df['Dataset'] == dataset][algo].values[0]
+            if isinstance(raw_val, (int, float)):
+                raw_times.append((i, float(raw_val)))
+
+        best_indices = set()
+        runner_up_indices = set()
+        if raw_times:
+            unique_times = sorted({t for _, t in raw_times})
+            best_time = unique_times[0]
+            best_indices = {idx for idx, t in raw_times if t == best_time}
+
+            if len(unique_times) > 1:
+                second_time = unique_times[1]
+                runner_up_indices = {idx for idx, t in raw_times if t == second_time}
+
+        time_styles[dataset] = {
+            'best': best_indices,
+            'runner_up': runner_up_indices
+        }
     
     time_combined_df = pd.DataFrame(time_data)
+    time_combined_df = time_combined_df[['Method'] + runtime_datasets]
     density_combined_df = pd.DataFrame(density_data)
-    
-    # Column format: l for method name, then c for each dataset
-    col_format = '@{}l' + 'c' * len(datasets) + '@{}'
-    
-    # Header row: Method and dataset names
-    header = "Method"
-    for dataset in datasets:
-        # Use abbreviation if available, otherwise use full name
-        abbr = dataset_abbr.get(dataset, dataset)
-        header += f" & {abbr}"
-    header += " \\\\"
+    density_combined_df = density_combined_df[['Method'] + density_datasets]
+
+    # Build LaTeX header from selected datasets.
+    def build_header(selected_datasets):
+        header = "Method"
+        for dataset in selected_datasets:
+            # Use abbreviation if available, otherwise use full name
+            abbr = dataset_abbr.get(dataset, dataset)
+            header += f" & {abbr}"
+        header += " \\\\"
+        return header
+
+    runtime_col_format = 'l' + ('r' * len(runtime_datasets))
+    density_col_format = 'l' + ('r' * len(density_datasets))
+    runtime_header = build_header(runtime_datasets)
+    density_header = build_header(density_datasets)
     
     # ===== TIME TABLE =====
     time_latex_lines = []
-    time_latex_lines.append("\\begin{table*}[t]")
+    time_latex_lines.append("\\begin{table*}[htbp]")
     time_latex_lines.append("\\centering")
-    time_latex_lines.append("\\footnotesize")
+    # time_latex_lines.append("\\footnotesize")
     time_latex_lines.append("\\setlength{\\tabcolsep}{4pt}")
-    time_latex_lines.append("\\caption{Algorithm Runtime Comparison (milliseconds)}")
-    time_latex_lines.append("\\label{tab:algorithm_runtime}")
-    time_latex_lines.append(f"\\begin{{tabular}}{{{col_format}}}")
-    time_latex_lines.append("\\hline")
-    time_latex_lines.append(header)
-    time_latex_lines.append("\\hline")
+    time_latex_lines.append("\\caption{Runtime comparison (milliseconds) on real-world datasets}")
+    time_latex_lines.append("\\label{tab:runtime}")
+    time_latex_lines.append(f"\\begin{{tabular}}{{{runtime_col_format}}}")
+    time_latex_lines.append("\\toprule")
+    time_latex_lines.append(runtime_header)
+    time_latex_lines.append("\\midrule")
     
     # Data rows for time
     for i, algo in enumerate(algorithms):
         # Use abbreviated name if available, otherwise use full name with escaped underscores
         display_name = method_abbr.get(algo, algo.replace('_', '\\_'))
         row = display_name
-        for dataset in datasets:
+        for dataset in runtime_datasets:
             time_val = time_data[dataset][i]
+            if i in time_styles[dataset]['best']:
+                time_val = f"\\textbf{{{time_val}}}"
+            elif i in time_styles[dataset]['runner_up']:
+                time_val = f"\\underline{{{time_val}}}"
             row += f" & {time_val}"
         row += " \\\\"
         time_latex_lines.append(row)
     
-    time_latex_lines.append("\\hline")
+    time_latex_lines.append("\\bottomrule")
     time_latex_lines.append("\\end{tabular}")
     time_latex_lines.append("\\end{table*}")
     
@@ -214,29 +293,29 @@ def create_latex_tables(density_df, time_df, algorithms):
     
     # ===== DENSITY TABLE =====
     density_latex_lines = []
-    density_latex_lines.append("\\begin{table*}[t]")
+    density_latex_lines.append("\\begin{table*}[htbp]")
     density_latex_lines.append("\\centering")
-    density_latex_lines.append("\\footnotesize")
+    # density_latex_lines.append("\\footnotesize")
     density_latex_lines.append("\\setlength{\\tabcolsep}{4pt}")
-    density_latex_lines.append("\\caption{Algorithm Density Comparison}")
-    density_latex_lines.append("\\label{tab:algorithm_density}")
-    density_latex_lines.append(f"\\begin{{tabular}}{{{col_format}}}")
-    density_latex_lines.append("\\hline")
-    density_latex_lines.append(header)
-    density_latex_lines.append("\\hline")
+    density_latex_lines.append("\\caption{Density comparison on real-world datasets}")
+    density_latex_lines.append("\\label{tab:density}")
+    density_latex_lines.append(f"\\begin{{tabular}}{{{density_col_format}}}")
+    density_latex_lines.append("\\toprule")
+    density_latex_lines.append(density_header)
+    density_latex_lines.append("\\midrule")
     
     # Data rows for density
     for i, algo in enumerate(algorithms):
         # Use abbreviated name if available, otherwise use full name with escaped underscores
         display_name = method_abbr.get(algo, algo.replace('_', '\\_'))
         row = display_name
-        for dataset in datasets:
+        for dataset in density_datasets:
             density_val = density_data[dataset][i]
             row += f" & {density_val}"
         row += " \\\\"
         density_latex_lines.append(row)
     
-    density_latex_lines.append("\\hline")
+    density_latex_lines.append("\\bottomrule")
     density_latex_lines.append("\\end{tabular}")
     density_latex_lines.append("\\end{table*}")
     
@@ -256,8 +335,23 @@ def main():
     # Create separate tables
     density_df, time_df = create_separate_tables(df, algorithms)
     
+    # Runtime columns to remove from the runtime table only.
+    # Supports full names (e.g., "Abortion") and abbreviations (e.g., "AB").
+    runtime_exclude_datasets = {'KC', 'BX', 'EL', 'AB', 'WP'}# 
+    # runtime_exclude_datasets = {}
+
+    # Density columns to remove from the density table only.
+    # Uses the same ordering template as runtime, with independent filtering.
+    density_exclude_datasets = set(['GV', 'RF', 'BG', 'GN', 'EP'])
+
     # Create LaTeX tables
-    time_latex, density_latex, time_combined_df, density_combined_df = create_latex_tables(density_df, time_df, algorithms)
+    time_latex, density_latex, time_combined_df, density_combined_df = create_latex_tables(
+        density_df,
+        time_df,
+        algorithms,
+        runtime_exclude_datasets=runtime_exclude_datasets,
+        density_exclude_datasets=density_exclude_datasets
+    )
     
     # Display results
     print("RUNTIME COMPARISON (milliseconds)")
@@ -272,14 +366,14 @@ def main():
     print()
     
     # Save LaTeX tables to separate files
-    with open('runtime_table.tex', 'w') as f:
-        f.write("% Algorithm Runtime Comparison Table (milliseconds)\n")
-        f.write("% Methods as rows, datasets as columns\n\n")
+    with open('output/tex/runtime_table.tex', 'w') as f:
+        # f.write("% Algorithm Runtime Comparison Table (milliseconds)\n")
+        # f.write("% Methods as rows, datasets as columns\n\n")
         f.write(time_latex)
     
-    with open('density_table.tex', 'w') as f:
-        f.write("% Algorithm Density Comparison Table\n")
-        f.write("% Methods as rows, datasets as columns\n\n")
+    with open('output/tex/density_table.tex', 'w') as f:
+        # f.write("% Algorithm Density Comparison Table\n")
+        # f.write("% Methods as rows, datasets as columns\n\n")
         f.write(density_latex)
     
     print()

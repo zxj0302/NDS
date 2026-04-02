@@ -8,6 +8,7 @@ competitor_templates: &competitor_templates
     exe: ./build/neg_dsd
     params:
       C_values: [0.9, 1.0, 1.1, 1.2]
+      run_time_limit: 3600.0
       num_iter: 1
   
   dcs_greedy:
@@ -15,6 +16,7 @@ competitor_templates: &competitor_templates
     name: DCSGreedy
     exe: ./build/dcs_greedy
     params:
+      run_time_limit: 3600.0
       num_iter: 1
   
   cep:
@@ -27,6 +29,7 @@ competitor_templates: &competitor_templates
       max_neg: 200
       max_local_optima: 10
       do_peeling: false
+      run_time_limit: 3600.0
       num_iter: 1
 
   miqcp:
@@ -35,6 +38,7 @@ competitor_templates: &competitor_templates
     exe: ./build/miqcp
     params:
       time_limit: 600.0
+      run_time_limit: 3600.0
       mip_gap: 0.0001
       threads: 0
       verbose: false
@@ -48,7 +52,11 @@ competitor_templates: &competitor_templates
       <<: *cep_params
       dinkelbach_iterations: 50
       epsilon: 0.9999
-      mip_time_limit: 600.0
+      mip_time_limit: 3600.0
+      # Lower bound method: "cep", "neg_dsd", or "dcs_greedy"
+      lb_method: "cep"
+      # C_values for NEG_DSD lower bound method (only used if lb_method is "neg_dsd")
+      lb_neg_dsd_c_values: [0.9, 1.0, 1.1, 1.2]
       enable_cep_init: true
       enable_binary_search: true
       enable_qpbo: false
@@ -78,7 +86,7 @@ competitor_templates: &competitor_templates
     exe: ./build/exact
     params: &cep_qpbo_mip_b_params
       <<: *cep_mip_b_params
-      step_size: 1.2
+      step_size: 1.1
       direct_mip_bound: 100
       enable_qpbo: true
       enable_qpbo_probe: false
@@ -198,7 +206,7 @@ competitor_templates: &competitor_templates
 competitor_templates_epsilon: &competitor_templates_epsilon
   <<: *competitor_templates
   cep_pruning_qpbo_mip_constrain_eps_90_b:
-    toggle: true
+    toggle: false
     name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_90_B
     exe: ./build/exact
     params:
@@ -206,7 +214,7 @@ competitor_templates_epsilon: &competitor_templates_epsilon
       epsilon: 0.9
 
   cep_pruning_qpbo_mip_constrain_eps_90_d:
-    toggle: true
+    toggle: false
     name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_90_D
     exe: ./build/exact
     params:
@@ -214,7 +222,7 @@ competitor_templates_epsilon: &competitor_templates_epsilon
       epsilon: 0.9
   
   cep_pruning_qpbo_mip_constrain_eps_95_b:
-    toggle: true
+    toggle: false
     name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_95_B
     exe: ./build/exact
     params:
@@ -222,7 +230,7 @@ competitor_templates_epsilon: &competitor_templates_epsilon
       epsilon: 0.95
 
   cep_pruning_qpbo_mip_constrain_eps_95_d:
-    toggle: true
+    toggle: false
     name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_95_D
     exe: ./build/exact
     params:
@@ -230,7 +238,7 @@ competitor_templates_epsilon: &competitor_templates_epsilon
       epsilon: 0.95
   
   cep_pruning_qpbo_mip_constrain_eps_99_b:
-    toggle: true
+    toggle: false
     name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_99_B
     exe: ./build/exact
     params:
@@ -238,7 +246,7 @@ competitor_templates_epsilon: &competitor_templates_epsilon
       epsilon: 0.99
 
   cep_pruning_qpbo_mip_constrain_eps_99_d:
-    toggle: true
+    toggle: false
     name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_99_D
     exe: ./build/exact
     params:
@@ -246,7 +254,7 @@ competitor_templates_epsilon: &competitor_templates_epsilon
       epsilon: 0.99
   
   cep_pruning_qpbo_mip_constrain_eps_999_b:
-    toggle: true
+    toggle: false
     name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_999_B
     exe: ./build/exact
     params:
@@ -254,7 +262,7 @@ competitor_templates_epsilon: &competitor_templates_epsilon
       epsilon: 0.999
 
   cep_pruning_qpbo_mip_constrain_eps_999_d:
-    toggle: true
+    toggle: false
     name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_999_D
     exe: ./build/exact
     params:
@@ -331,10 +339,49 @@ competitor_templates_cep: &competitor_templates_cep
       max_neg: 500
 
 # =============================================================================
+# Extended Competitor Templates For Different Lower Bound Methods
+# =============================================================================
+competitor_templates_lb: &competitor_templates_lb
+  <<: *competitor_templates
+  neg_dsd_pruning_qpbo_mip_constrain_b:
+    toggle: true
+    name: NEG_DSD_PRUNING_QPBO_MIP_CONSTRAIN_B
+    exe: ./build/exact
+    params:
+      <<: *cep_pruning_qpbo_mip_constrain_b_params
+      lb_method: "neg_dsd"
+      lb_neg_dsd_c_values: [0.9, 1.0, 1.1, 1.2]
+
+  neg_dsd_pruning_qpbo_mip_constrain_d:
+    toggle: true
+    name: NEG_DSD_PRUNING_QPBO_MIP_CONSTRAIN_D
+    exe: ./build/exact
+    params:
+      <<: *cep_pruning_qpbo_mip_constrain_d_params
+      lb_method: "neg_dsd"
+      lb_neg_dsd_c_values: [0.9, 1.0, 1.1, 1.2]
+
+  dcs_greedy_pruning_qpbo_mip_constrain_b:
+    toggle: true
+    name: DCS_GREEDY_PRUNING_QPBO_MIP_CONSTRAIN_B
+    exe: ./build/exact
+    params:
+      <<: *cep_pruning_qpbo_mip_constrain_b_params
+      lb_method: "dcs_greedy"
+
+  dcs_greedy_pruning_qpbo_mip_constrain_d:
+    toggle: true
+    name: DCS_GREEDY_PRUNING_QPBO_MIP_CONSTRAIN_D
+    exe: ./build/exact
+    params:
+      <<: *cep_pruning_qpbo_mip_constrain_d_params
+      lb_method: "dcs_greedy"
+
+# =============================================================================
 # Final Competitors Selection
 # =============================================================================
 competitors: &competitors
-  <<: *competitor_templates_epsilon
+  <<: *competitor_templates_lb
 
 # =============================================================================
 # Experiment Configurations
@@ -344,26 +391,36 @@ real-world:
   # Input datasets (individual files)
   input:
     - path: ./input/real-world/Abortion/Abortion.txt
-      toggle: false
-    - path: ./input/real-world/Biogrid/Biogrid.txt
-      toggle: false
-    - path: ./input/real-world/Brexit/Brexit.txt
       toggle: true
+    - path: ./input/real-world/Biogrid/Biogrid.txt
+      toggle: true
+    - path: ./input/real-world/Brexit/Brexit.txt
+      toggle: false
     - path: ./input/real-world/Collins/Collins.txt
-      toggle: false
+      toggle: true
     - path: ./input/real-world/Election/Election.txt
-      toggle: false
+      toggle: true
     - path: ./input/real-world/Gavin/Gavin.txt
-      toggle: false
+      toggle: true
     - path: ./input/real-world/Gun/Gun.txt
-      toggle: false
+      toggle: true
     - path: ./input/real-world/Krogan-Core/Krogan-Core.txt
-      toggle: false
+      toggle: true
     - path: ./input/real-world/Krogan-Extended/Krogan-Extended.txt
-      toggle: false
+      toggle: true
     - path: ./input/real-world/Partisanship/Partisanship.txt
-      toggle: false
+      toggle: true
     - path: ./input/real-world/Referendum/Referendum.txt
+      toggle: true
+    - path: ./input/real-world/Amazon/Amazon.txt
+      toggle: true
+    - path: ./input/real-world/Epinions/Epinions.txt
+      toggle: false
+    - path: ./input/real-world/Stackoverflow/Stackoverflow.txt
+      toggle: false
+    - path: ./input/real-world/WikiData/WikiData.txt
+      toggle: true
+    - path: ./input/real-world/WikiPolitics/WikiPolitics.txt
       toggle: false
   
   weight_reverse: false
@@ -378,7 +435,7 @@ synthetic:
     - path: ./input/synthetic/BA/
       toggle: false
     - path: ./input/synthetic/ER/
-      toggle: true
+      toggle: false
     - path: ./input/synthetic/RGG/
       toggle: false
     - path: ./input/synthetic/SBM/

@@ -191,6 +191,7 @@ cat > config.json << EOF
   "input": "./input/real-world/Referendum/Referendum.txt",
   "output": "./output/test/result.json",
   "reverse_weight": false,
+  "run_time_limit": 600.0,
   "num_iter": 1,
   "do_peeling": false,
   "max_local_optima": 10,

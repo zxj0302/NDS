@@ -1,12 +1,20 @@
 #include "cep.hpp"
+#include "neg_dsd.hpp"
+#include "dcs_greedy.hpp"
 #include "../../external/QPBO/QPBO.h"
 #include <gurobi_c++.h>
 
 class EXACT : public CEP {
 public:
     struct EXACT_Config : public CEP_Config {
+        enum class LowerBoundMethod {
+            CEP,
+            NEG_DSD,
+            DCS_GREEDY
+        };
+
         // For finding upper bound
-        double step_size = 1.02;
+        double step_size = 1.2;
         // Direct MIP bound
         unsigned direct_mip_bound = 100;
         // Binary search related params
@@ -14,6 +22,27 @@ public:
         double epsilon = -0.001;
         // MIP related params
         double mip_time_limit = 600.0;
+
+        // Lower bound method selection: "cep", "neg_dsd", or "dcs_greedy"
+        LowerBoundMethod lb_method = LowerBoundMethod::CEP;
+        // NEG_DSD specific parameters
+        vector<double> lb_neg_dsd_c_values = {1.0};
+
+        static LowerBoundMethod ParseLowerBoundMethod(const string& method) {
+            if (method == "cep") return LowerBoundMethod::CEP;
+            if (method == "neg_dsd") return LowerBoundMethod::NEG_DSD;
+            if (method == "dcs_greedy") return LowerBoundMethod::DCS_GREEDY;
+            throw runtime_error("Unknown lb_method '" + method + "'. Must be 'cep', 'neg_dsd', or 'dcs_greedy'.");
+        }
+
+        static string LowerBoundMethodToString(LowerBoundMethod method) {
+            switch (method) {
+                case LowerBoundMethod::CEP: return "cep";
+                case LowerBoundMethod::NEG_DSD: return "neg_dsd";
+                case LowerBoundMethod::DCS_GREEDY: return "dcs_greedy";
+            }
+            throw runtime_error("Invalid lower bound method enum value.");
+        }
 
         // Components toggle for ablation study
         bool enable_cep_init = false;
@@ -43,6 +72,16 @@ public:
             if (json.contains("epsilon")) epsilon = json.at("epsilon").to_number<double>();
             if (json.contains("mip_time_limit")) mip_time_limit = json.at("mip_time_limit").to_number<double>();
 
+            if (json.contains("lb_method")) {
+                lb_method = ParseLowerBoundMethod(json.at("lb_method").as_string().c_str());
+            }
+            if (json.contains("lb_neg_dsd_c_values")) {
+                lb_neg_dsd_c_values.clear();
+                for (auto& v : json.at("lb_neg_dsd_c_values").as_array()) {
+                    lb_neg_dsd_c_values.push_back(v.as_double());
+                }
+            }
+
             if (json.contains("enable_cep_init")) enable_cep_init = json.at("enable_cep_init").as_bool();
             if (json.contains("enable_binary_search")) enable_binary_search = json.at("enable_binary_search").as_bool();
             if (json.contains("enable_qpbo")) enable_qpbo = json.at("enable_qpbo").as_bool();
@@ -66,6 +105,13 @@ public:
             cfg["dinkelbach_iterations"] = dinkelbach_iterations;
             cfg["epsilon"] = epsilon;
             cfg["mip_time_limit"] = mip_time_limit;
+
+            cfg["lb_method"] = LowerBoundMethodToString(lb_method);
+            json::array c_values_array;
+            for (const auto& c : lb_neg_dsd_c_values) {
+                c_values_array.push_back(c);
+            }
+            cfg["lb_neg_dsd_c_values"] = c_values_array;
 
             cfg["enable_cep_init"] = enable_cep_init;
             cfg["enable_binary_search"] = enable_binary_search;
@@ -130,8 +176,45 @@ private:
     size_t vertex_lower_bound, vertex_upper_bound;
     SubgraphResult naive_lb;
 
+    NEG_DSD::NEG_DSD_Config BuildNegDsdConfig(const EXACT_Config& cfg) const {
+        NEG_DSD::NEG_DSD_Config neg_dsd_cfg;
+        neg_dsd_cfg.input = cfg.input;
+        neg_dsd_cfg.output = cfg.output;
+        neg_dsd_cfg.reverse_weight = cfg.reverse_weight;
+        neg_dsd_cfg.num_iter = cfg.num_iter;
+        neg_dsd_cfg.C_values = cfg.lb_neg_dsd_c_values;
+        return neg_dsd_cfg;
+    }
+
+    DCSGreedy::DCSGreedy_Config BuildDcsGreedyConfig(const EXACT_Config& cfg) const {
+        DCSGreedy::DCSGreedy_Config dcs_cfg;
+        dcs_cfg.input = cfg.input;
+        dcs_cfg.output = cfg.output;
+        dcs_cfg.reverse_weight = cfg.reverse_weight;
+        dcs_cfg.num_iter = cfg.num_iter;
+        return dcs_cfg;
+    }
+
+    SubgraphResult RunLowerBoundInitializer(const EXACT_Config& cfg) {
+        switch (cfg.lb_method) {
+            case EXACT_Config::LowerBoundMethod::CEP:
+                return CEP::Run(cfg);
+            case EXACT_Config::LowerBoundMethod::NEG_DSD: {
+                auto neg_dsd_cfg = BuildNegDsdConfig(cfg);
+                NEG_DSD neg_dsd(neg_dsd_cfg);
+                return neg_dsd.Run(neg_dsd_cfg);
+            }
+            case EXACT_Config::LowerBoundMethod::DCS_GREEDY: {
+                auto dcs_cfg = BuildDcsGreedyConfig(cfg);
+                DCSGreedy dcs_greedy(dcs_cfg);
+                return dcs_greedy.Run();
+            }
+        }
+        throw runtime_error("Invalid lower bound method enum value.");
+    }
+
     struct Timings {
-        double cep_init       = 0.0;  // CEP::Run in FindLowerBound
+        double cep_init       = 0.0;  // Lower-bound initializer in FindLowerBound
         double qpbo           = 0.0;  // RunQPBO (standard + improve)
         double mip            = 0.0;  // RunMIP
         double pruning        = 0.0;  // Pruning + PruningModeToggle
@@ -312,13 +395,14 @@ public:
     }
 
     pair<SubgraphResult, bool> FindLowerBound(const EXACT_Config& cfg) {
-        // 1. Run CEP to get initial solution
+        // 1. Run selected lower bound method to get initial solution
         auto result_lb = SubgraphResult{{}, 0.0};
         if (cfg.enable_cep_init) {
-            result_lb = timed(timings.cep_init, [&]{ return CEP::Run(cfg); });
-            LOG("FindLowerBound: CEP init lb: " << result_lb.density);
+            result_lb = timed(timings.cep_init, [&]{ return RunLowerBoundInitializer(cfg); });
+            LOG("FindLowerBound: " << EXACT_Config::LowerBoundMethodToString(cfg.lb_method) << " init lb: " << result_lb.density);
+            CEP::Reset(true);
         }
-        CEP::Reset(true);
+        
         // 2. Need to find better lower bound among single nodes and edges if set vertex lb
         if (cfg.enable_mip_constrains_vertex_lb || !cfg.enable_cep_init) {
             if (naive_lb.density > result_lb.density) {
@@ -326,6 +410,7 @@ public:
                 LOG("FindLowerBound: Updated to naive lb: " << result_lb.density);
             }
         }
+        
         // 3. Run QPBO to check whether it is already optimal, or update lower bound if possible
         if (cfg.enable_graph_pruning) timed(timings.pruning, [&]{ Pruning({}, result_lb.density); });
         if (cfg.enable_qpbo) {

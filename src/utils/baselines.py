@@ -57,6 +57,7 @@ def run_competitor(dataset_path, competitor, output_path, reverse):
     comp_name = competitor['name']
     program = competitor['exe']
     params = competitor.get('params', {})
+    run_time_limit = params.get('run_time_limit', 0)
     
     # Build complete config
     full_config = {
@@ -69,9 +70,24 @@ def run_competitor(dataset_path, competitor, output_path, reverse):
     # Write config and execute
     config_path = write_config_json(full_config)
     try:
-        subprocess.run([program, config_path], check=True)
+        timeout = float(run_time_limit) if run_time_limit and float(run_time_limit) > 0 else None
+        subprocess.run([program, config_path], check=True, timeout=timeout)
         result = json.load(open(output_path))
         logger.info(f'{comp_name:<45}: time: {result["time"]:.6f}s, density: {result["density"]:.6f}')
+    except subprocess.TimeoutExpired:
+        timeout_seconds = float(run_time_limit) if run_time_limit else 0.0
+        timeout_result = {
+            "time": timeout_seconds,
+            "density": 0.0,
+            "size": 0,
+            "nodes": [],
+            "status": "timeout",
+            "config": full_config,
+            "timings": {"total": timeout_seconds}
+        }
+        with open(output_path, 'w') as f:
+            json.dump(timeout_result, f, indent=2)
+        logger.warning(f'{comp_name:<45}: timeout after {timeout_seconds:.2f}s on {dataset_path}')
     except subprocess.CalledProcessError as e:
         logger.error(f'{comp_name:<45}: crashed with exit code {e.returncode} on {dataset_path}')
     except Exception as e:

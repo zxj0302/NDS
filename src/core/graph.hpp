@@ -38,6 +38,7 @@ public:
         string output;
         bool reverse_weight = false;
         unsigned num_iter = 1;
+        double run_time_limit = 0.0;
         
         virtual void load_from_json(const string& filename) {
             ifstream file(filename);
@@ -48,6 +49,7 @@ public:
             if (json.contains("output")) output = json.at("output").as_string().c_str();
             if (json.contains("reverse_weight")) reverse_weight = json.at("reverse_weight").as_bool();
             if (json.contains("num_iter")) num_iter = json.at("num_iter").to_number<unsigned>();
+            if (json.contains("run_time_limit")) run_time_limit = json.at("run_time_limit").to_number<double>();
         }
 
         virtual void add_to_json(json::object& cfg) const {
@@ -55,6 +57,7 @@ public:
             cfg["output"] = output;
             cfg["reverse_weight"] = reverse_weight;
             cfg["num_iter"] = num_iter;
+            cfg["run_time_limit"] = run_time_limit;
         }
     };
 
