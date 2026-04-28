@@ -36,6 +36,7 @@ private:
 
 public:
     NEG_DSD(const NEG_DSD_Config& cfg) : PGraph(cfg) {}
+    explicit NEG_DSD(const PGraph& loaded_graph) : PGraph(loaded_graph) {}
 
     void InitializeDegrees() {
         pos_deg.assign(num_vertices(G), 0.0);

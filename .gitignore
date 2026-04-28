@@ -15,3 +15,8 @@ backups
 test*
 results
 gurobi*
+# input/Signed_Graphs
+input
+skip*.yaml
+*.pdf
+*.png

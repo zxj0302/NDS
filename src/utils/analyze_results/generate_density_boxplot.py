@@ -1,7 +1,36 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-import seaborn as sns
+
+
+#================ CHANGE IF NEEDED ================
+# Method name mapping (from internal names to display names)
+METHOD_ABBR = {
+    'DCSGreedy': 'DCSGreedy',
+    'NEG_DSD': 'NEG-DSD',
+    'CEP_L1': 'ECP-L1',
+    'CEP_L5': 'ECP-L5',
+    'CEP_L20': 'ECP-L20',
+    'CEP_L50': 'ECP-L50',
+    'CEP_L100': 'ECP-L100',
+    'CEP_L200': 'ECP-L200',
+    'CEP_L300': 'ECP-L300',
+    'CEP_K0': 'ECP-K0',
+    'CEP_K50': 'ECP-K50',
+    'CEP_K100': 'ECP-K100',
+    'CEP_K200': 'ECP-K200',
+    'CEP_K500': 'ECP-K500',
+    'CEP': 'ECP',
+    'CEP_MIP_B': 'EM',
+    'CEP_QPBO_MIP_B': 'EM w/ Q',
+    'CEP_PRUNING_QPBO_MIP_B': 'EM w/ Q+P',
+    'CEP_PRUNING_QPBO_MIP_CONSTRAIN_B': 'BAR',
+    'CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_80_B': 'BAR-80',
+    'CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_90_B': 'BAR-90',
+    'CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_95_B': 'BAR-95',
+    'CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_99_B': 'BAR-99',
+    'CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_999_B': 'BAR-999',
+}
 
 # Set publication-quality style
 plt.rcParams['font.family'] = 'serif'
@@ -11,19 +40,57 @@ plt.rcParams['axes.labelsize'] = 12
 plt.rcParams['axes.titlesize'] = 13
 plt.rcParams['xtick.labelsize'] = 9
 plt.rcParams['ytick.labelsize'] = 9
-plt.rcParams['legend.fontsize'] = 8
+plt.rcParams['legend.fontsize'] = 8.5
 plt.rcParams['figure.titlesize'] = 13
 plt.rcParams['pdf.fonttype'] = 42
 plt.rcParams['ps.fonttype'] = 42
 
-# Read the CSV file
-df = pd.read_csv('results/synthetic/density_improvements.csv')
-
 # Define which methods to show (in this order)
-methods_to_show = ['DCSGreedy','NEG-DSD', 'CEP', 'MIQP-D', 'CQM-B-90', 'CQM-B-95', 'CQM-B-99', 'CQM-B', 'CQM-D-90', 'CQM-D-95', 'CQM-D-99', 'CQM-D']
+methods_to_show = ['DCSGreedy','NEG-DSD', 'ECP', 'BAR-80', 'BAR-90', 'BAR-95', 'BAR-99', 'BAR']
+save_path = 'results/figure/density_improvement_boxplot.pdf'
+#==================================================
 
-# Filter to only include methods that exist in the data and are in our list
-methods = [m for m in methods_to_show if m in df['method'].values]
+
+# Read only required columns from the ER density table.
+# Use internal method names (CSV columns) that map to the requested display names.
+display_to_internal = {v: k for k, v in METHOD_ABBR.items()}
+wanted_internal_methods = [display_to_internal[m] for m in methods_to_show if m in display_to_internal]
+columns_to_read = ['graph_name'] + [c for c in wanted_internal_methods if c != 'graph_name']
+df_density = pd.read_csv('results/synthetic/ER/ER_density_table.csv', usecols=columns_to_read)
+df_time = pd.read_csv('results/synthetic/ER/ER_time_table.csv', usecols=columns_to_read)
+
+# Keep only graphs where all wanted methods have valid values
+df_density_complete = df_density.dropna(subset=wanted_internal_methods)
+df_time_complete = df_time.dropna(subset=wanted_internal_methods)
+
+# Counted graphs are those with complete density and runtime values for all wanted methods
+counted_graphs = set(df_density_complete['graph_name']).intersection(set(df_time_complete['graph_name']))
+df_density_complete = df_density_complete[df_density_complete['graph_name'].isin(counted_graphs)]
+df_time_complete = df_time_complete[df_time_complete['graph_name'].isin(counted_graphs)]
+
+# Long format and apply display-name mapping
+df_long = df_density_complete.melt(id_vars=['graph_name'], var_name='method', value_name='density')
+df_long['method_display'] = df_long['method'].map(METHOD_ABBR)
+df_long = df_long[df_long['method_display'].notna()]
+
+# Runtime long table (same counted graphs/methods) for average runtime line
+df_time_long = df_time_complete.melt(id_vars=['graph_name'], var_name='method', value_name='runtime')
+df_time_long['method_display'] = df_time_long['method'].map(METHOD_ABBR)
+df_time_long = df_time_long[df_time_long['method_display'].notna()]
+
+# Density improvement (%) relative to DCSGreedy for each graph
+baseline = df_long[df_long['method_display'] == 'DCSGreedy'][['graph_name', 'density']].rename(columns={'density': 'baseline_density'})
+df_long = df_long.merge(baseline, on='graph_name', how='left')
+df_long['improvement_pct'] = (df_long['density'] - df_long['baseline_density']) / df_long['baseline_density'] * 100.0
+
+# Keep plotting order for methods that exist after complete-case filtering
+methods = [m for m in methods_to_show if m in df_long['method_display'].values]
+
+# Average runtime (seconds) over counted graphs for each method
+avg_runtime_by_method = [
+    df_time_long[df_time_long['method_display'] == method]['runtime'].mean()
+    for method in methods
+]
 
 # Prepare data for boxplot and compute statistics
 data_to_plot = []
@@ -31,7 +98,7 @@ labels = []
 stats = []
 
 for method in methods:
-    method_data = df[df['method'] == method]['improvement_pct'].values
+    method_data = df_long[df_long['method_display'] == method]['improvement_pct'].values
     data_to_plot.append(method_data)
     labels.append(method)
     stats.append({
@@ -60,6 +127,26 @@ bp = ax.boxplot(data_to_plot, patch_artist=True,
 ax.set_xticks(range(1, len(labels) + 1))
 ax.set_xticklabels(labels, rotation=45, ha='center')
 
+# Add average runtime line on a secondary axis
+x_positions = list(range(1, len(labels) + 1))
+ax2 = ax.twinx()
+runtime_line = ax2.plot(
+    x_positions,
+    avg_runtime_by_method,
+    color='darkred',
+    marker='o',
+    markersize=3.5,
+    linewidth=1.1,
+    linestyle='--',
+    label='Avg Runtime'
+)
+ax2.set_ylabel('Average Runtime (s)', fontsize=10, fontweight='bold', color='black')
+ax2.tick_params(axis='y', labelcolor='black')
+ax2.set_yscale('log')
+runtime_min = min(avg_runtime_by_method)
+runtime_max = max(avg_runtime_by_method)
+ax2.set_ylim([runtime_min / 40.0, runtime_max * 1.05])
+
 # Add mean markers (stars)
 for i, (stat, pos) in enumerate(zip(stats, range(1, len(stats) + 1))):
     ax.plot(pos, stat['mean'], marker='*', markersize=4, 
@@ -74,7 +161,7 @@ for i, (stat, pos) in enumerate(zip(stats, range(1, len(stats) + 1))):
     
     # Add mean value text just above the mean marker
     ax.text(pos, stat['mean'] + offset, 
-            f"{stat['mean']:.1f}",
+            f"{stat['mean']:.2f}",
             ha='center', va='bottom', fontsize=9,
             color='darkred', fontweight='bold')
 
@@ -87,14 +174,16 @@ ax.set_xlabel('Method', fontsize=10, fontweight='bold')
 ax.set_ylabel('Density Improvement (%)', fontsize=10, fontweight='bold')
 
 # Add legend for median line and mean marker
-from matplotlib.patches import Patch
 from matplotlib.lines import Line2D
 legend_elements = [
     Line2D([0], [0], color='darkred', linewidth=1.5, label='Median'),
     Line2D([0], [0], marker='*', color='darkred', linestyle='None',
-           markersize=8, markeredgecolor='darkred', markeredgewidth=1.0, label='Mean')
+        markersize=8, markeredgecolor='darkred', markeredgewidth=1.0, label='Mean'),
+    Line2D([0], [0], color='darkred', marker='o', linewidth=1.1, linestyle='--',
+        markersize=4, label='Avg Runtime')
 ]
-ax.legend(handles=legend_elements, loc='upper left', framealpha=0.9, edgecolor='black')
+ax.legend(handles=legend_elements, loc='upper center', bbox_to_anchor=(0.5, 1.0),
+          ncol=3, framealpha=0.9, edgecolor='black')
 
 # Add horizontal line at 0 for reference
 ax.axhline(y=0, color='gray', linestyle='-', linewidth=0.8, alpha=0.5)
@@ -115,13 +204,19 @@ for spine in ax.spines.values():
 plt.tight_layout()
 
 # Save the figure
-plt.savefig('density_improvement_boxplot.pdf', bbox_inches='tight')
+plt.savefig(save_path, bbox_inches='tight')
 
-print("Boxplot saved as 'density_improvement_boxplot.pdf' and 'density_improvement_boxplot.png'")
+print("Boxplot saved as 'density_improvement_boxplot.pdf'")
+print(f"Counted graphs: {len(counted_graphs)}")
 print("\nSummary Statistics:")
 print("-" * 80)
 for method, stat in zip(methods, stats):
-    print(f"{method:15s} | Median: {stat['median']:6.2f}% | Mean: {stat['mean']:6.2f}% | Std: {stat['std']:6.2f}%")
+    print(f"{method:15s} | Median: {stat['median']:6.3f}% | Mean: {stat['mean']:6.3f}% | Std: {stat['std']:6.3f}%")
+
+print("\nAverage Runtime on Counted Graphs:")
+print("-" * 80)
+for method, avg_runtime in zip(methods, avg_runtime_by_method):
+    print(f"{method:15s} | Avg Runtime: {avg_runtime:10.4f} s")
 
 # Show the plot
 plt.show()

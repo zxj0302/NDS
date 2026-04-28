@@ -175,6 +175,8 @@ private:
     using REAL = double;
     size_t vertex_lower_bound, vertex_upper_bound;
     SubgraphResult naive_lb;
+    unique_ptr<NEG_DSD> neg_dsd_runner;
+    unique_ptr<DCSGreedy> dcs_greedy_runner;
 
     NEG_DSD::NEG_DSD_Config BuildNegDsdConfig(const EXACT_Config& cfg) const {
         NEG_DSD::NEG_DSD_Config neg_dsd_cfg;
@@ -195,19 +197,41 @@ private:
         return dcs_cfg;
     }
 
+    void EnsureLowerBoundRunnerInitialized(const EXACT_Config& cfg) {
+        if (cfg.lb_method == EXACT_Config::LowerBoundMethod::NEG_DSD && !neg_dsd_runner) {
+            neg_dsd_runner = make_unique<NEG_DSD>(static_cast<const PGraph&>(*this));
+        }
+        if (cfg.lb_method == EXACT_Config::LowerBoundMethod::DCS_GREEDY && !dcs_greedy_runner) {
+            dcs_greedy_runner = make_unique<DCSGreedy>(static_cast<const PGraph&>(*this));
+        }
+    }
+
+    // Time a callable and accumulate the elapsed seconds into `acc`.
+    // Works for both void-returning and value-returning callables.
+    template<typename Fn>
+    decltype(auto) timed(double& acc, Fn&& fn) {
+        auto t = chrono::steady_clock::now();
+        if constexpr (is_void_v<invoke_result_t<Fn>>) {
+            fn();
+            acc += chrono::duration<double>(chrono::steady_clock::now() - t).count();
+        } else {
+            decltype(auto) result = fn();
+            acc += chrono::duration<double>(chrono::steady_clock::now() - t).count();
+            return result;
+        }
+    }
+
     SubgraphResult RunLowerBoundInitializer(const EXACT_Config& cfg) {
+        EnsureLowerBoundRunnerInitialized(cfg);
         switch (cfg.lb_method) {
             case EXACT_Config::LowerBoundMethod::CEP:
-                return CEP::Run(cfg);
+                return timed(timings.cep_init, [&]{ return CEP::Run(cfg); });
             case EXACT_Config::LowerBoundMethod::NEG_DSD: {
                 auto neg_dsd_cfg = BuildNegDsdConfig(cfg);
-                NEG_DSD neg_dsd(neg_dsd_cfg);
-                return neg_dsd.Run(neg_dsd_cfg);
+                return timed(timings.cep_init, [&]{ return neg_dsd_runner->Run(neg_dsd_cfg); });
             }
             case EXACT_Config::LowerBoundMethod::DCS_GREEDY: {
-                auto dcs_cfg = BuildDcsGreedyConfig(cfg);
-                DCSGreedy dcs_greedy(dcs_cfg);
-                return dcs_greedy.Run();
+                return timed(timings.cep_init, [&]{ return dcs_greedy_runner->Run(); });
             }
         }
         throw runtime_error("Invalid lower bound method enum value.");
@@ -225,23 +249,9 @@ private:
     };
     Timings timings;
 
-    // Time a callable and accumulate the elapsed seconds into `acc`.
-    // Works for both void-returning and value-returning callables.
-    template<typename Fn>
-    decltype(auto) timed(double& acc, Fn&& fn) {
-        auto t = chrono::steady_clock::now();
-        if constexpr (is_void_v<invoke_result_t<Fn>>) {
-            fn();
-            acc += chrono::duration<double>(chrono::steady_clock::now() - t).count();
-        } else {
-            decltype(auto) result = fn();
-            acc += chrono::duration<double>(chrono::steady_clock::now() - t).count();
-            return result;
-        }
-    }
-
 public:
     EXACT(const EXACT_Config& cfg) : CEP(cfg) {
+        EnsureLowerBoundRunnerInitialized(cfg);
         if (cfg.enable_mip_constrains_vertex_lb) {
             vertex_lower_bound = 3;
             naive_lb = NaiveLowerBound();
@@ -398,7 +408,7 @@ public:
         // 1. Run selected lower bound method to get initial solution
         auto result_lb = SubgraphResult{{}, 0.0};
         if (cfg.enable_cep_init) {
-            result_lb = timed(timings.cep_init, [&]{ return RunLowerBoundInitializer(cfg); });
+            result_lb = RunLowerBoundInitializer(cfg);
             LOG("FindLowerBound: " << EXACT_Config::LowerBoundMethodToString(cfg.lb_method) << " init lb: " << result_lb.density);
             CEP::Reset(true);
         }

@@ -51,7 +51,7 @@ competitor_templates: &competitor_templates
     params: &cep_mip_b_params
       <<: *cep_params
       dinkelbach_iterations: 50
-      epsilon: 0.9999
+      epsilon: 0.999
       mip_time_limit: 3600.0
       # Lower bound method: "cep", "neg_dsd", or "dcs_greedy"
       lb_method: "cep"
@@ -205,6 +205,22 @@ competitor_templates: &competitor_templates
 # =============================================================================
 competitor_templates_epsilon: &competitor_templates_epsilon
   <<: *competitor_templates
+  cep_pruning_qpbo_mip_constrain_eps_70_b:
+    toggle: false
+    name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_70_B
+    exe: ./build/exact
+    params:
+      <<: *cep_pruning_qpbo_mip_constrain_b_params
+      epsilon: 0.7
+
+  cep_pruning_qpbo_mip_constrain_eps_80_b:
+    toggle: false
+    name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_80_B
+    exe: ./build/exact
+    params:
+      <<: *cep_pruning_qpbo_mip_constrain_b_params
+      epsilon: 0.8
+
   cep_pruning_qpbo_mip_constrain_eps_90_b:
     toggle: false
     name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_90_B
@@ -290,6 +306,14 @@ competitor_templates_cep: &competitor_templates_cep
       <<: *cep_params
       max_local_optima: 5
 
+  cep_l10:
+    toggle: false
+    name: CEP_L10
+    exe: ./build/cep
+    params:
+      <<: *cep_params
+      max_local_optima: 10
+
   cep_l20:
     toggle: false
     name: CEP_L20
@@ -305,6 +329,30 @@ competitor_templates_cep: &competitor_templates_cep
     params:
       <<: *cep_params
       max_local_optima: 50
+
+  cep_l100:
+    toggle: false
+    name: CEP_L100
+    exe: ./build/cep
+    params:
+      <<: *cep_params
+      max_local_optima: 100
+
+  cep_l200:
+    toggle: false
+    name: CEP_L200
+    exe: ./build/cep
+    params:
+      <<: *cep_params
+      max_local_optima: 200
+
+  cep_l300:
+    toggle: false
+    name: CEP_L300
+    exe: ./build/cep
+    params:
+      <<: *cep_params
+      max_local_optima: 300
 
   cep_k0:
     toggle: false
@@ -330,6 +378,14 @@ competitor_templates_cep: &competitor_templates_cep
       <<: *cep_params
       max_neg: 100
 
+  cep_k200:
+    toggle: false
+    name: CEP_K200
+    exe: ./build/cep
+    params:
+      <<: *cep_params
+      max_neg: 200
+
   cep_k500:
     toggle: false
     name: CEP_K500
@@ -344,7 +400,7 @@ competitor_templates_cep: &competitor_templates_cep
 competitor_templates_lb: &competitor_templates_lb
   <<: *competitor_templates
   neg_dsd_pruning_qpbo_mip_constrain_b:
-    toggle: true
+    toggle: false
     name: NEG_DSD_PRUNING_QPBO_MIP_CONSTRAIN_B
     exe: ./build/exact
     params:
@@ -353,7 +409,7 @@ competitor_templates_lb: &competitor_templates_lb
       lb_neg_dsd_c_values: [0.9, 1.0, 1.1, 1.2]
 
   neg_dsd_pruning_qpbo_mip_constrain_d:
-    toggle: true
+    toggle: false
     name: NEG_DSD_PRUNING_QPBO_MIP_CONSTRAIN_D
     exe: ./build/exact
     params:
@@ -362,7 +418,7 @@ competitor_templates_lb: &competitor_templates_lb
       lb_neg_dsd_c_values: [0.9, 1.0, 1.1, 1.2]
 
   dcs_greedy_pruning_qpbo_mip_constrain_b:
-    toggle: true
+    toggle: false
     name: DCS_GREEDY_PRUNING_QPBO_MIP_CONSTRAIN_B
     exe: ./build/exact
     params:
@@ -370,7 +426,7 @@ competitor_templates_lb: &competitor_templates_lb
       lb_method: "dcs_greedy"
 
   dcs_greedy_pruning_qpbo_mip_constrain_d:
-    toggle: true
+    toggle: false
     name: DCS_GREEDY_PRUNING_QPBO_MIP_CONSTRAIN_D
     exe: ./build/exact
     params:
@@ -378,10 +434,47 @@ competitor_templates_lb: &competitor_templates_lb
       lb_method: "dcs_greedy"
 
 # =============================================================================
+# Extended Competitor Templates For Different Step Size alpha
+# =============================================================================
+competitor_templates_step_size: &competitor_templates_ss
+  <<: *competitor_templates
+  cep_pruning_qpbo_mip_constrain_alpha_1_02_b:
+      toggle: true
+      name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_ALPHA_1_02_B
+      exe: ./build/exact
+      params:
+        <<: *cep_pruning_qpbo_mip_constrain_b_params
+        step_size: 1.02
+
+  cep_pruning_qpbo_mip_constrain_alpha_1_1_b:
+      toggle: true
+      name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_ALPHA_1_1_B
+      exe: ./build/exact
+      params:
+        <<: *cep_pruning_qpbo_mip_constrain_b_params
+        step_size: 1.1
+
+  cep_pruning_qpbo_mip_constrain_alpha_1_2_b:
+      toggle: true
+      name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_ALPHA_1_2_B
+      exe: ./build/exact
+      params:
+        <<: *cep_pruning_qpbo_mip_constrain_b_params
+        step_size: 1.2
+
+  cep_pruning_qpbo_mip_constrain_alpha_1_5_b:
+      toggle: true
+      name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_ALPHA_1_5_B
+      exe: ./build/exact
+      params:
+        <<: *cep_pruning_qpbo_mip_constrain_b_params
+        step_size: 1.5
+
+# =============================================================================
 # Final Competitors Selection
 # =============================================================================
 competitors: &competitors
-  <<: *competitor_templates_lb
+  <<: *competitor_templates_ss
 
 # =============================================================================
 # Experiment Configurations
@@ -391,36 +484,36 @@ real-world:
   # Input datasets (individual files)
   input:
     - path: ./input/real-world/Abortion/Abortion.txt
-      toggle: true
+      toggle: false
     - path: ./input/real-world/Biogrid/Biogrid.txt
-      toggle: true
+      toggle: false
     - path: ./input/real-world/Brexit/Brexit.txt
       toggle: false
     - path: ./input/real-world/Collins/Collins.txt
-      toggle: true
+      toggle: false
     - path: ./input/real-world/Election/Election.txt
-      toggle: true
+      toggle: false
     - path: ./input/real-world/Gavin/Gavin.txt
-      toggle: true
+      toggle: false
     - path: ./input/real-world/Gun/Gun.txt
-      toggle: true
+      toggle: false
     - path: ./input/real-world/Krogan-Core/Krogan-Core.txt
-      toggle: true
+      toggle: false
     - path: ./input/real-world/Krogan-Extended/Krogan-Extended.txt
-      toggle: true
+      toggle: false
     - path: ./input/real-world/Partisanship/Partisanship.txt
-      toggle: true
+      toggle: false
     - path: ./input/real-world/Referendum/Referendum.txt
-      toggle: true
-    - path: ./input/real-world/Amazon/Amazon.txt
-      toggle: true
-    - path: ./input/real-world/Epinions/Epinions.txt
       toggle: false
-    - path: ./input/real-world/Stackoverflow/Stackoverflow.txt
+    - path: ./input/real-world/Amazon/Amazon.txt # use eps = 0.9999
       toggle: false
-    - path: ./input/real-world/WikiData/WikiData.txt
-      toggle: true
-    - path: ./input/real-world/WikiPolitics/WikiPolitics.txt
+    - path: ./input/real-world/Epinions/Epinions.txt # use eps = 0.999
+      toggle: false
+    - path: ./input/real-world/Stackoverflow/Stackoverflow.txt # all fail on this, can only run with eps = 0.8
+      toggle: false
+    - path: ./input/real-world/WikiData/WikiData.txt # use eps = 0.9999
+      toggle: false
+    - path: ./input/real-world/WikiPolitics/WikiPolitics.txt # all fail on this
       toggle: false
   
   weight_reverse: false
@@ -435,7 +528,7 @@ synthetic:
     - path: ./input/synthetic/BA/
       toggle: false
     - path: ./input/synthetic/ER/
-      toggle: false
+      toggle: true
     - path: ./input/synthetic/RGG/
       toggle: false
     - path: ./input/synthetic/SBM/
@@ -451,8 +544,25 @@ test:
   # Quick test configuration with minimal settings
   input:
     # - ./input/synthetic/BA/BA_n50000_m3_setting25_inst0.txt
-    - ./input/synthetic/ER/ER_n100000_m500000_setting71_inst0.txt
+    - ./input/synthetic/ER/ER_n1000000_m1500000_setting105_inst0.txt
     # - ./input/synthetic/WS/WS_n500000_k10_p0.3_setting172_inst0.txt
+    # - ./input/real-world/WikiData/WikiData.txt
+    # - ./input/real-world/Collins/Collins.txt
+    # - ./input/real-world/Abortion/Abortion.txt
+    # - ./input/real-world/Biogrid/Biogrid.txt
+    # - ./input/real-world/Brexit/Brexit.txt
+    # - ./input/real-world/Election/Election.txt
+    # - ./input/real-world/Gavin/Gavin.txt
+    # - ./input/real-world/Gun/Gun.txt
+    # - ./input/real-world/Krogan-Core/Krogan-Core.txt
+    # - ./input/real-world/Krogan-Extended/Krogan-Extended.txt
+    # - ./input/real-world/Partisanship/Partisanship.txt
+    # - ./input/real-world/Referendum/Referendum.txt
+    # - ./input/real-world/Amazon/Amazon.txt
+    # - ./input/real-world/Epinions/Epinions.txt
+    # - ./input/real-world/Stackoverflow/Stackoverflow.txt
+    # - ./input/real-world/WikiData/WikiData.txt
+    # - ./input/real-world/WikiPolitics/WikiPolitics.txt
   
   weight_reverse: false
   output: ./output/test/

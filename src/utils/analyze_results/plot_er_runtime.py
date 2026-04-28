@@ -1,8 +1,31 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-import numpy as np
 
-def run(method = 'CEP_PRUNING_QPBO_MIP_CONSTRAIN'):
+
+#================ CHANGE IF NEEDED ================
+# Match the publication style used by generate_density_boxplot.py
+plt.rcParams['font.family'] = 'serif'
+plt.rcParams['font.serif'] = ['Times New Roman', 'DejaVu Serif']
+plt.rcParams['font.size'] = 13
+plt.rcParams['axes.labelsize'] = 13
+plt.rcParams['axes.titlesize'] = 13
+plt.rcParams['xtick.labelsize'] = 12
+plt.rcParams['ytick.labelsize'] = 12
+plt.rcParams['legend.fontsize'] = 11.5
+plt.rcParams['figure.titlesize'] = 14
+plt.rcParams['pdf.fonttype'] = 42
+plt.rcParams['ps.fonttype'] = 42
+
+method = 'CEP_PRUNING_QPBO_MIP_CONSTRAIN_B'
+shown_weight_modes = 3
+save_path = 'results/figure/ER_runtime_scatter.pdf'
+
+# Define markers for different weight modes
+markers = ['o', 'D', '_', 'd', 'D']  # line, circle, line, diamond, diamond
+#==================================================
+
+
+def run(method):
     # Read the CSV file
     df = pd.read_csv('results/synthetic/ER/ER_time_table.csv')
 
@@ -26,47 +49,76 @@ def run(method = 'CEP_PRUNING_QPBO_MIP_CONSTRAIN'):
     method_col = method
     df_filtered = df[df[method_col].notna()].copy()
     df_filtered['runtime'] = df_filtered[method_col]
-
-    # Define markers for different weight modes
-    markers = ['o', 's', '^', 'D', 'v']  # circle, square, triangle up, diamond, triangle down
+    
     weight_mode_labels = [r'$\mathcal{U}(-1, 1)$', r'$\mathcal{N}(0, 0.3)$', r'$\mathcal{N}(0, 0.5)$', 
                         r'$\text{Beta}(2.0, 5.0)$', r'$\text{Beta}(5.0, 2.0)$']
+    mode_colors = ['darkred', 'darkred', 'darkred', 'firebrick', 'darkgray']
 
     # Create figure with two subplots
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
+    _, (ax1, ax2) = plt.subplots(1, 2, figsize=(8, 4))
+
+    ax1.set_facecolor('white')
+    ax2.set_facecolor('white')
 
     # Plot 1: Runtime vs Node Count
-    for mode in range(5):
+    for mode in range(shown_weight_modes):
         mode_data = df_filtered[df_filtered['weight_mode'] == mode]
-        ax1.scatter(mode_data['node_count'], mode_data['runtime'], 
-                marker=markers[mode], label=weight_mode_labels[mode], 
-                alpha=0.7, s=20)
+        scatter_kwargs = dict(
+            marker=markers[mode],
+            label=weight_mode_labels[mode],
+            alpha=1,
+            s=250,
+        )
+        if markers[mode] in ['|', '_', 'x']:
+            scatter_kwargs.update(color=mode_colors[mode], linewidths=1 if markers[mode] == '|' else 1, s=50 if markers[mode] == '|' else 200)
+        elif markers[mode] in ['o']:
+            scatter_kwargs.update(facecolors='none', edgecolors=mode_colors[mode], linewidths=1, s=80)
+        else:
+            scatter_kwargs.update(facecolors=mode_colors[mode], edgecolors='none', linewidths=0, s=15)
+        ax1.scatter(mode_data['node_count'], mode_data['runtime'], **scatter_kwargs)
 
-    ax1.set_xlabel('Node Count', fontsize=10)
-    ax1.set_ylabel('Runtime (seconds)', fontsize=10)
-    ax1.set_title('Runtime vs Node Count', fontsize=12)
-    ax1.legend(loc='best')
-    ax1.grid(True, alpha=0.3)
+    ax1.set_xlabel('Node Count', fontsize=12, fontweight='bold')
+    ax1.set_ylabel('Runtime (seconds)', fontsize=12, fontweight='bold')
+    # ax1.set_title('Runtime vs Node Count', fontsize=13)
+    ax1.legend(loc='best', framealpha=0.9, edgecolor='black')
+    ax1.grid(True, alpha=0.3, linestyle='--', linewidth=0.8)
     ax1.set_xscale('log')
     ax1.set_yscale('log')
+    ax1.tick_params(axis='both', colors='black')
 
     # Plot 2: Runtime vs Density
-    for mode in range(5):
+    for mode in range(shown_weight_modes):
         mode_data = df_filtered[df_filtered['weight_mode'] == mode]
-        ax2.scatter(mode_data['density'], mode_data['runtime'], 
-                marker=markers[mode], label=weight_mode_labels[mode], 
-                alpha=0.7, s=20)
+        scatter_kwargs = dict(
+            marker=markers[mode],
+            label=weight_mode_labels[mode],
+            alpha=1.0,
+            s=250,
+        )
+        if markers[mode] in ['|', '_', 'x']:
+            scatter_kwargs.update(color=mode_colors[mode], linewidths=1 if markers[mode] == '|' else 1, s=50 if markers[mode] == '|' else 200)
+        elif markers[mode] == 'o':
+            scatter_kwargs.update(facecolors='none', edgecolors=mode_colors[mode], linewidths=1, s=80)
+        else:
+            scatter_kwargs.update(facecolors=mode_colors[mode], edgecolors='none', linewidths=0, s=15)
+        ax2.scatter(mode_data['density'], mode_data['runtime'], **scatter_kwargs)
 
-    ax2.set_xlabel('Density (#edges/#nodes)', fontsize=10)
-    ax2.set_ylabel('Runtime (seconds)', fontsize=10)
-    ax2.set_title('Runtime vs Density', fontsize=12)
+    ax2.set_xlabel('Density (#edges/#nodes)', fontsize=12, fontweight='bold')
+    ax2.set_ylabel('Runtime (seconds)', fontsize=12, fontweight='bold')
+    # ax2.set_title('Runtime vs Density', fontsize=13)
     # ax2.legend(loc='best')
-    ax2.grid(True, alpha=0.3)
+    ax2.grid(True, alpha=0.3, linestyle='--', linewidth=0.8)
     ax2.set_yscale('log')
+    ax2.tick_params(axis='both', colors='black')
+
+    for ax in (ax1, ax2):
+        for spine in ax.spines.values():
+            spine.set_edgecolor('black')
+            spine.set_linewidth(1.2)
 
     # Adjust layout and save
     plt.tight_layout()
-    plt.savefig(f'ER_runtime_scatter_{method}.pdf', bbox_inches='tight')
+    plt.savefig(save_path, bbox_inches='tight')
     plt.show()
 
     print(f"Total data points: {len(df_filtered)}")
@@ -75,5 +127,4 @@ def run(method = 'CEP_PRUNING_QPBO_MIP_CONSTRAIN'):
     print(f"\nRuntime range: {df_filtered['runtime'].min():.6f} - {df_filtered['runtime'].max():.6f} seconds")
 
 if __name__ == "__main__":
-    run('CEP_PRUNING_QPBO_MIP_CONSTRAIN')
-    run('CEP_PRUNING_QPBO_MIP_CONSTRAIN_NB')
+    run(method)

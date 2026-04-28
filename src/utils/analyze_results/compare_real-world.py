@@ -3,6 +3,63 @@ import os
 import pandas as pd
 from pathlib import Path
 
+
+# ================ CHANGE IF NEEDED ================
+# Dataset abbreviations mapping
+dataset_abbr = {
+    'Abortion': 'AB',
+    'Biogrid': 'BG',
+    'Brexit': 'BX',
+    'Collins': 'CL',
+    'Election': 'EL',
+    'Gavin': 'GV',
+    'Gun': 'GN',
+    'Krogan-Core': 'KC',
+    'Krogan-Extended': 'KE',
+    'Partisanship': 'PA',
+    'Referendum': 'RF',
+    'Amazon': 'AM',
+    'Epinions': 'EP',
+    'Stackoverflow': 'SO',
+    'WikiData': 'WD',
+    'WikiPolitics': 'WP'
+}
+# Define desired column order for runtime table (by abbreviation)
+desired_runtime_order = ['CL', 'GV', 'KC', 'RF', 'KE', 'AB', 'BG', 'GN', 'BX', 'PA', 'EL', 'EP', 'WP', 'WD', 'AM', 'SO']
+# Method name abbreviations for LaTeX
+method_abbr = {
+    'DCSGreedy': 'DCSGreedy',
+    'NEG_DSD': 'NEG-DSD',
+    'CEP': 'ECP',
+    'CEP_MIP_B': 'EM',
+    'CEP_QPBO_MIP_B': 'EM w/ Q',
+    'DCS_GREEDY_PRUNING_QPBO_MIP_CONSTRAIN_B': 'BAR-ID',
+    'NEG_DSD_PRUNING_QPBO_MIP_CONSTRAIN_B': 'BAR-IN',
+    'CEP_PRUNING_QPBO_MIP_CONSTRAIN_B': 'BAR'
+}
+# Methods to hide from all comparisons.
+# Use the raw JSON filename stem here, e.g. 'CEP_MIP_B' or 'NEG_DSD'.
+# 'CEP_PRUNING_QPBO_MIP_B': 'EM w/ Q+P',
+# 'CEP_MIP_D': 'MIQP-D',
+# 'CEP_PRUNING_QPBO_MIP_CONSTRAIN_D': 'CQM-D'
+ # Runtime columns to remove from the runtime table only.
+# Supports full names (e.g., "Abortion") and abbreviations (e.g., "AB").
+runtime_exclude_datasets = {'KC', 'BX', 'EL', 'AB', 'WP'}# 
+# Density columns to remove from the density table only.
+# Uses the same ordering template as runtime, with independent filtering.
+density_exclude_datasets = set(['GV', 'RF', 'BG', 'GN', 'EP', 'WP'])
+
+runtime_path = 'results/tex/rw_runtime_table.tex'
+density_path = 'results/tex/rw_density_table.tex'
+excluded_methods = {'CEP_PRUNING_QPBO_MIP_B'}
+# =================================================
+
+
+def is_excluded_method(algo_name):
+    """Return True if a method should be omitted from the comparison."""
+    display_name = method_abbr.get(algo_name, algo_name.replace('_', '\\_'))
+    return algo_name in excluded_methods or display_name in excluded_methods
+
 def read_algorithm_result(json_path):
     """
     Read algorithm result from JSON file.
@@ -46,6 +103,7 @@ def compare_algorithms(base_path='./output/real-world'):
                 all_algorithms.add(algo_name)
     
     algorithms = sorted(all_algorithms)
+    algorithms = [algo for algo in algorithms if not is_excluded_method(algo)]
     
     # Create comparison data
     results = []
@@ -108,29 +166,6 @@ def create_latex_tables(
     """
     datasets = list(density_df['Dataset'])
     
-    # Dataset abbreviations mapping
-    dataset_abbr = {
-        'Abortion': 'AB',
-        'Biogrid': 'BG',
-        'Brexit': 'BX',
-        'Collins': 'CL',
-        'Election': 'EL',
-        'Gavin': 'GV',
-        'Gun': 'GN',
-        'Krogan-Core': 'KC',
-        'Krogan-Extended': 'KE',
-        'Partisanship': 'PA',
-        'Referendum': 'RF',
-        'Amazon': 'AM',
-        'Epinions': 'EP',
-        'Stackoverflow': 'SO',
-        'WikiData': 'WD',
-        'WikiPolitics': 'WP'
-    }
-    
-    # Define desired column order for runtime table (by abbreviation)
-    desired_runtime_order = ['CL', 'GV', 'KC', 'RF', 'KE', 'AB', 'BG', 'GN', 'BX', 'PA', 'EL', 'EP', 'WP', 'WD', 'AM', 'SO']
-    
     # Create reverse mapping: abbr -> full name
     abbr_to_dataset = {v: k for k, v in dataset_abbr.items()}
     
@@ -158,15 +193,6 @@ def create_latex_tables(
 
     runtime_datasets = build_selected_datasets(runtime_exclude_datasets)
     density_datasets = build_selected_datasets(density_exclude_datasets)
-    
-    # Method name abbreviations for LaTeX
-    method_abbr = {
-        'NEG_DSD': 'NEG-DSD',
-        'CEP_MIP_B': 'MIQP-B',
-        'CEP_MIP_D': 'MIQP-D',
-        'CEP_PRUNING_QPBO_MIP_CONSTRAIN_B': 'CQM-B',
-        'CEP_PRUNING_QPBO_MIP_CONSTRAIN_D': 'CQM-D'
-    }
     
     # Format numeric values
     def format_value(val, is_time=False):
@@ -334,15 +360,6 @@ def main():
     
     # Create separate tables
     density_df, time_df = create_separate_tables(df, algorithms)
-    
-    # Runtime columns to remove from the runtime table only.
-    # Supports full names (e.g., "Abortion") and abbreviations (e.g., "AB").
-    runtime_exclude_datasets = {'KC', 'BX', 'EL', 'AB', 'WP'}# 
-    # runtime_exclude_datasets = {}
-
-    # Density columns to remove from the density table only.
-    # Uses the same ordering template as runtime, with independent filtering.
-    density_exclude_datasets = set(['GV', 'RF', 'BG', 'GN', 'EP'])
 
     # Create LaTeX tables
     time_latex, density_latex, time_combined_df, density_combined_df = create_latex_tables(
@@ -366,12 +383,16 @@ def main():
     print()
     
     # Save LaTeX tables to separate files
-    with open('output/tex/runtime_table.tex', 'w') as f:
+    if not os.path.exists('results/tex'):
+        os.makedirs('results/tex')
+    with open(runtime_path, 'w') as f:
         # f.write("% Algorithm Runtime Comparison Table (milliseconds)\n")
         # f.write("% Methods as rows, datasets as columns\n\n")
         f.write(time_latex)
     
-    with open('output/tex/density_table.tex', 'w') as f:
+    if not os.path.exists('results/tex'):
+        os.makedirs('results/tex')
+    with open(density_path, 'w') as f:
         # f.write("% Algorithm Density Comparison Table\n")
         # f.write("% Methods as rows, datasets as columns\n\n")
         f.write(density_latex)
@@ -379,8 +400,8 @@ def main():
     print()
     print("=" * 100)
     print("LaTeX tables saved to:")
-    print("  - runtime_table.tex")
-    print("  - density_table.tex")
+    print("  - rw_runtime_table.tex")
+    print("  - rw_density_table.tex")
     print("=" * 100)
     
     # Print LaTeX code to console

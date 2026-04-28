@@ -3,6 +3,12 @@ import yaml
 from pathlib import Path
 from natsort import natsorted
 
+#================ CHANGE IF NEEDED ================
+goal = 'CEP_PRUNING_QPBO_MIP_CONSTRAIN_B.json'
+output_file = f'results/skip/{goal.split(".")[0]}.yaml'
+DEFAULT_TIME_BOUND_SECONDS = 3599.0
+#==================================================
+
 def check_synthetic_results():
     """
     Iterate through output/synthetic folder and check CEP results.
@@ -28,7 +34,7 @@ def check_synthetic_results():
                 continue
                 
             # Construct path to the JSON file
-            json_file = subsubfolder / 'CEP_PRUNING_QPBO_CEP_MIP_CONSTRAIN_CEP_NB.json'
+            json_file = subsubfolder / goal
             
             # Check if file exists
             if not json_file.exists():
@@ -43,8 +49,11 @@ def check_synthetic_results():
                 
                 # Check if 'Fail' substring exists in config.info
                 info = data.get('config', {}).get('info', '')
+                runtime = data.get('time', None)
                 
                 if ('Terminate' not in info) and ('Fail' in info):
+                    failed.append(subsubfolder.name)
+                elif runtime is not None and float(runtime) >= DEFAULT_TIME_BOUND_SECONDS:
                     failed.append(subsubfolder.name)
                 else:
                     success.append(subsubfolder.name)
@@ -54,16 +63,15 @@ def check_synthetic_results():
     
     # Output results to YAML file
     results = {
-        'failed': failed,
-        'success': success,
         'summary': {
             'total_failed': len(failed),
             'total_success': len(success),
             'total': len(failed) + len(success)
-        }
+        },
+        'failed': failed,
+        'success': success
     }
     
-    output_file = 'results_summary.yaml'
     with open(output_file, 'w') as f:
         yaml.dump(results, f, default_flow_style=False, sort_keys=False)
     

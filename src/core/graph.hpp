@@ -93,6 +93,10 @@ public:
         ReadGraph(cfg);
     }
 
+    // Build a new algorithm instance from an already loaded graph state.
+    // This avoids re-reading the graph file when multiple algorithms share input.
+    PGraph(const PGraph& other) = default;
+
     void ReadGraph(const PGraph_Config& cfg) {
         ifstream infile(cfg.input);
         size_t n = 0, m = 0;
@@ -134,6 +138,7 @@ public:
     template<typename ConfigType>
     void output(const ConfigType& cfg, double avg_time, SubgraphResult& result) {
         json::object json_output;
+        json_output["status"] = output_status;
         json_output["time"] = avg_time;
         json_output["density"] = result.density;
         json_output["size"] = result.nodes.size();

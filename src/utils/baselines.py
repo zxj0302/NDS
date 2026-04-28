@@ -77,11 +77,11 @@ def run_competitor(dataset_path, competitor, output_path, reverse):
     except subprocess.TimeoutExpired:
         timeout_seconds = float(run_time_limit) if run_time_limit else 0.0
         timeout_result = {
+            "status": "timeout",
             "time": timeout_seconds,
             "density": 0.0,
             "size": 0,
             "nodes": [],
-            "status": "timeout",
             "config": full_config,
             "timings": {"total": timeout_seconds}
         }

@@ -13,6 +13,7 @@ public:
     };
     
     DCSGreedy(const DCSGreedy_Config& cfg) : PGraph(cfg) {}
+    explicit DCSGreedy(const PGraph& loaded_graph) : PGraph(loaded_graph) {}
 
     SubgraphResult MaxEdge() {
         double max_weight = -numeric_limits<double>::infinity();
