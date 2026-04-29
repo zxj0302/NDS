@@ -404,7 +404,7 @@ public:
         return lb;
     }
 
-    pair<SubgraphResult, bool> FindLowerBound(const EXACT_Config& cfg) {
+    SubgraphResult FindLowerBound(const EXACT_Config& cfg) {
         // 1. Run selected lower bound method to get initial solution
         auto result_lb = SubgraphResult{{}, 0.0};
         if (cfg.enable_cep_init) {
@@ -421,42 +421,10 @@ public:
             }
         }
         
-        // 3. Run QPBO to check whether it is already optimal, or update lower bound if possible
+        // 3. Pruning
         if (cfg.enable_graph_pruning) timed(timings.pruning, [&]{ Pruning({}, result_lb.density); });
-        if (cfg.enable_qpbo) {
-            auto result = QPBO_CEP_MIP(cfg, result_lb, result_lb.density, false);
-            switch (result.info) {
-                case Indicator::QPBO_UB:
-                case Indicator::QPBO_LB:
-                case Indicator::UNDER_MIP_DIRECT_UB:
-                    // (1). Optimal found
-                    if (result.nodes.empty() && result.exact) {
-                        string msg = "FindLowerBound: Optimal found.";
-                        LOG(msg);
-                        info += msg + " | ";
-                        return {result_lb, true};
-                    }
 
-                    // (2). Have found a better lower bound
-                    if (result.density > result_lb.density) {
-                        result_lb = {result.nodes, result.density};
-                        if (cfg.enable_mip_constrains_vertex_ub && result.exact) {
-                            vertex_upper_bound = result.nodes.size() - 1;
-                        }
-                        LOG("FindLowerBound: Updated to QPBO_MIP lb: " << result_lb.density);
-                        return {result_lb, false};
-                    }
-                case Indicator::NO_MIP:
-                    // (3). MIP not succeeded, or have more than direct_mip_bound undecided nodes in QPBO
-                    LOG("FindLowerBound: MIP failed or not run due to large undecided nodes");
-                    return {result_lb, false};
-                default:
-                    string msg = "FindLowerBound Bug: Should only use QPBO and MIP in the FindLowerBound function.";
-                    info += msg + " | ";
-                    throw runtime_error(msg);
-            }
-        }
-        return {result_lb, false};
+        return result_lb;
     }
 
     double FindUpperBound(const EXACT_Config& cfg, SubgraphResult& result_lb) {
@@ -471,7 +439,7 @@ public:
         }
 
         // 2. try to find a tighter upper bound by increasing from lower bound step by step
-        auto lambda = result_lb.density * cfg.step_size;
+        auto lambda = result_lb.density;
         while (lambda < upper_bound) {
             auto result = QPBO_CEP_MIP(cfg, result_lb, lambda, false);
             switch (result.info) {
@@ -1085,20 +1053,19 @@ public:
     }
 
     SubgraphResult Run(const EXACT_Config& cfg) {
-        // Step 1. Result found by CEP as initial solution
+        // Step 1. Result found by heuristics as initial solution and lower bound
         LOG("Start Running on " << cfg.input);
-        auto [result_lb, optima] = FindLowerBound(cfg);
-        if (optima) return result_lb;
+        auto result_lb = FindLowerBound(cfg);
         LOG("FindLowerBound: Lower bound set to: " << result_lb.density);
         if (cfg.enable_pruning_set) timed(timings.pruning, [&]{ PruningModeToggle(cfg, 0, true); });
         if (cfg.enable_graph_pruning) timed(timings.pruning, [&]{ Pruning({}, result_lb.density); });
         
-        // Step 2. Find an upper bound for QPBO
+        // Step 2. Find an upper bound with QPBO
         auto upper_bound = FindUpperBound(cfg, result_lb);
         LOG("FindUpperBound: Upper bound set to: " << upper_bound);
 
         // Step 3. Refine the solution by Dinkelbach
-        return cfg.enable_binary_search ? DinkelbachBinary(cfg, result_lb, upper_bound) : Dinkelbach(cfg, result_lb, upper_bound);   
+        return cfg.enable_binary_search ? DinkelbachBinary(cfg, result_lb, upper_bound) : Dinkelbach(cfg, result_lb, upper_bound);
     }
 
     void Reset(const EXACT_Config& cfg) {
