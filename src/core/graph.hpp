@@ -23,9 +23,22 @@
 using namespace std;
 using namespace boost;
 
+#ifdef ENABLE_DEBUG
+    #define DEBUG(msg) \
+        do { cerr << msg << std::endl; } while (0)
+#else
+    #define DEBUG(msg) \
+        do { } while (0)
+#endif
+
 #ifdef ENABLE_LOG
     #define LOG(msg) \
-        do { cerr << msg << std::endl; } while (0)
+        do { \
+            std::ostringstream _oss_info; \
+            auto _now_info = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()); \
+            _oss_info << "[" << std::put_time(std::localtime(&_now_info), "%H:%M:%S") << "] " << msg << " | "; \
+            log_data += _oss_info.str(); \
+        } while (0)
 #else
     #define LOG(msg) \
         do { } while (0)
@@ -85,6 +98,7 @@ protected:
     double total_weight = 0.0;
     vector<double> loop_weight;
     string info = "| Start | ";
+    string log_data = ""; // Store LOG separate from info
 
     PGraph() = default;
 
@@ -157,6 +171,9 @@ public:
         cfg.add_to_json(config);
         json_output["config"] = config;
         json_output["info"] = info + " End |";
+        if (!log_data.empty()) {
+            json_output["log"] = log_data;
+        }
 
         // All timing data in one dict: total wall-clock + any sub-process breakdowns
         json::object timings_obj;

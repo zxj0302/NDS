@@ -15,7 +15,8 @@ option(BUILD_MIQCP "Build miqcp executable (requires Gurobi)" ON)
 option(USE_GUROBI "Enable Gurobi support for MIP-based algorithms" ON)
 option(VERBOSE_BUILD "Show detailed build information" OFF)
 
-option(ENABLE_LOG "Enable logging macro ENABLE_LOG" ON)
+option(ENABLE_DEBUG "Enable debug macro ENABLE_DEBUG" ON)
+option(ENABLE_LOG "Enable log macro ENABLE_LOG" OFF)
 option(DISABLE_WARNINGS "Disable compiler warnings" OFF)
 
 # ============================================================================
@@ -101,6 +102,9 @@ function(add_nds_algorithm NAME REQUIRES_GUROBI REQUIRES_QPBO)
         add_executable(${NAME} executables/${NAME}.cpp)
 
         # Compiler flags
+        if(ENABLE_DEBUG)
+            target_compile_definitions(${NAME} PRIVATE ENABLE_DEBUG)
+        endif()
         if(ENABLE_LOG)
             target_compile_definitions(${NAME} PRIVATE ENABLE_LOG)
         endif()

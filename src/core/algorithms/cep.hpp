@@ -454,6 +454,6 @@ public:
         if (init_pos_weight) {
             InitializePositiveWeights();
         }
-        LOG("Reset: done.");
+        DEBUG("Reset: done.");
     }
 };

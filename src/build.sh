@@ -24,7 +24,8 @@ usage() {
     echo "  -a, --algorithm ALG    Build specific algorithm only (neg_dsd, dcs_greedy, cep, etc.)"
     echo "  -j, --jobs N           Number of parallel jobs (default: auto)"
     echo "  --no-gurobi            Disable Gurobi support"
-    echo "  --log                  Enable logging (ENABLE_LOG=ON)"
+    echo "  --debug                Enable debug output to terminal (ENABLE_DEBUG=ON)"
+    echo "  --log                  Enable log to JSON (ENABLE_LOG=ON)"
     echo "  --no-warnings          Disable compiler warnings"
     echo "  --verbose              Verbose build output"
     echo "  -h, --help             Show this help"
@@ -45,6 +46,7 @@ CLEAN=false
 ALGORITHM=""
 JOBS=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)
 USE_GUROBI=ON
+ENABLE_DEBUG=OFF
 ENABLE_LOG=OFF
 DISABLE_WARNINGS=OFF
 VERBOSE=OFF
@@ -70,6 +72,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --no-gurobi)
             USE_GUROBI=OFF
+            shift
+            ;;
+        --debug)
+            ENABLE_DEBUG=ON
             shift
             ;;
         --log)
@@ -110,6 +116,7 @@ cd "${BUILD_DIR}"
 CMAKE_OPTS=(
     -DCMAKE_BUILD_TYPE="${BUILD_TYPE}"
     -DUSE_GUROBI="${USE_GUROBI}"
+    -DENABLE_DEBUG="${ENABLE_DEBUG}"
     -DENABLE_LOG="${ENABLE_LOG}"
     -DDISABLE_WARNINGS="${DISABLE_WARNINGS}"
     -DVERBOSE_BUILD="${VERBOSE}"
