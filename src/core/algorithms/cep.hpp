@@ -168,6 +168,7 @@ public:
                 }
             }
             valid_count = pruning_set.size();
+            LOG("PruningModeToggle: ON at iteration " << it << ", pruning set size: " << pruning_set.size());
         }
     }
 
@@ -341,6 +342,7 @@ public:
 
     void Pruning(const vector<Vertex>& nodes, double threshold_density) {
         pruning_set_on ? PruningSet(nodes, threshold_density) : PruningVector(nodes, threshold_density);
+        LOG("Pruning: " << nodes.size() << " CEP local nodes pruned, valid count: " << valid_count << "/" << boost::num_vertices(G) << ", valid edge count: " << valid_edge_count << "/" << boost::num_edges(G));
     }
     
     void PruningSet(const vector<Vertex>& nodes, double threshold_density) {
@@ -454,6 +456,6 @@ public:
         if (init_pos_weight) {
             InitializePositiveWeights();
         }
-        DEBUG("Reset: done.");
+        LOG("Reset: done.");
     }
 };
