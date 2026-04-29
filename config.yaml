@@ -100,7 +100,7 @@ competitor_templates: &competitor_templates
       enable_binary_search: false
       
   cep_pruning_qpbo_mip_b:
-    toggle: false
+    toggle: true
     name: CEP_PRUNING_QPBO_MIP_B
     exe: ./build/exact
     params: &cep_pruning_qpbo_mip_b_params
@@ -439,7 +439,7 @@ competitor_templates_lb: &competitor_templates_lb
 competitor_templates_step_size: &competitor_templates_ss
   <<: *competitor_templates
   cep_pruning_qpbo_mip_constrain_alpha_1_02_b:
-      toggle: true
+      toggle: false
       name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_ALPHA_1_02_B
       exe: ./build/exact
       params:
@@ -447,7 +447,7 @@ competitor_templates_step_size: &competitor_templates_ss
         step_size: 1.02
 
   cep_pruning_qpbo_mip_constrain_alpha_1_1_b:
-      toggle: true
+      toggle: false
       name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_ALPHA_1_1_B
       exe: ./build/exact
       params:
@@ -455,7 +455,7 @@ competitor_templates_step_size: &competitor_templates_ss
         step_size: 1.1
 
   cep_pruning_qpbo_mip_constrain_alpha_1_2_b:
-      toggle: true
+      toggle: false
       name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_ALPHA_1_2_B
       exe: ./build/exact
       params:
@@ -463,7 +463,7 @@ competitor_templates_step_size: &competitor_templates_ss
         step_size: 1.2
 
   cep_pruning_qpbo_mip_constrain_alpha_1_5_b:
-      toggle: true
+      toggle: false
       name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_ALPHA_1_5_B
       exe: ./build/exact
       params:
@@ -544,7 +544,7 @@ test:
   # Quick test configuration with minimal settings
   input:
     # - ./input/synthetic/BA/BA_n50000_m3_setting25_inst0.txt
-    - ./input/synthetic/ER/ER_n1000000_m1500000_setting105_inst0.txt
+    # - ./input/synthetic/ER/ER_n1000000_m1500000_setting105_inst0.txt
     # - ./input/synthetic/WS/WS_n500000_k10_p0.3_setting172_inst0.txt
     # - ./input/real-world/WikiData/WikiData.txt
     # - ./input/real-world/Collins/Collins.txt
@@ -561,7 +561,7 @@ test:
     # - ./input/real-world/Amazon/Amazon.txt
     # - ./input/real-world/Epinions/Epinions.txt
     # - ./input/real-world/Stackoverflow/Stackoverflow.txt
-    # - ./input/real-world/WikiData/WikiData.txt
+    - ./input/real-world/WikiData/WikiData.txt
     # - ./input/real-world/WikiPolitics/WikiPolitics.txt
   
   weight_reverse: false

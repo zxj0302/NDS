@@ -246,6 +246,9 @@ private:
         double cep_lambda     = 0.0;  // CEPLambda for MIP initialization
         double cep_final      = 0.0;  // CEPDensity after MIP
         double compute_density = 0.0; // ComputeDensity calls
+        double phase_lower_bound = 0.0;
+        double phase_upper_bound = 0.0;
+        double phase_refinement = 0.0;
     };
     Timings timings;
 
@@ -421,7 +424,9 @@ public:
             }
         }
         
-        // 3. Pruning
+        // 3. Pruning * 2 after initial lower bound to speed up upper bound search and refinement
+        if (cfg.enable_pruning_set) timed(timings.pruning, [&]{ PruningModeToggle(cfg, 0, true); });
+        if (cfg.enable_graph_pruning) timed(timings.pruning, [&]{ Pruning({}, result_lb.density); });
         if (cfg.enable_graph_pruning) timed(timings.pruning, [&]{ Pruning({}, result_lb.density); });
 
         return result_lb;
@@ -1042,30 +1047,44 @@ public:
     }
 
     void add_timings_to_json(json::object& t) const override {
-        t["cep_init"]   = timings.cep_init;
-        t["qpbo"]       = timings.qpbo;
-        t["mip"]        = timings.mip;
-        t["pruning"]    = timings.pruning;
-        t["cep_middle"] = timings.cep_middle;
-        t["cep_lambda"]      = timings.cep_lambda;
-        t["cep_final"]       = timings.cep_final;
-        t["compute_density"] = timings.compute_density;
+        json::object components;
+        components["cep_init"]   = timings.cep_init;
+        components["qpbo"]       = timings.qpbo;
+        components["mip"]        = timings.mip;
+        components["pruning"]    = timings.pruning;
+        components["cep_middle"] = timings.cep_middle;
+        components["cep_lambda"]      = timings.cep_lambda;
+        components["cep_final"]       = timings.cep_final;
+        components["compute_density"] = timings.compute_density;
+        t["components"] = components;
+
+        json::object phases;
+        phases["lower_bound"] = timings.phase_lower_bound;
+        phases["upper_bound"] = timings.phase_upper_bound;
+        phases["refinement"]  = timings.phase_refinement;
+        t["phases"] = phases;
     }
 
     SubgraphResult Run(const EXACT_Config& cfg) {
         // Step 1. Result found by heuristics as initial solution and lower bound
         LOG("Start Running on " << cfg.input);
-        auto result_lb = FindLowerBound(cfg);
-        LOG("FindLowerBound: Lower bound set to: " << result_lb.density);
-        if (cfg.enable_pruning_set) timed(timings.pruning, [&]{ PruningModeToggle(cfg, 0, true); });
-        if (cfg.enable_graph_pruning) timed(timings.pruning, [&]{ Pruning({}, result_lb.density); });
+        auto result_lb = timed(timings.phase_lower_bound, [&]{
+            auto lb = FindLowerBound(cfg);
+            LOG("FindLowerBound: Lower bound set to: " << lb.density);
+            return lb;
+        });
         
         // Step 2. Find an upper bound with QPBO
-        auto upper_bound = FindUpperBound(cfg, result_lb);
-        LOG("FindUpperBound: Upper bound set to: " << upper_bound);
+        auto upper_bound = timed(timings.phase_upper_bound, [&]{
+            auto ub = FindUpperBound(cfg, result_lb);
+            LOG("FindUpperBound: Upper bound set to: " << ub);
+            return ub;
+        });
 
         // Step 3. Refine the solution by Dinkelbach
-        return cfg.enable_binary_search ? DinkelbachBinary(cfg, result_lb, upper_bound) : Dinkelbach(cfg, result_lb, upper_bound);
+        return timed(timings.phase_refinement, [&]{
+            return cfg.enable_binary_search ? DinkelbachBinary(cfg, result_lb, upper_bound) : Dinkelbach(cfg, result_lb, upper_bound);
+        });
     }
 
     void Reset(const EXACT_Config& cfg) {

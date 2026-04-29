@@ -136,24 +136,27 @@ public:
     };
 
     template<typename ConfigType>
-    void output(const ConfigType& cfg, double avg_time, SubgraphResult& result) {
+    void output(const ConfigType& cfg, double avg_time, SubgraphResult& result, const string& output_status = "success", bool output_nodes = false) {
         json::object json_output;
         json_output["status"] = output_status;
         json_output["time"] = avg_time;
         json_output["density"] = result.density;
         json_output["size"] = result.nodes.size();
-        sort(result.nodes.begin(), result.nodes.end());
-        json::array nodes_array;
-        for (const auto& node : result.nodes) {
-            nodes_array.push_back(node);
+        
+        if (output_nodes) {
+            sort(result.nodes.begin(), result.nodes.end());
+            json::array nodes_array;
+            for (const auto& node : result.nodes) {
+                nodes_array.push_back(node);
+            }
+            json_output["nodes"] = nodes_array;
         }
-        json_output["nodes"] = nodes_array;
         
         // Build config object
         json::object config;
-        config["info"] = info + " End |";
         cfg.add_to_json(config);
         json_output["config"] = config;
+        json_output["info"] = info + " End |";
 
         // All timing data in one dict: total wall-clock + any sub-process breakdowns
         json::object timings_obj;
