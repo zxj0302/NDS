@@ -15,7 +15,7 @@ int main(int argc, char* argv[]) {
     
     for (unsigned iter = 0; iter < cfg.num_iter; ++iter) {
         auto start_time = chrono::high_resolution_clock::now();
-        auto result = graph.Run(cfg);
+        auto result = graph.Run(cfg, start_time);
         auto end_time = chrono::high_resolution_clock::now();
         auto duration = chrono::duration_cast<chrono::nanoseconds>(end_time - start_time);
         double time_seconds = duration.count() / 1e9;
@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    graph.output(cfg, total_time / cfg.num_iter, first_result);
+    graph.output(cfg, total_time / cfg.num_iter, first_result, "success", false, graph.final_upper_bound);
 
     return 0;
 }

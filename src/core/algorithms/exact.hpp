@@ -129,6 +129,19 @@ public:
         }
     };
 
+    double final_upper_bound = -1.0;
+    chrono::time_point<chrono::high_resolution_clock> last_output_time = chrono::high_resolution_clock::now();
+
+    void ReportIntermediate(const EXACT_Config& cfg, chrono::time_point<chrono::high_resolution_clock> start_time, SubgraphResult& result_lb, double upper_bound = -1.0, bool force = true) {
+        auto current_time = chrono::high_resolution_clock::now();
+        if (!force && chrono::duration_cast<chrono::milliseconds>(current_time - last_output_time).count() < 100) {
+            return; // limit to at most 10 writes per second
+        }
+        last_output_time = current_time;
+        double elapsed = chrono::duration_cast<chrono::nanoseconds>(current_time - start_time).count() / 1e9;
+        this->output(cfg, elapsed, result_lb, "timeout", false, upper_bound);
+    }
+
 private:
     enum class Indicator {
         QPBO_UB,
@@ -945,7 +958,7 @@ public:
         return stop;
     }
 
-    SubgraphResult DinkelbachBinary(const EXACT_Config& cfg, SubgraphResult& result_lb, double upper_bound) {
+    SubgraphResult DinkelbachBinary(const EXACT_Config& cfg, SubgraphResult& result_lb, double& upper_bound, chrono::time_point<chrono::high_resolution_clock> start_time) {
         for (auto iter = 0; iter < cfg.dinkelbach_iterations; iter++) {
             DEBUG("DinkelbachBinary: it " << iter << ": lb = " << result_lb.density << ", ub = " << upper_bound);
             if (Terminate(cfg, result_lb.density, upper_bound)) break;
@@ -964,12 +977,17 @@ public:
                     // Can be evoked in QPBO_UB, UNDER_MIP_DIRECT_UB, and MIP_INDIRECT cases
                     if (result.nodes.empty() && result.exact) {
                         upper_bound = lambda;
+                        
+                        ReportIntermediate(cfg, start_time, result_lb, upper_bound);
                         break;
                     }
 
                     // (2). Have found a better lower bound
                     if (result.density > result_lb.density) {
                         result_lb = {result.nodes, result.density};
+                        
+                        ReportIntermediate(cfg, start_time, result_lb, upper_bound);
+                        
                         if (cfg.enable_graph_pruning) timed(timings.pruning, [&]{ Pruning({}, result_lb.density); });
                         if (result.exact) {
                             if (cfg.enable_mip_constrains_vertex_ub) {
@@ -994,7 +1012,7 @@ public:
         return result_lb;
     }
 
-    SubgraphResult Dinkelbach(const EXACT_Config& cfg, SubgraphResult& result_lb, double upper_bound) {
+    SubgraphResult Dinkelbach(const EXACT_Config& cfg, SubgraphResult& result_lb, double& upper_bound, chrono::time_point<chrono::high_resolution_clock> start_time) {
         for (auto iter = 0; iter < cfg.dinkelbach_iterations; iter++) {
             DEBUG("Dinkelbach: it " << iter << ": lb = " << result_lb.density);
             auto lambda = cfg.epsilon > 0 ? (result_lb.density / min(cfg.epsilon, 1.0)) : (result_lb.density - cfg.epsilon);
@@ -1012,16 +1030,21 @@ public:
                 case Indicator::MIP_INDIRECT_WITH_INIT: // the same as UNDER_MIP_DIRECT_UB
                 case Indicator::MIP_INDIRECT_NO_INIT: // the same as UNDER_MIP_DIRECT_UB
                 case Indicator::MIP_INDIRECT_WITH_HEURISTIC: // the same as CEP_DENSITY_LB
-                    // (1). Have reached the given accuracy requirement
-                    // Can be evoked in QPBO_UB, UNDER_MIP_DIRECT_UB, and MIP_INDIRECT cases
                     if (result.nodes.empty() && result.exact) {
                         Terminate(cfg, result_lb.density, lambda);
+
+                        upper_bound = lambda;
+                        ReportIntermediate(cfg, start_time, result_lb, upper_bound);
+                        
                         return result_lb;
                     }
 
                     // (2). Have found a better lower bound
                     if (result.density > result_lb.density) {
                         result_lb = {result.nodes, result.density};
+                        
+                        ReportIntermediate(cfg, start_time, result_lb, upper_bound);
+
                         if (cfg.enable_graph_pruning) timed(timings.pruning, [&]{ Pruning({}, result_lb.density); });
                         if (result.exact) {
                             if (cfg.enable_mip_constrains_vertex_ub) {
@@ -1065,7 +1088,7 @@ public:
         t["phases"] = phases;
     }
 
-    SubgraphResult Run(const EXACT_Config& cfg) {
+    SubgraphResult Run(const EXACT_Config& cfg, chrono::time_point<chrono::high_resolution_clock> start_time = chrono::high_resolution_clock::now()) {
         // Step 1. Result found by heuristics as initial solution and lower bound
         DEBUG("Start Running on " << cfg.input);
         auto result_lb = timed(timings.phase_lower_bound, [&]{
@@ -1074,6 +1097,9 @@ public:
             return lb;
         });
         
+        // Output intermediate result after finding LB
+        ReportIntermediate(cfg, start_time, result_lb, -1.0, true);
+        
         // Step 2. Find an upper bound with QPBO
         auto upper_bound = timed(timings.phase_upper_bound, [&]{
             auto ub = FindUpperBound(cfg, result_lb);
@@ -1081,10 +1107,16 @@ public:
             return ub;
         });
 
+        // Output intermediate result after finding UB
+        ReportIntermediate(cfg, start_time, result_lb, upper_bound, true);
+        
         // Step 3. Refine the solution by Dinkelbach
-        return timed(timings.phase_refinement, [&]{
-            return cfg.enable_binary_search ? DinkelbachBinary(cfg, result_lb, upper_bound) : Dinkelbach(cfg, result_lb, upper_bound);
+        auto res = timed(timings.phase_refinement, [&]{
+            return cfg.enable_binary_search ? DinkelbachBinary(cfg, result_lb, upper_bound, start_time) : Dinkelbach(cfg, result_lb, upper_bound, start_time);
         });
+        
+        this->final_upper_bound = upper_bound;
+        return res;
     }
 
     void Reset(const EXACT_Config& cfg) {

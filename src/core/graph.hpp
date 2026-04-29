@@ -150,12 +150,16 @@ public:
     };
 
     template<typename ConfigType>
-    void output(const ConfigType& cfg, double avg_time, SubgraphResult& result, const string& output_status = "success", bool output_nodes = false) {
+    void output(const ConfigType& cfg, double avg_time, SubgraphResult& result, const string& output_status = "success", bool output_nodes = false, double upper_bound = -1.0) {
         json::object json_output;
         json_output["status"] = output_status;
         json_output["time"] = avg_time;
         json_output["density"] = result.density;
         json_output["size"] = result.nodes.size();
+        
+        if (upper_bound >= 0.0) {
+            json_output["upper_bound"] = upper_bound;
+        }
         
         if (output_nodes) {
             sort(result.nodes.begin(), result.nodes.end());
