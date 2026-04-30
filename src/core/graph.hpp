@@ -36,8 +36,8 @@ using namespace boost;
         do { \
             std::ostringstream _oss_info; \
             auto _now_info = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()); \
-            _oss_info << "[" << std::put_time(std::localtime(&_now_info), "%H:%M:%S") << "] " << msg << " | "; \
-            log_data += _oss_info.str(); \
+            _oss_info << "[" << std::put_time(std::localtime(&_now_info), "%H:%M:%S") << "] " << msg; \
+            log_data.push_back(_oss_info.str()); \
         } while (0)
 #else
     #define LOG(msg) \
@@ -98,7 +98,7 @@ protected:
     double total_weight = 0.0;
     vector<double> loop_weight;
     string info = "| Start | ";
-    string log_data = ""; // Store LOG separate from info
+    vector<string> log_data; // Store LOG entries separate from info
 
     PGraph() = default;
 
@@ -176,7 +176,11 @@ public:
         json_output["config"] = config;
         json_output["info"] = info + " End |";
         if (!log_data.empty()) {
-            json_output["log"] = log_data;
+            json::array log_array;
+            for (const auto& entry : log_data) {
+                log_array.push_back(json::value(entry));
+            }
+            json_output["log"] = log_array;
         }
 
         // All timing data in one dict: total wall-clock + any sub-process breakdowns
@@ -194,6 +198,27 @@ public:
         format_json = [&](const json::value& val, int indent_level) -> string {
             ostringstream result;
             string indent_str(indent_level * 2, ' ');
+            auto escape_string = [](const string& input) {
+                ostringstream escaped;
+                for (char ch : input) {
+                    switch (ch) {
+                        case '\\': escaped << "\\\\"; break;
+                        case '"': escaped << "\\\""; break;
+                        case '\b': escaped << "\\b"; break;
+                        case '\f': escaped << "\\f"; break;
+                        case '\n': escaped << "\\n"; break;
+                        case '\r': escaped << "\\r"; break;
+                        case '\t': escaped << "\\t"; break;
+                        default:
+                            if (static_cast<unsigned char>(ch) < 0x20) {
+                                escaped << "\\u" << hex << setw(4) << setfill('0') << static_cast<int>(static_cast<unsigned char>(ch)) << dec << setfill(' ');
+                            } else {
+                                escaped << ch;
+                            }
+                    }
+                }
+                return escaped.str();
+            };
             
             if (val.is_object()) {
                 result << "{\n";
@@ -209,11 +234,15 @@ public:
             } else if (val.is_array()) {
                 result << "[";
                 auto& arr = val.as_array();
-                bool first = true;
-                for (auto& elem : arr) {
-                    if (!first) result << ", ";
-                    first = false;
-                    result << format_json(elem, indent_level);
+                if (!arr.empty()) {
+                    result << "\n";
+                    bool first = true;
+                    for (auto& elem : arr) {
+                        if (!first) result << ",\n";
+                        first = false;
+                        result << string((indent_level + 1) * 2, ' ') << format_json(elem, indent_level + 1);
+                    }
+                    result << "\n" << indent_str;
                 }
                 result << "]";
             } else if (val.is_double()) {
@@ -225,7 +254,7 @@ public:
             } else if (val.is_bool()) {
                 result << (val.as_bool() ? "true" : "false");
             } else if (val.is_string()) {
-                result << "\"" << val.as_string().c_str() << "\"";
+                result << "\"" << escape_string(val.as_string().c_str()) << "\"";
             } else {
                 result << "null";
             }

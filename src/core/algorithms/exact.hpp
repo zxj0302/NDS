@@ -479,7 +479,8 @@ public:
                         if (cfg.enable_graph_pruning) timed(timings.pruning, [&]{ Pruning({}, result.density); });
                         if (result.exact) {
                             if (cfg.enable_mip_constrains_vertex_ub) {
-                                vertex_upper_bound = result.nodes.size() - 1;
+                                // Note: can also use result.nodes.size() - 1 to require finding strictly denser subgraph
+                                vertex_upper_bound = result.nodes.size();
                                 LOG("FindUpperBound: iteration = " << iteration << ", lambda = " << lambda << ", found better lb with " << result.nodes.size() << "nodes, update vertex upper bound to " << vertex_upper_bound << ".");
                             }
                             if (cfg.enable_mip_constrains_vertex_lb) {
@@ -545,8 +546,6 @@ public:
                     obj += -w * undecided_vars[v];
                 }
             }
-            LOG("RunMIP: MIP model constructed with " << model.get(GRB_IntAttr_NumVars) << " unary terms and " << model.get(GRB_IntAttr_NumQConstrs) << " quadratic terms in the objective.");
-
             // Note: add vertex count constraint
             GRBLinExpr vertex_sum = 0.0;
             for (auto i : qpbo_result.undecided) {
@@ -573,6 +572,13 @@ public:
             }
             
             model.setObjective(obj, GRB_MINIMIZE);
+            // Ensure model internal data structures are updated so attribute queries are valid
+            #ifdef ENABLE_LOG
+                model.update();
+            #endif
+            LOG("RunMIP: MIP model constructed with " << model.get(GRB_IntAttr_NumVars) << " variables and " << model.get(GRB_IntAttr_NumQNZs) << " quadratic terms in the objective.");
+            DEBUG("RunMIP: MIP model constructed with " << model.get(GRB_IntAttr_NumVars) << " variables and " << model.get(GRB_IntAttr_NumQNZs) << " quadratic terms in the objective.");
+
             model.set(GRB_DoubleParam_TimeLimit, cfg.mip_time_limit);
             model.optimize();
             vector<Vertex> selected = qpbo_result.fixed_in;
@@ -942,7 +948,8 @@ public:
             if (cep_after_result.density > density) { // CEPDensity after MIP gets better lower bound
                 if (mip_result.second) { // update the constrains for MIP if MIP is optimal
                     if (cfg.enable_mip_constrains_vertex_ub) {
-                        vertex_upper_bound = mip_result.first.size() - 1;
+                        // Note: can also use mip_result.first.size() - 1 to require finding strictly denser subgraph
+                        vertex_upper_bound = mip_result.first.size();
                     }
                     if (cfg.enable_mip_constrains_vertex_lb) {
                         *upper_bound = min(*upper_bound, lambda + mip_result.first.size() * (density - lambda) / vertex_lower_bound);
@@ -973,6 +980,8 @@ public:
         for (auto iter = 0; iter < cfg.dinkelbach_iterations; iter++) {
             LOG("DinkelbachBinary: iteration = " << iter << ": lb = " << result_lb.density << ", ub = " << upper_bound);
             if (Terminate(cfg, result_lb.density, upper_bound)) break;
+            ReportIntermediate(cfg, start_time, result_lb, upper_bound);
+
             auto lambda = (result_lb.density + upper_bound) / 2.0;
             auto result = QPBO_CEP_MIP(cfg, result_lb, lambda, true, &upper_bound);
             switch (result.info) {
@@ -997,12 +1006,12 @@ public:
                     if (result.density > result_lb.density) {
                         result_lb = {result.nodes, result.density};
                         LOG("DinkelbachBinary: iteration = " << iter << ", lambda = " << lambda << ", found better lb with " << result.nodes.size() << "nodes.");
-                        ReportIntermediate(cfg, start_time, result_lb, upper_bound);
                         
                         if (cfg.enable_graph_pruning) timed(timings.pruning, [&]{ Pruning({}, result_lb.density); });
                         if (result.exact) {
                             if (cfg.enable_mip_constrains_vertex_ub) {
-                                vertex_upper_bound = result.nodes.size() - 1;
+                                // Note: can also use result.nodes.size() - 1 to require finding strictly denser subgraph
+                                vertex_upper_bound = result.nodes.size();
                                 LOG("DinkelbachBinary: iteration = " << iter << ", lambda = " << lambda << ", found better exact lb, update vertex upper bound to " << vertex_upper_bound << ".");
                             }
                             if (cfg.enable_mip_constrains_vertex_lb) {
@@ -1010,6 +1019,8 @@ public:
                                 LOG("DinkelbachBinary: iteration = " << iter << ", lambda = " << lambda << ", found better exact lb, update upper bound to " << upper_bound << ".");
                             }
                         }
+
+                        ReportIntermediate(cfg, start_time, result_lb, upper_bound);
                         break;
                     }
 
@@ -1060,7 +1071,8 @@ public:
                         if (cfg.enable_graph_pruning) timed(timings.pruning, [&]{ Pruning({}, result_lb.density); });
                         if (result.exact) {
                             if (cfg.enable_mip_constrains_vertex_ub) {
-                                vertex_upper_bound = result.nodes.size() - 1;
+                                // Note: can also use result.nodes.size() - 1 to require finding strictly denser subgraph
+                                vertex_upper_bound = result.nodes.size();
                                 LOG("Dinkelbach: iteration = " << iter << ", lambda = " << lambda << ", found better exact lb, update vertex upper bound to " << vertex_upper_bound << ".");
                             }
                             if (cfg.enable_mip_constrains_vertex_lb) {
