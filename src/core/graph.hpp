@@ -150,7 +150,7 @@ public:
     };
 
     template<typename ConfigType>
-    void output(const ConfigType& cfg, double avg_time, SubgraphResult& result, const string& output_status = "success", bool output_nodes = false, double upper_bound = -1.0) {
+    void output(const ConfigType& cfg, double avg_time, SubgraphResult& result, const string& output_status = "success", bool output_nodes = true, double upper_bound = -1.0) {
         json::object json_output;
         json_output["status"] = output_status;
         json_output["time"] = avg_time;

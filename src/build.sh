@@ -139,7 +139,11 @@ cmake "${CMAKE_OPTS[@]}" "${SRC_DIR}"
 
 # Build
 echo -e "${GREEN}Building with ${JOBS} parallel jobs...${NC}"
-cmake --build . --parallel ${JOBS}
+if [ -n "$ALGORITHM" ]; then
+    cmake --build . --target "$ALGORITHM" --parallel ${JOBS}
+else
+    cmake --build . --parallel ${JOBS}
+fi
 
 echo -e "${GREEN}✓ Build complete!${NC}"
 echo ""
