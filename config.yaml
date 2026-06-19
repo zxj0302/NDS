@@ -52,7 +52,7 @@ competitor_templates: &competitor_templates
       <<: *cep_params
       dinkelbach_iterations: 50
       epsilon: 0.9999
-      mip_time_limit: 3600.0
+      mip_time_limit: 3500.0
       # Lower bound method: "cep", "neg_dsd", or "dcs_greedy"
       lb_method: "cep"
       # C_values for NEG_DSD lower bound method (only used if lb_method is "neg_dsd")
