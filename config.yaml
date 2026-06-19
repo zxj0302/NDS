@@ -27,7 +27,7 @@ competitor_templates: &competitor_templates
       toggle_done: 2
       toggle_left: 20
       max_neg: 200
-      max_local_optima: 10
+      max_local_optima: 20
       do_peeling: false
       run_time_limit: 3600.0
       num_iter: 1
@@ -51,7 +51,7 @@ competitor_templates: &competitor_templates
     params: &cep_mip_b_params
       <<: *cep_params
       dinkelbach_iterations: 50
-      epsilon: 0.999
+      epsilon: 0.9999
       mip_time_limit: 3600.0
       # Lower bound method: "cep", "neg_dsd", or "dcs_greedy"
       lb_method: "cep"
@@ -100,7 +100,7 @@ competitor_templates: &competitor_templates
       enable_binary_search: false
       
   cep_pruning_qpbo_mip_b:
-    toggle: true
+    toggle: false
     name: CEP_PRUNING_QPBO_MIP_B
     exe: ./build/exact
     params: &cep_pruning_qpbo_mip_b_params
@@ -183,7 +183,7 @@ competitor_templates: &competitor_templates
       enable_cep_final: true
 
   cep_pruning_qpbo_cep_mip_constrain_cep_d:
-    toggle: false
+    toggle: true
     name: CEP_PRUNING_QPBO_CEP_MIP_CONSTRAIN_CEP_D
     exe: ./build/exact
     params:
@@ -205,6 +205,54 @@ competitor_templates: &competitor_templates
 # =============================================================================
 competitor_templates_epsilon: &competitor_templates_epsilon
   <<: *competitor_templates
+  cep_pruning_qpbo_mip_constrain_eps_10_b:
+    toggle: false
+    name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_10_B
+    exe: ./build/exact
+    params:
+      <<: *cep_pruning_qpbo_mip_constrain_b_params
+      epsilon: 0.1
+  
+  cep_pruning_qpbo_mip_constrain_eps_20_b:
+    toggle: false
+    name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_20_B
+    exe: ./build/exact
+    params:
+      <<: *cep_pruning_qpbo_mip_constrain_b_params
+      epsilon: 0.2
+  
+  cep_pruning_qpbo_mip_constrain_eps_30_b:
+    toggle: false
+    name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_30_B
+    exe: ./build/exact
+    params:
+      <<: *cep_pruning_qpbo_mip_constrain_b_params
+      epsilon: 0.3
+
+  cep_pruning_qpbo_mip_constrain_eps_40_b:
+    toggle: false
+    name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_40_B
+    exe: ./build/exact
+    params:
+      <<: *cep_pruning_qpbo_mip_constrain_b_params
+      epsilon: 0.4
+
+  cep_pruning_qpbo_mip_constrain_eps_50_b:
+    toggle: false
+    name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_50_B
+    exe: ./build/exact
+    params:
+      <<: *cep_pruning_qpbo_mip_constrain_b_params
+      epsilon: 0.5
+
+  cep_pruning_qpbo_mip_constrain_eps_60_b:
+    toggle: false
+    name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_60_B
+    exe: ./build/exact
+    params:
+      <<: *cep_pruning_qpbo_mip_constrain_b_params
+      epsilon: 0.6
+
   cep_pruning_qpbo_mip_constrain_eps_70_b:
     toggle: false
     name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_70_B
@@ -284,6 +332,14 @@ competitor_templates_epsilon: &competitor_templates_epsilon
     params:
       <<: *cep_pruning_qpbo_mip_constrain_d_params
       epsilon: 0.999
+
+  cep_pruning_qpbo_mip_constrain_eps_9999_b:
+    toggle: false
+    name: CEP_PRUNING_QPBO_MIP_CONSTRAIN_EPS_9999_B
+    exe: ./build/exact
+    params:
+      <<: *cep_pruning_qpbo_mip_constrain_b_params
+      epsilon: 0.9999
 
 # =============================================================================
 # Extended Competitor Templates For CEP Settings
@@ -474,7 +530,7 @@ competitor_templates_step_size: &competitor_templates_ss
 # Final Competitors Selection
 # =============================================================================
 competitors: &competitors
-  <<: *competitor_templates_ss
+  <<: *competitor_templates_epsilon
 
 # =============================================================================
 # Experiment Configurations
@@ -561,9 +617,17 @@ test:
     # - ./input/real-world/Amazon/Amazon.txt
     # - ./input/real-world/Epinions/Epinions.txt
     # - ./input/real-world/Stackoverflow/Stackoverflow.txt
-    - ./input/real-world/WikiData/WikiData.txt
+    # - ./input/real-world/WikiData/WikiData.txt
     # - ./input/real-world/WikiPolitics/WikiPolitics.txt
-  
-  weight_reverse: false
+    # - ./input/real-world/Slashdot081106/Slashdot081106.txt
+    # - ./input/real-world/Slashdot090216/Slashdot090216.txt
+    - ./input/real-world/WikiRfa/WikiRfa.txt
+    # - ./input/real-world/BitcoinOTC/BitcoinOTC.txt
+    # - ./input/real-world/RedditHyperlinks/RedditHyperlinks.txt 
+    # - ./input/real-world/WikiElection/WikiElection.txt 
+    # - ./input/real-world/WikiSigned/WikiSigned-1.txt
+    # - ./input/real-world/WikiTalk/WikiTalk.txt
+    # - ./input/real-world/CollecTRI/CollecTRI.txt
+  weight_reverse: true
   output: ./output/test/
   competitors: *competitors

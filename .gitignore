@@ -20,3 +20,4 @@ input
 skip*.yaml
 *.pdf
 *.png
+.cache

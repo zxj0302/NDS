@@ -3,6 +3,18 @@
 #include "dcs_greedy.hpp"
 #include "../../external/QPBO/QPBO.h"
 #include <gurobi_c++.h>
+#include <csignal>
+
+extern volatile sig_atomic_t g_sigterm_received;
+
+class SigtermCallback : public GRBCallback {
+protected:
+    void callback() override {
+        if (where == GRB_CB_MIP && g_sigterm_received) {
+            abort();
+        }
+    }
+};
 
 class EXACT : public CEP {
 public:
@@ -580,6 +592,8 @@ public:
             DEBUG("RunMIP: MIP model constructed with " << model.get(GRB_IntAttr_NumVars) << " variables and " << model.get(GRB_IntAttr_NumQNZs) << " quadratic terms in the objective.");
 
             model.set(GRB_DoubleParam_TimeLimit, cfg.mip_time_limit);
+            SigtermCallback cb;
+            model.setCallback(&cb);
             model.optimize();
             vector<Vertex> selected = qpbo_result.fixed_in;
             if (model.get(GRB_IntAttr_SolCount) > 0) {
@@ -1065,7 +1079,7 @@ public:
                     // (2). Have found a better lower bound
                     if (result.density > result_lb.density) {
                         result_lb = {result.nodes, result.density};
-                        LOG("Dinkelbach: iteration = " << iter << ", lambda = " << lambda << ", found better lb with " << result.nodes.size() << "nodes.");
+                        LOG("Dinkelbach: iteration = " << iter << ", lambda = " << lambda << ", found better lb with " << result.nodes.size() << " nodes.");
                         ReportIntermediate(cfg, start_time, result_lb, upper_bound);
 
                         if (cfg.enable_graph_pruning) timed(timings.pruning, [&]{ Pruning({}, result_lb.density); });

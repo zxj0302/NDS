@@ -16,9 +16,10 @@ plt.rcParams['figure.titlesize'] = 14
 plt.rcParams['pdf.fonttype'] = 42
 plt.rcParams['ps.fonttype'] = 42
 
-method = 'CEP_PRUNING_QPBO_MIP_CONSTRAIN_B'
+# method = 'CEP_PRUNING_QPBO_MIP_CONSTRAIN_B'
+method = 'CEP'
 shown_weight_modes = 3
-save_path = 'results/figure/ER_runtime_scatter.pdf'
+save_path = 'results/figure/ER_runtime_scatter_ECP.pdf'
 
 # Define markers for different weight modes
 markers = ['o', 'D', '_', 'd', 'D']  # line, circle, line, diamond, diamond
